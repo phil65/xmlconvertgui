@@ -1,0 +1,11 @@
+C:\Users\Phil\documents\visual studio 2010\Projects\xmlconvertgui\xmlconvertgui\bin\Release\xmlconvertgui.exe
+C:\Users\Phil\documents\visual studio 2010\Projects\xmlconvertgui\xmlconvertgui\bin\Release\xmlconvertgui.pdb
+C:\Users\Phil\documents\visual studio 2010\Projects\xmlconvertgui\xmlconvertgui\bin\Release\xmlconvertgui.xml
+C:\Users\Phil\documents\visual studio 2010\Projects\xmlconvertgui\xmlconvertgui\obj\x86\Release\ResolveAssemblyReference.cache
+C:\Users\Phil\documents\visual studio 2010\Projects\xmlconvertgui\xmlconvertgui\obj\x86\Release\WindowsApplication1.Filechooser.resources
+C:\Users\Phil\documents\visual studio 2010\Projects\xmlconvertgui\xmlconvertgui\obj\x86\Release\WindowsApplication1.Resources.resources
+C:\Users\Phil\documents\visual studio 2010\Projects\xmlconvertgui\xmlconvertgui\obj\x86\Release\GenerateResource.read.1.tlog
+C:\Users\Phil\documents\visual studio 2010\Projects\xmlconvertgui\xmlconvertgui\obj\x86\Release\GenerateResource.write.1.tlog
+C:\Users\Phil\documents\visual studio 2010\Projects\xmlconvertgui\xmlconvertgui\obj\x86\Release\xmlconvertgui.exe
+C:\Users\Phil\documents\visual studio 2010\Projects\xmlconvertgui\xmlconvertgui\obj\x86\Release\xmlconvertgui.xml
+C:\Users\Phil\documents\visual studio 2010\Projects\xmlconvertgui\xmlconvertgui\obj\x86\Release\xmlconvertgui.pdb
