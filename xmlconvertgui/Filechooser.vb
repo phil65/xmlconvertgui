@@ -207,59 +207,6 @@ Public Class Filechooser
             End If
         End If
     End Function
-    Function ConvertValue(ByVal InputString As String, ByVal orientation As String) As String
-        Dim number As Integer
-        ConvertValue = InputString
-        If Int32.TryParse(InputString, number) Then
-            ConvertValue = Math.Round(InputString * multiplyFactor)
-        Else
-            If DebugOutput.Checked Then
-                OutputLog.AppendText("Attempted conversion of " + InputString + " failed." & vbCrLf)
-            End If
-            If InputString.Length > 1 Then
-                TempLetter = InputString.ToString.Substring(InputString.Length - 1, 1)
-                InputString = InputString.ToString.Substring(0, InputString.Length - 1)
-                If DebugOutput.Checked Then
-                    OutputLog.AppendText("Removed last letter... " & vbCrLf)
-                    OutputLog.AppendText(InputString & vbCrLf)
-                End If
-                If Int32.TryParse(InputString, number) Then
-                    ConvertValue = Math.Round(number * multiplyFactor).ToString + TempLetter
-                    '   ConvertValue = Math.Round(number * multiplyFactor).ToString
-                    If DebugOutput.Checked Then
-                        OutputLog.AppendText("Conversion successful" & vbCrLf)
-                    End If
-                    OutputLog.AppendText(InputString & vbCrLf)
-                Else
-                    If InputString.Length > 1 Then
-                        TempLetter = InputString.ToString.Substring(InputString.Length - 1, 1)
-                        InputString = InputString.ToString.Substring(0, InputString.Length - 1)
-                        If DebugOutput.Checked Then
-                            OutputLog.AppendText("Removed last letter... " & vbCrLf)
-                            OutputLog.AppendText(InputString & vbCrLf)
-                        End If
-                        If Int32.TryParse(InputString, number) Then
-                            '      ConvertValue = Math.Round(number * multiplyFactor).ToString + TempLetter
-                            ConvertValue = Math.Round(number * multiplyFactor).ToString
-                            If DebugOutput.Checked Then
-                                OutputLog.AppendText("Conversion successful" & vbCrLf)
-                            End If
-                            OutputLog.AppendText(InputString & vbCrLf)
-                        Else
-                            If DebugOutput.Checked Then
-                                OutputLog.AppendText("not converted... " & vbCrLf)
-                            End If
-                        End If
-                    Else
-                        If DebugOutput.Checked Then
-                            OutputLog.AppendText("not converted... " & vbCrLf)
-                        End If
-                    End If
-                End If
-            End If
-        End If
-    End Function
-
     Sub convertString(ByRef CompleteString As String)
         Dim NewString As String = ""
         Dim TempString As String = CompleteString
@@ -299,33 +246,6 @@ Public Class Filechooser
             End If
         End If
     End Sub
-    Sub convertStringifseveralstretch(ByRef CompleteString As String)
-        Dim NewString As String = ""
-        Dim IndexStart = 0
-        Dim TempString As String = CompleteString
-        Dim isX As Boolean = True
-        If CompleteString.Contains(",") Then
-            For i = 0 To CompleteString.Length - 1
-                If CompleteString(i) = "," Then
-                    If DebugOutput.Checked Then
-                        OutputLog.AppendText("comma detected. Pos i:" + i.ToString & vbCrLf)
-                    End If
-                    NewString = NewString + ConvertValue(CompleteString.Substring(IndexStart, i - IndexStart)) + ","
-                    If isX = True Then
-                        isX = False
-                    Else
-                        isX = True
-                    End If
-                    IndexStart = i + 1
-                End If
-            Next
-            CompleteString = NewString + ConvertValue((CompleteString.Substring(IndexStart, CompleteString.Length - IndexStart)))
-            If DebugOutput.Checked Then
-                OutputLog.AppendText(TempString & " ==> " & CompleteString & vbCrLf)
-            End If
-        End If
-    End Sub
-
     Sub changeAttributes()
         If DebugOutput.Checked Then
             OutputLog.AppendText("Changing Attributes..." & vbCrLf)
