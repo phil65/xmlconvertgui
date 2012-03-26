@@ -6,7 +6,8 @@ Imports System.Security
 Imports System.Security.Principal.WindowsIdentity
 Public Class Filechooser
     Public strOutputFolder As String = ""
-    Public xmlelements As String() = {"posx", "posy", "width", "height", "textoffsetx", "textoffsety", "radiowidth", "radioheight", "radioposx", "radioposy", "textwidth", "border", "size", "bordersize", "itemgap"}
+    Public xmlelements As String() = {"posx", "posy", "width", "height", "textoffsetx", "textoffsety", "radiowidth", "radioheight", "radioposx", "radioposy", "textwidth", "size", "itemgap"}
+    Public xmlelementsBorder As String() = {"border", "bordersize"}
     Public xmlattributes As String(,)
     Public doc As New XmlDocument()
     Public multiplyFactor As Double = 1.5
@@ -86,6 +87,11 @@ Public Class Filechooser
                     For i = 0 To xmlelements.Length - 1
                         changeElements(xmlelements(i))
                     Next i
+                    If ConvertBorders.Checked Then
+                        For i = 0 To xmlelementsBorder.Length - 1
+                            changeElements(xmlelementsBorder(i))
+                        Next i
+                    End If
                     changeAttributes()
                 End If
                 Dim wrtr As XmlTextWriter = Nothing
