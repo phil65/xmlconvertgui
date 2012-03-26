@@ -158,13 +158,13 @@ Public Class Filechooser
     Function ConvertValue(ByVal InputString As String) As String
         Dim number As Integer
         ConvertValue = InputString
-        If Int32.TryParse(InputString, number) Then
+        If Int32.TryParse(InputString, number) & (InputString <> "1") Then
             ConvertValue = Math.Round(InputString * multiplyFactor)
         Else
-            If DebugOutput.Checked Then
-                OutputLog.AppendText("Attempted conversion of " + InputString + " failed." & vbCrLf)
-            End If
             If InputString.Length > 1 Then
+                If DebugOutput.Checked Then
+                    OutputLog.AppendText("Attempted conversion of " + InputString + " failed." & vbCrLf)
+                End If
                 TempLetter = InputString.ToString.Substring(InputString.Length - 1, 1)
                 InputString = InputString.ToString.Substring(0, InputString.Length - 1)
                 If DebugOutput.Checked Then
@@ -277,13 +277,15 @@ Public Class Filechooser
                 convertString(elementlist(i).Attributes("center").InnerText)
             End If
         Next
-        elementlist = doc.SelectNodes("//texturefocus | //texture | //texturenofocus | //bordertexture | //texturesliderbackground | //texturesliderbar | //texturesliderbarfocus | //alttexturenofocus | //alttexturefocus | //midtexture")
-        For i = 0 To elementlist.Count - 1
-            If Not elementlist(i).Attributes("border") Is Nothing Then
-                convertString(elementlist(i).Attributes("border").InnerText)
-            End If
-        Next
-        elementlist = doc.SelectNodes("//focusedlayout | //itemlayout")
+        If ConvertBorders.Checked Then
+            elementlist = doc.SelectNodes("//texturefocus | //texture | //texturenofocus | //bordertexture | //texturesliderbackground | //texturesliderbar | //texturesliderbarfocus | //alttexturenofocus | //alttexturefocus | //midtexture")
+            For i = 0 To elementlist.Count - 1
+                If Not elementlist(i).Attributes("border") Is Nothing Then
+                    convertString(elementlist(i).Attributes("border").InnerText)
+                End If
+            Next
+        End If
+        elementlist = doc.SelectNodes("//focusedlayout | //itemlayout | //channellayout | //focusedchannellayout | //rulerlayout")
         For i = 0 To elementlist.Count - 1
             If Not elementlist(i).Attributes("width") Is Nothing Then
                 convertString(elementlist(i).Attributes("width").InnerText)
@@ -317,5 +319,4 @@ Public Class Filechooser
             End If
         Next
     End Sub
-
 End Class

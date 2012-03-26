@@ -34,6 +34,7 @@ Partial Class Filechooser
         Me.HeaderOption = New System.Windows.Forms.CheckBox()
         Me.EncodingDropDown = New System.Windows.Forms.ComboBox()
         Me.DebugOutput = New System.Windows.Forms.CheckBox()
+        Me.ConvertBorders = New System.Windows.Forms.CheckBox()
         Me.SuspendLayout()
         '
         'OpenFileDialog
@@ -53,7 +54,7 @@ Partial Class Filechooser
         'ConvertButton
         '
         Me.ConvertButton.Enabled = False
-        Me.ConvertButton.Location = New System.Drawing.Point(166, 214)
+        Me.ConvertButton.Location = New System.Drawing.Point(202, 214)
         Me.ConvertButton.Name = "ConvertButton"
         Me.ConvertButton.Size = New System.Drawing.Size(75, 23)
         Me.ConvertButton.TabIndex = 3
@@ -102,7 +103,7 @@ Partial Class Filechooser
         Me.ConversionDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ConversionDropDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ConversionDropDown.ImeMode = System.Windows.Forms.ImeMode.Off
-        Me.ConversionDropDown.Location = New System.Drawing.Point(12, 192)
+        Me.ConversionDropDown.Location = New System.Drawing.Point(12, 130)
         Me.ConversionDropDown.Name = "ConversionDropDown"
         Me.ConversionDropDown.Size = New System.Drawing.Size(121, 21)
         Me.ConversionDropDown.TabIndex = 8
@@ -110,7 +111,7 @@ Partial Class Filechooser
         'HeaderOption
         '
         Me.HeaderOption.AutoSize = True
-        Me.HeaderOption.Location = New System.Drawing.Point(12, 275)
+        Me.HeaderOption.Location = New System.Drawing.Point(12, 203)
         Me.HeaderOption.Name = "HeaderOption"
         Me.HeaderOption.Size = New System.Drawing.Size(108, 17)
         Me.HeaderOption.TabIndex = 9
@@ -122,7 +123,7 @@ Partial Class Filechooser
         Me.EncodingDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.EncodingDropDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.EncodingDropDown.ImeMode = System.Windows.Forms.ImeMode.Off
-        Me.EncodingDropDown.Location = New System.Drawing.Point(12, 233)
+        Me.EncodingDropDown.Location = New System.Drawing.Point(12, 167)
         Me.EncodingDropDown.Name = "EncodingDropDown"
         Me.EncodingDropDown.Size = New System.Drawing.Size(121, 21)
         Me.EncodingDropDown.TabIndex = 10
@@ -130,7 +131,7 @@ Partial Class Filechooser
         'DebugOutput
         '
         Me.DebugOutput.AutoSize = True
-        Me.DebugOutput.Location = New System.Drawing.Point(166, 275)
+        Me.DebugOutput.Location = New System.Drawing.Point(12, 226)
         Me.DebugOutput.Name = "DebugOutput"
         Me.DebugOutput.Size = New System.Drawing.Size(115, 17)
         Me.DebugOutput.TabIndex = 11
@@ -138,11 +139,23 @@ Partial Class Filechooser
         Me.DebugOutput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         Me.DebugOutput.UseVisualStyleBackColor = True
         '
+        'ConvertBorders
+        '
+        Me.ConvertBorders.AutoSize = True
+        Me.ConvertBorders.Location = New System.Drawing.Point(12, 249)
+        Me.ConvertBorders.Name = "ConvertBorders"
+        Me.ConvertBorders.Size = New System.Drawing.Size(102, 17)
+        Me.ConvertBorders.TabIndex = 12
+        Me.ConvertBorders.Text = "Convert Borders"
+        Me.ConvertBorders.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        Me.ConvertBorders.UseVisualStyleBackColor = True
+        '
         'Filechooser
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(725, 318)
+        Me.Controls.Add(Me.ConvertBorders)
         Me.Controls.Add(Me.DebugOutput)
         Me.Controls.Add(Me.EncodingDropDown)
         Me.Controls.Add(Me.HeaderOption)
@@ -171,5 +184,6 @@ Partial Class Filechooser
     Friend WithEvents HeaderOption As System.Windows.Forms.CheckBox
     Friend WithEvents EncodingDropDown As System.Windows.Forms.ComboBox
     Friend WithEvents DebugOutput As System.Windows.Forms.CheckBox
+    Friend WithEvents ConvertBorders As System.Windows.Forms.CheckBox
 
 End Class
