@@ -164,7 +164,7 @@ Public Class Filechooser
     Function ConvertValue(ByVal InputString As String) As String
         Dim number As Integer
         ConvertValue = InputString
-        If Int32.TryParse(InputString, number) & (InputString <> "1") Then
+        If Int32.TryParse(InputString, number) And (InputString <> "1") Then
             ConvertValue = Math.Round(InputString * multiplyFactor)
         Else
             If InputString.Length > 1 Then
