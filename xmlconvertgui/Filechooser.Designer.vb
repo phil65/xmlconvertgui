@@ -38,6 +38,7 @@ Partial Class Filechooser
         Me.SkinFolderButton = New System.Windows.Forms.Button()
         Me.SkinFolderDialog = New System.Windows.Forms.FolderBrowserDialog()
         Me.ClearLogButton = New System.Windows.Forms.Button()
+        Me.Button1 = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'OpenFileDialog
@@ -148,14 +149,14 @@ Partial Class Filechooser
         '
         Me.TextureCheckButton.Location = New System.Drawing.Point(49, 59)
         Me.TextureCheckButton.Name = "TextureCheckButton"
-        Me.TextureCheckButton.Size = New System.Drawing.Size(75, 23)
+        Me.TextureCheckButton.Size = New System.Drawing.Size(95, 23)
         Me.TextureCheckButton.TabIndex = 13
         Me.TextureCheckButton.Text = "Check Textures"
         Me.TextureCheckButton.UseVisualStyleBackColor = True
         '
         'SkinFolderButton
         '
-        Me.SkinFolderButton.Location = New System.Drawing.Point(49, 20)
+        Me.SkinFolderButton.Location = New System.Drawing.Point(58, 20)
         Me.SkinFolderButton.Name = "SkinFolderButton"
         Me.SkinFolderButton.Size = New System.Drawing.Size(75, 23)
         Me.SkinFolderButton.TabIndex = 14
@@ -171,11 +172,21 @@ Partial Class Filechooser
         Me.ClearLogButton.Text = "Clear Log"
         Me.ClearLogButton.UseVisualStyleBackColor = True
         '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(49, 88)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(95, 23)
+        Me.Button1.TabIndex = 16
+        Me.Button1.Text = "Check Fonts"
+        Me.Button1.UseVisualStyleBackColor = True
+        '
         'Filechooser
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(913, 283)
+        Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.ClearLogButton)
         Me.Controls.Add(Me.SkinFolderButton)
         Me.Controls.Add(Me.TextureCheckButton)
@@ -211,5 +222,6 @@ Partial Class Filechooser
     Friend WithEvents SkinFolderButton As System.Windows.Forms.Button
     Friend WithEvents SkinFolderDialog As System.Windows.Forms.FolderBrowserDialog
     Friend WithEvents ClearLogButton As System.Windows.Forms.Button
+    Friend WithEvents Button1 As System.Windows.Forms.Button
 
 End Class

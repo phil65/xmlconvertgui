@@ -15,6 +15,7 @@ Public Class Filechooser
     Public doc As New XmlDocument()
     Public multiplyFactor As Double = 1.5
     Public ShortenedTexturePaths As New ArrayList()
+    Public FontList As New ArrayList()
     Public Filepaths As New ArrayList()
     Public SafeFilepaths As New ArrayList()
     Public elementlist As XmlNodeList
@@ -447,6 +448,57 @@ Public Class Filechooser
 
     Private Sub ClearLogButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ClearLogButton.Click
         OutputLog.Clear()
+    End Sub
+
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+        OutputLog.AppendText("Building Font List" & vbCrLf)
+        FontFinder()
+        OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the fonts of the upcoming list for usage." & vbCrLf)
+        For j = 0 To Filepaths.Count - 1
+            Try
+                doc.Load(Filepaths(j))
+                elementlist = doc.GetElementsByTagName("font")
+                For i = 0 To elementlist.Count - 1
+                    If DebugOutput.Checked Then
+                        OutputLog.AppendText(elementlist(i).InnerXml.ToString & vbCrLf)
+                    End If
+                    If FontList.Contains(elementlist(i).InnerXml) Then
+                        FontList.Remove(elementlist(i).InnerXml)
+                    End If
+                Next i
+                '    OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
+                '        OutputLog.AppendText("Removed " + elementlist(i).InnerXml.ToLower & vbCrLf)
+
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(xmlex.Message)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(ex.Message)
+            End Try
+        Next j
+        OutputLog.AppendText("Unused Fonts:" & vbCrLf)
+        Dim str As String
+        For Each str In FontList
+            OutputLog.AppendText(str & vbCrLf)
+        Next
+    End Sub
+    Sub FontFinder()
+        Dim ShortPath As String = ""
+        Try
+            doc.Load(XMLFolder + "\font.xml")
+            elementlist = doc.GetElementsByTagName("name")
+            For i = 0 To elementlist.Count - 1
+                If DebugOutput.Checked Then
+                    OutputLog.AppendText(elementlist(i).InnerXml & vbCrLf)
+                End If
+                If Not FontList.Contains(elementlist(i).InnerXml) Then
+                    FontList.Add(elementlist(i).InnerXml)
+                End If
+            Next i
+        Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+            OutputLog.AppendText(xmlex.Message)
+        Catch ex As Exception                        ' Handle the generic Exceptions here.
+            OutputLog.AppendText(ex.Message)
+        End Try
     End Sub
 End Class
 
