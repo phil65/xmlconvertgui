@@ -72,10 +72,6 @@ Public Class Filechooser
             Try
                 OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
                 doc.Load(Filepaths(j))
-                If HeaderOption.Checked Then
-                    Dim root As XmlElement = doc.DocumentElement
-                    doc.InsertBefore(xmldecl, root)
-                End If
                 If multiplyFactor <> 1 Then
                     For i = 0 To xmlelements.Length - 1
                         changeElements(xmlelements(i))
@@ -87,24 +83,27 @@ Public Class Filechooser
                     End If
                     changeAttributes()
                 End If
-                Dim wrtr As XmlTextWriter = Nothing
+                Dim myXmlSettings As New XmlWriterSettings
+                If Not HeaderOption.Checked Then
+                    myXmlSettings.OmitXmlDeclaration = True
+                End If
+                myXmlSettings.Indent = True
                 Select Case EncodingDropDown.SelectedIndex
                     Case 0
-                        wrtr = New XmlTextWriter(strOutputFolder + "\" + SafeFilepaths(j).ToString, Encoding.UTF8)
+                        myXmlSettings.Encoding = Encoding.UTF8
                     Case 1
-                        wrtr = New XmlTextWriter(strOutputFolder + "\" + SafeFilepaths(j).ToString, Encoding.ASCII)
+                        myXmlSettings.Encoding = Encoding.ASCII
                 End Select
-                wrtr.Formatting = Formatting.Indented
+                myXmlSettings.Indent = True
                 Select Case IndentingDropDown.SelectedIndex
                     Case 0
-                        wrtr.Indentation = 2
+                        myXmlSettings.IndentChars = "  "
                         OutputLog.AppendText("Indenting: 2" & vbCrLf)
                     Case 1
-                        wrtr.Indentation = 4
+                        myXmlSettings.IndentChars = "    "
                         OutputLog.AppendText("Indenting: 4" & vbCrLf)
                 End Select
-
-
+                Dim wrtr As XmlWriter = XmlWriter.Create(strOutputFolder + "\" + SafeFilepaths(j).ToString, myXmlSettings)
                 doc.WriteTo(wrtr)
                 wrtr.Close()
                 OutputLog.AppendText(SafeFilepaths(j) + " created successfully" & vbCrLf)
@@ -330,10 +329,14 @@ Public Class Filechooser
         Try
             ' Display all files in a directory
             For Each fname As String In Directory.GetFiles(dir)
+                Dim number As Integer = 0
                 ShortPath = fname.Substring(SkinFolder.Length + 7, fname.Length - (SkinFolder.Length + 7))
                 If ((Not ShortPath.Contains("flags\")) And (Not ShortPath.Contains("cerberus")) And (Not ShortPath.ToLower.Contains("default")) And
                     (Not ShortPath.ToLower.Contains("stars\")) And (Not ShortPath.ToLower.Contains("rating1.png")) And (Not ShortPath.ToLower.Contains("rating2.png")) And
-                    (Not ShortPath.ToLower.Contains("rating3.png")) And (Not ShortPath.ToLower.Contains("rating4.png")) And (Not ShortPath.ToLower.Contains("rating5.png"))) Then 'SHortpath length needs to be checked before substring
+                    (Not ShortPath.ToLower.Contains("rating3.png")) And (Not ShortPath.ToLower.Contains("rating4.png")) And (Not ShortPath.ToLower.Contains("rating5.png")) And
+                    (Not ShortPath.ToLower.Contains("\480p.png")) And (Not ShortPath.ToLower.Contains("\540p.png")) And (Not ShortPath.ToLower.Contains("\720p.png")) And
+                    (Not ShortPath.ToLower.Contains("\576p.png")) And (Not ShortPath.ToLower.Contains("\1080p.png")) And (Not ShortPath.ToLower.Contains("overlaywatched.png")) And
+                    (Not Int32.TryParse(ShortPath.Substring(0, ShortPath.Length - 5), number))) Then 'SHortpath length needs to be checked before substring
                     ShortPath = ShortPath.Replace("\", "/")
                     ShortPath = ShortPath.ToLower
                     '    OutputLog.AppendText(ShortPath & vbCrLf)
