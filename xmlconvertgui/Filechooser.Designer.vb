@@ -94,7 +94,7 @@ Partial Class Filechooser
         Me.OutputLog.Multiline = True
         Me.OutputLog.Name = "OutputLog"
         Me.OutputLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.OutputLog.Size = New System.Drawing.Size(559, 221)
+        Me.OutputLog.Size = New System.Drawing.Size(559, 317)
         Me.OutputLog.TabIndex = 7
         '
         'ConversionDropDown
@@ -169,7 +169,7 @@ Partial Class Filechooser
         '
         'ClearLogButton
         '
-        Me.ClearLogButton.Location = New System.Drawing.Point(835, 249)
+        Me.ClearLogButton.Location = New System.Drawing.Point(835, 345)
         Me.ClearLogButton.Name = "ClearLogButton"
         Me.ClearLogButton.Size = New System.Drawing.Size(75, 23)
         Me.ClearLogButton.TabIndex = 15
