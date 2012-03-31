@@ -23,7 +23,6 @@ Partial Class Filechooser
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.OpenFileDialog = New System.Windows.Forms.OpenFileDialog()
-        Me.ChooseButton = New System.Windows.Forms.Button()
         Me.ConvertButton = New System.Windows.Forms.Button()
         Me.xmlname = New System.Windows.Forms.Label()
         Me.OutputButton = New System.Windows.Forms.Button()
@@ -35,21 +34,16 @@ Partial Class Filechooser
         Me.EncodingDropDown = New System.Windows.Forms.ComboBox()
         Me.DebugOutput = New System.Windows.Forms.CheckBox()
         Me.ConvertBorders = New System.Windows.Forms.CheckBox()
+        Me.TextureCheckButton = New System.Windows.Forms.Button()
+        Me.SkinFolderButton = New System.Windows.Forms.Button()
+        Me.SkinFolderDialog = New System.Windows.Forms.FolderBrowserDialog()
+        Me.ClearLogButton = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'OpenFileDialog
         '
         Me.OpenFileDialog.FileName = "OpenFileDialog1"
         Me.OpenFileDialog.Multiselect = True
-        '
-        'ChooseButton
-        '
-        Me.ChooseButton.Location = New System.Drawing.Point(49, 22)
-        Me.ChooseButton.Name = "ChooseButton"
-        Me.ChooseButton.Size = New System.Drawing.Size(75, 23)
-        Me.ChooseButton.TabIndex = 1
-        Me.ChooseButton.Text = "Choose"
-        Me.ChooseButton.UseVisualStyleBackColor = True
         '
         'ConvertButton
         '
@@ -64,15 +58,15 @@ Partial Class Filechooser
         'xmlname
         '
         Me.xmlname.AutoSize = True
-        Me.xmlname.Location = New System.Drawing.Point(163, 27)
+        Me.xmlname.Location = New System.Drawing.Point(163, 25)
         Me.xmlname.Name = "xmlname"
-        Me.xmlname.Size = New System.Drawing.Size(98, 13)
+        Me.xmlname.Size = New System.Drawing.Size(99, 13)
         Me.xmlname.TabIndex = 4
-        Me.xmlname.Text = "Choose XML File(s)"
+        Me.xmlname.Text = "Choose Skin Folder"
         '
         'OutputButton
         '
-        Me.OutputButton.Location = New System.Drawing.Point(49, 84)
+        Me.OutputButton.Location = New System.Drawing.Point(202, 167)
         Me.OutputButton.Name = "OutputButton"
         Me.OutputButton.Size = New System.Drawing.Size(75, 24)
         Me.OutputButton.TabIndex = 5
@@ -82,9 +76,9 @@ Partial Class Filechooser
         '
         'OutputLabel
         '
-        Me.OutputLabel.Location = New System.Drawing.Point(163, 90)
+        Me.OutputLabel.Location = New System.Drawing.Point(180, 140)
         Me.OutputLabel.Name = "OutputLabel"
-        Me.OutputLabel.Size = New System.Drawing.Size(203, 61)
+        Me.OutputLabel.Size = New System.Drawing.Size(152, 24)
         Me.OutputLabel.TabIndex = 6
         Me.OutputLabel.Text = "Choose Output Folder"
         Me.OutputLabel.Visible = False
@@ -95,7 +89,7 @@ Partial Class Filechooser
         Me.OutputLog.Multiline = True
         Me.OutputLog.Name = "OutputLog"
         Me.OutputLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.OutputLog.Size = New System.Drawing.Size(362, 284)
+        Me.OutputLog.Size = New System.Drawing.Size(559, 221)
         Me.OutputLog.TabIndex = 7
         '
         'ConversionDropDown
@@ -150,11 +144,41 @@ Partial Class Filechooser
         Me.ConvertBorders.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         Me.ConvertBorders.UseVisualStyleBackColor = True
         '
+        'TextureCheckButton
+        '
+        Me.TextureCheckButton.Location = New System.Drawing.Point(49, 59)
+        Me.TextureCheckButton.Name = "TextureCheckButton"
+        Me.TextureCheckButton.Size = New System.Drawing.Size(75, 23)
+        Me.TextureCheckButton.TabIndex = 13
+        Me.TextureCheckButton.Text = "Check Textures"
+        Me.TextureCheckButton.UseVisualStyleBackColor = True
+        '
+        'SkinFolderButton
+        '
+        Me.SkinFolderButton.Location = New System.Drawing.Point(49, 20)
+        Me.SkinFolderButton.Name = "SkinFolderButton"
+        Me.SkinFolderButton.Size = New System.Drawing.Size(75, 23)
+        Me.SkinFolderButton.TabIndex = 14
+        Me.SkinFolderButton.Text = "Choose"
+        Me.SkinFolderButton.UseVisualStyleBackColor = True
+        '
+        'ClearLogButton
+        '
+        Me.ClearLogButton.Location = New System.Drawing.Point(835, 249)
+        Me.ClearLogButton.Name = "ClearLogButton"
+        Me.ClearLogButton.Size = New System.Drawing.Size(75, 23)
+        Me.ClearLogButton.TabIndex = 15
+        Me.ClearLogButton.Text = "Clear Log"
+        Me.ClearLogButton.UseVisualStyleBackColor = True
+        '
         'Filechooser
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(725, 318)
+        Me.ClientSize = New System.Drawing.Size(913, 283)
+        Me.Controls.Add(Me.ClearLogButton)
+        Me.Controls.Add(Me.SkinFolderButton)
+        Me.Controls.Add(Me.TextureCheckButton)
         Me.Controls.Add(Me.ConvertBorders)
         Me.Controls.Add(Me.DebugOutput)
         Me.Controls.Add(Me.EncodingDropDown)
@@ -165,7 +189,6 @@ Partial Class Filechooser
         Me.Controls.Add(Me.OutputButton)
         Me.Controls.Add(Me.xmlname)
         Me.Controls.Add(Me.ConvertButton)
-        Me.Controls.Add(Me.ChooseButton)
         Me.Name = "Filechooser"
         Me.Text = "Skin XML Converter - by phil65"
         Me.ResumeLayout(False)
@@ -173,7 +196,6 @@ Partial Class Filechooser
 
     End Sub
     Friend WithEvents OpenFileDialog As System.Windows.Forms.OpenFileDialog
-    Friend WithEvents ChooseButton As System.Windows.Forms.Button
     Friend WithEvents ConvertButton As System.Windows.Forms.Button
     Friend WithEvents xmlname As System.Windows.Forms.Label
     Friend WithEvents OutputButton As System.Windows.Forms.Button
@@ -185,5 +207,9 @@ Partial Class Filechooser
     Friend WithEvents EncodingDropDown As System.Windows.Forms.ComboBox
     Friend WithEvents DebugOutput As System.Windows.Forms.CheckBox
     Friend WithEvents ConvertBorders As System.Windows.Forms.CheckBox
+    Friend WithEvents TextureCheckButton As System.Windows.Forms.Button
+    Friend WithEvents SkinFolderButton As System.Windows.Forms.Button
+    Friend WithEvents SkinFolderDialog As System.Windows.Forms.FolderBrowserDialog
+    Friend WithEvents ClearLogButton As System.Windows.Forms.Button
 
 End Class

@@ -6,13 +6,18 @@ Imports System.Security
 Imports System.Security.Principal.WindowsIdentity
 Public Class Filechooser
     Public strOutputFolder As String = ""
+    Public XMLFolder As String = ""
+    Public SkinFolder As String = ""
     Public xmlelements As String() = {"posx", "posy", "width", "height", "textoffsetx", "textoffsety", "radiowidth", "radioheight", "radioposx", "radioposy", "textwidth", "size", "itemgap"}
     Public xmlelementsBorder As String() = {"border", "bordersize"}
+    Public xmlelementsTexture As String() = {"texture", "texturefocus", "texturenofocus", "texturebg", "bordertexture", "value", "icon", "thumb", "alttexturefocus", "alttexturenofocus", "texturesliderbackground", "texturesliderbar", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "midtexture"}
     Public xmlattributes As String(,)
     Public doc As New XmlDocument()
     Public multiplyFactor As Double = 1.5
     Public Filenames As String() = {}
-    Public SafeFilenames As String() = {}
+    Public ShortenedTexturePaths As New ArrayList()
+    Public Filepaths As New ArrayList()
+    Public SafeFilepaths As New ArrayList()
     Public elementlist As XmlNodeList
     Public TempLetter As String
     Public ElementCounter As String
@@ -26,38 +31,21 @@ Public Class Filechooser
         OutputLog.AppendText("Program started" & vbCrLf)
     End Sub
 
-    Private Sub ChooseButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ChooseButton.Click
-
-        OpenFileDialog.Title = "Choose XML file"
-        OpenFileDialog.Filter = "XML Files|*.xml"
-        Dim DidWork As Integer = OpenFileDialog.ShowDialog()
-        If DidWork = DialogResult.Cancel Then
-
-        Else
-            OutputButton.Visible = True
-            OutputLabel.Visible = True
-            Filenames = OpenFileDialog.FileNames
-            SafeFilenames = OpenFileDialog.SafeFileNames
-            If Filenames.Length = 1 Then
-                OutputLog.AppendText("XML File chosen: " + SafeFilenames(0) & vbCrLf)
-                xmlname.Text = SafeFilenames(0)
-            Else
-                OutputLog.AppendText("Amount Of Files Chosen: " + Filenames.Length.ToString & vbCrLf)
-                For i = 0 To Filenames.Length - 1
-                    OutputLog.AppendText(SafeFilenames(i) & vbCrLf)
-                Next i
-                xmlname.Text = Filenames.Length.ToString + " Files chosen"
-            End If
-            If strOutputFolder <> "" Then
-                ConvertButton.Enabled = True
-            End If
-        End If
-    End Sub
 
     Public Sub ConvertButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ConvertButton.Click
         ' Create an XML declaration. 
         Dim xmldecl As XmlDeclaration
         xmldecl = doc.CreateXmlDeclaration("1.0", Nothing, Nothing)
+        If Filepaths.Count = 1 Then
+            OutputLog.AppendText("XML File chosen: " + SafeFilepaths(0) & vbCrLf)
+            xmlname.Text = SafeFilepaths(0)
+        Else
+            OutputLog.AppendText("Amount Of Files Chosen: " + Filepaths.Count.ToString & vbCrLf)
+            For i = 0 To Filenames.Length - 1
+                OutputLog.AppendText(SafeFilepaths(i) & vbCrLf)
+            Next i
+            xmlname.Text = Filepaths.Count.ToString + " Files chosen"
+        End If
         Select Case EncodingDropDown.SelectedIndex
             Case 0
                 xmldecl.Encoding = "UTF-8"
@@ -77,7 +65,7 @@ Public Class Filechooser
         Dim errorcounter = 0
         For j = 0 To Filenames.Length - 1
             Try
-                OutputLog.AppendText("Processing " + SafeFilenames(j) & vbCrLf)
+                OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
                 doc.Load(Filenames(j))
                 If HeaderOption.Checked Then
                     Dim root As XmlElement = doc.DocumentElement
@@ -97,14 +85,14 @@ Public Class Filechooser
                 Dim wrtr As XmlTextWriter = Nothing
                 Select Case EncodingDropDown.SelectedIndex
                     Case 0
-                        wrtr = New XmlTextWriter(strOutputFolder + "\" + SafeFilenames(j), Encoding.UTF8)
+                        wrtr = New XmlTextWriter(strOutputFolder + "\" + SafeFilepaths(j).ToString, Encoding.UTF8)
                     Case 1
-                        wrtr = New XmlTextWriter(strOutputFolder + "\" + SafeFilenames(j), Encoding.ASCII)
+                        wrtr = New XmlTextWriter(strOutputFolder + "\" + SafeFilepaths(j).ToString, Encoding.ASCII)
                 End Select
                 wrtr.Formatting = Formatting.Indented
                 doc.WriteTo(wrtr)
                 wrtr.Close()
-                OutputLog.AppendText(SafeFilenames(j) + " created successfully" & vbCrLf)
+                OutputLog.AppendText(SafeFilepaths(j) + " created successfully" & vbCrLf)
                 ElementCounter = ElementCounter + 1
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(xmlex.Message)
@@ -117,9 +105,6 @@ Public Class Filechooser
         OutputLog.AppendText("All Files converted" & vbCrLf)
         MsgBox(ElementCounter + " XML Files converted." & vbCrLf & "Errors: " + errorcounter.ToString)
         errorcounter = 0
-        ReDim Filenames(0)
-        ReDim SafeFilenames(0)
-        xmlname.Text = ""
         ConvertButton.Enabled = False
 
     End Sub
@@ -140,10 +125,10 @@ Public Class Filechooser
                 OutputLog.AppendText("Output Folder chosen:" & vbCrLf)
                 OutputLog.AppendText(strOutputFolder & vbCrLf)
             End If
-            If (strOutputFolder + "\" + SafeFilenames(0) = Filenames(0)) Then
+            If (strOutputFolder + "\" + SafeFilepaths(0) = Filepaths(0)) Then
                 MsgBox("You´ve chosen the soure directory. please change the output path.")
             End If
-        Loop While (strOutputFolder + "\" + SafeFilenames(0) = Filenames(0))
+        Loop While (strOutputFolder + "\" + SafeFilepaths(0) = Filenames(0))
 
 
     End Sub
@@ -325,4 +310,145 @@ Public Class Filechooser
             End If
         Next
     End Sub
+    Sub FileFinder(ByVal dir As String)
+        Dim ShortPath As String = ""
+        Try
+            ' Display all files in a directory
+            For Each fname As String In Directory.GetFiles(dir)
+                ShortPath = fname.Substring(SkinFolder.Length + 7, fname.Length - (SkinFolder.Length + 7))
+                If ((Not ShortPath.Contains("flags\")) And (Not ShortPath.Contains("cerberus")) And (Not ShortPath.ToLower.Contains("default")) And
+                    (Not ShortPath.ToLower.Contains("stars\")) And (Not ShortPath.ToLower.Contains("rating1.png")) And (Not ShortPath.ToLower.Contains("rating2.png")) And
+                    (Not ShortPath.ToLower.Contains("rating3.png")) And (Not ShortPath.ToLower.Contains("rating4.png")) And (Not ShortPath.ToLower.Contains("rating5.png"))) Then 'SHortpath length needs to be checked before substring
+                    ShortPath = ShortPath.Replace("\", "/")
+                    ShortPath = ShortPath.ToLower
+                    '    OutputLog.AppendText(ShortPath & vbCrLf)
+                    ShortenedTexturePaths.Add(ShortPath)
+                End If
+            Next
+            ' A recursive call for all the subdirectories in this directory.
+            For Each subdir As String In Directory.GetDirectories(dir)
+                FileFinder(subdir)
+            Next
+        Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+            OutputLog.AppendText(xmlex.Message)
+        Catch ex As Exception                        ' Handle the generic Exceptions here.
+            OutputLog.AppendText(ex.Message)
+        End Try
+    End Sub
+    Private Sub TextureCheckButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TextureCheckButton.Click
+        OutputLog.AppendText("Building Texture List" & vbCrLf)
+        FileFinder(SkinFolder + "\media")
+        OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the textures of the upcoming list for usage." & vbCrLf)
+        For j = 0 To Filepaths.Count - 1
+            Try
+                '    OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
+                doc.Load(Filepaths(j))
+                RemoveTexturesFromArray()
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(xmlex.Message)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(ex.Message)
+            End Try
+        Next j
+        OutputLog.AppendText("Unused Textures:" & vbCrLf)
+        Dim str As String
+        For Each str In ShortenedTexturePaths
+            OutputLog.AppendText(str & vbCrLf)
+        Next
+    End Sub
+
+    Sub RemoveTexturesFromArray()
+        Try
+            elementlist = doc.SelectNodes("//texture")
+            For i = 0 To elementlist.Count - 1
+                If Not elementlist(i).Attributes("diffuse") Is Nothing Then
+                    If ShortenedTexturePaths.Contains(elementlist(i).Attributes("diffuse").InnerText.ToString.ToLower) Then
+                        ShortenedTexturePaths.Remove(elementlist(i).Attributes("diffuse").InnerText.ToString.ToLower)
+                    End If
+                End If
+                If Not elementlist(i).Attributes("fallback") Is Nothing Then
+                    If ShortenedTexturePaths.Contains(elementlist(i).Attributes("fallback").InnerText.ToString.ToLower) Then
+                        ShortenedTexturePaths.Remove(elementlist(i).Attributes("fallback").InnerText.ToString.ToLower)
+                    End If
+                End If
+            Next
+            For j = 0 To xmlelementsTexture.Length
+                elementlist = doc.GetElementsByTagName(xmlelementsTexture(j))
+                For i = 0 To elementlist.Count - 1
+                    If DebugOutput.Checked Then
+                        OutputLog.AppendText(elementlist(i).InnerXml.ToString & vbCrLf)
+                    End If
+                    If ShortenedTexturePaths.Contains(elementlist(i).InnerXml.ToLower) Then
+                        ShortenedTexturePaths.Remove(elementlist(i).InnerXml.ToLower)
+                        '        OutputLog.AppendText("Removed " + elementlist(i).InnerXml.ToLower & vbCrLf)
+                    End If
+                Next i
+            Next j
+        Catch
+        End Try
+    End Sub
+
+    Private Function CheckPath(ByVal strPath As String) As Boolean
+        If Dir$(strPath) <> "" Then
+            CheckPath = True
+        Else
+            CheckPath = False
+        End If
+    End Function
+
+    Private Sub SkinFolderButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SkinFolderButton.Click
+        SafeFilepaths.Clear()
+        Filepaths.Clear()
+        xmlname.Text = ""
+        SkinFolderDialog.Description = "Choose Skin Folder"
+        Dim DidWork As Integer = SkinFolderDialog.ShowDialog()
+        If DidWork = DialogResult.Cancel Then
+        Else
+            SkinFolder = SkinFolderDialog.SelectedPath
+            OutputLog.AppendText("Skin Folder chosen:" & vbCrLf)
+            OutputLog.AppendText(SkinFolder & vbCrLf)
+        End If
+        If Not CheckPath(SkinFolder + "\addon.xml") Then
+            MsgBox("Please choose a skin folder.")
+        Else
+            If SkinFolder <> "" Then
+                OutputButton.Visible = True
+                OutputLabel.Visible = True
+                If strOutputFolder <> "" Then
+                    ConvertButton.Enabled = True
+                End If
+                Dim TempString As String = SkinFolder + "\720p"
+                Const ATTR_DIRECTORY = 16
+                If Dir$(SkinFolder + "\720p", ATTR_DIRECTORY) <> "" Then
+                    XMLFolder = SkinFolder + "\720p"
+                    OutputLog.AppendText("720p Folder detected" & vbCrLf)
+                ElseIf Dir$(SkinFolder + "\1080i", ATTR_DIRECTORY) <> "" Then
+                    XMLFolder = SkinFolder + "\1080i"
+                    OutputLog.AppendText("1080i Folder detected" & vbCrLf)
+                Else
+                    doc.Load(SkinFolder + "\addon.xml")
+                    elementlist = doc.SelectNodes("//res")
+                    For i = 0 To elementlist.Count - 1
+                        If Not elementlist(i).Attributes("folder") Is Nothing Then
+                            XMLFolder = SkinFolder + elementlist(i).Attributes("folder").InnerText
+                        End If
+                    Next
+                    XMLFolder = SkinFolder
+                End If
+                Dim DirInfo As New DirectoryInfo(XMLFolder)
+                Dim FileObj As IO.FileSystemInfo
+                For Each FileObj In DirInfo.GetFileSystemInfos
+                    Filepaths.Add(FileObj.FullName)
+                    SafeFilepaths.Add(FileObj.Name)
+                    '  OutputLog.AppendText(FileObj.FullName & vbCrLf)
+                Next
+            End If
+        End If
+    End Sub
+
+    Private Sub ClearLogButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ClearLogButton.Click
+        OutputLog.Clear()
+    End Sub
 End Class
+
+
