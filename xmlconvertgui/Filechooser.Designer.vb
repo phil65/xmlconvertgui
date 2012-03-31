@@ -39,6 +39,9 @@ Partial Class Filechooser
         Me.SkinFolderDialog = New System.Windows.Forms.FolderBrowserDialog()
         Me.ClearLogButton = New System.Windows.Forms.Button()
         Me.Button1 = New System.Windows.Forms.Button()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.Splitter1 = New System.Windows.Forms.Splitter()
+        Me.CheckIncludesButton = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'OpenFileDialog
@@ -49,7 +52,7 @@ Partial Class Filechooser
         'ConvertButton
         '
         Me.ConvertButton.Enabled = False
-        Me.ConvertButton.Location = New System.Drawing.Point(202, 214)
+        Me.ConvertButton.Location = New System.Drawing.Point(202, 306)
         Me.ConvertButton.Name = "ConvertButton"
         Me.ConvertButton.Size = New System.Drawing.Size(75, 23)
         Me.ConvertButton.TabIndex = 3
@@ -67,7 +70,7 @@ Partial Class Filechooser
         '
         'OutputButton
         '
-        Me.OutputButton.Location = New System.Drawing.Point(202, 167)
+        Me.OutputButton.Location = New System.Drawing.Point(202, 259)
         Me.OutputButton.Name = "OutputButton"
         Me.OutputButton.Size = New System.Drawing.Size(75, 24)
         Me.OutputButton.TabIndex = 5
@@ -77,7 +80,7 @@ Partial Class Filechooser
         '
         'OutputLabel
         '
-        Me.OutputLabel.Location = New System.Drawing.Point(180, 140)
+        Me.OutputLabel.Location = New System.Drawing.Point(180, 232)
         Me.OutputLabel.Name = "OutputLabel"
         Me.OutputLabel.Size = New System.Drawing.Size(152, 24)
         Me.OutputLabel.TabIndex = 6
@@ -98,7 +101,7 @@ Partial Class Filechooser
         Me.ConversionDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ConversionDropDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ConversionDropDown.ImeMode = System.Windows.Forms.ImeMode.Off
-        Me.ConversionDropDown.Location = New System.Drawing.Point(12, 130)
+        Me.ConversionDropDown.Location = New System.Drawing.Point(12, 222)
         Me.ConversionDropDown.Name = "ConversionDropDown"
         Me.ConversionDropDown.Size = New System.Drawing.Size(121, 21)
         Me.ConversionDropDown.TabIndex = 8
@@ -106,7 +109,7 @@ Partial Class Filechooser
         'HeaderOption
         '
         Me.HeaderOption.AutoSize = True
-        Me.HeaderOption.Location = New System.Drawing.Point(12, 203)
+        Me.HeaderOption.Location = New System.Drawing.Point(12, 295)
         Me.HeaderOption.Name = "HeaderOption"
         Me.HeaderOption.Size = New System.Drawing.Size(108, 17)
         Me.HeaderOption.TabIndex = 9
@@ -118,7 +121,7 @@ Partial Class Filechooser
         Me.EncodingDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.EncodingDropDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.EncodingDropDown.ImeMode = System.Windows.Forms.ImeMode.Off
-        Me.EncodingDropDown.Location = New System.Drawing.Point(12, 167)
+        Me.EncodingDropDown.Location = New System.Drawing.Point(12, 259)
         Me.EncodingDropDown.Name = "EncodingDropDown"
         Me.EncodingDropDown.Size = New System.Drawing.Size(121, 21)
         Me.EncodingDropDown.TabIndex = 10
@@ -126,7 +129,7 @@ Partial Class Filechooser
         'DebugOutput
         '
         Me.DebugOutput.AutoSize = True
-        Me.DebugOutput.Location = New System.Drawing.Point(12, 226)
+        Me.DebugOutput.Location = New System.Drawing.Point(12, 318)
         Me.DebugOutput.Name = "DebugOutput"
         Me.DebugOutput.Size = New System.Drawing.Size(115, 17)
         Me.DebugOutput.TabIndex = 11
@@ -137,7 +140,7 @@ Partial Class Filechooser
         'ConvertBorders
         '
         Me.ConvertBorders.AutoSize = True
-        Me.ConvertBorders.Location = New System.Drawing.Point(12, 249)
+        Me.ConvertBorders.Location = New System.Drawing.Point(12, 341)
         Me.ConvertBorders.Name = "ConvertBorders"
         Me.ConvertBorders.Size = New System.Drawing.Size(102, 17)
         Me.ConvertBorders.TabIndex = 12
@@ -181,11 +184,41 @@ Partial Class Filechooser
         Me.Button1.Text = "Check Fonts"
         Me.Button1.UseVisualStyleBackColor = True
         '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label1.Location = New System.Drawing.Point(83, 182)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(143, 16)
+        Me.Label1.TabIndex = 17
+        Me.Label1.Text = "Conversion Options"
+        '
+        'Splitter1
+        '
+        Me.Splitter1.Location = New System.Drawing.Point(0, 0)
+        Me.Splitter1.Name = "Splitter1"
+        Me.Splitter1.Size = New System.Drawing.Size(3, 380)
+        Me.Splitter1.TabIndex = 18
+        Me.Splitter1.TabStop = False
+        '
+        'CheckIncludesButton
+        '
+        Me.CheckIncludesButton.Location = New System.Drawing.Point(49, 117)
+        Me.CheckIncludesButton.Name = "CheckIncludesButton"
+        Me.CheckIncludesButton.Size = New System.Drawing.Size(95, 23)
+        Me.CheckIncludesButton.TabIndex = 19
+        Me.CheckIncludesButton.Text = "Check Includes"
+        Me.CheckIncludesButton.UseVisualStyleBackColor = True
+        '
         'Filechooser
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(913, 283)
+        Me.ClientSize = New System.Drawing.Size(913, 380)
+        Me.Controls.Add(Me.CheckIncludesButton)
+        Me.Controls.Add(Me.Splitter1)
+        Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.ClearLogButton)
         Me.Controls.Add(Me.SkinFolderButton)
@@ -223,5 +256,8 @@ Partial Class Filechooser
     Friend WithEvents SkinFolderDialog As System.Windows.Forms.FolderBrowserDialog
     Friend WithEvents ClearLogButton As System.Windows.Forms.Button
     Friend WithEvents Button1 As System.Windows.Forms.Button
+    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents Splitter1 As System.Windows.Forms.Splitter
+    Friend WithEvents CheckIncludesButton As System.Windows.Forms.Button
 
 End Class

@@ -16,6 +16,8 @@ Public Class Filechooser
     Public multiplyFactor As Double = 1.5
     Public ShortenedTexturePaths As New ArrayList()
     Public FontList As New ArrayList()
+    Public IncludeList As New ArrayList()
+    Public IncludeList2 As New ArrayList()
     Public Filepaths As New ArrayList()
     Public SafeFilepaths As New ArrayList()
     Public elementlist As XmlNodeList
@@ -90,6 +92,8 @@ Public Class Filechooser
                         wrtr = New XmlTextWriter(strOutputFolder + "\" + SafeFilepaths(j).ToString, Encoding.ASCII)
                 End Select
                 wrtr.Formatting = Formatting.Indented
+                wrtr.Indentation = 8
+
                 doc.WriteTo(wrtr)
                 wrtr.Close()
                 OutputLog.AppendText(SafeFilepaths(j) + " created successfully" & vbCrLf)
@@ -499,6 +503,74 @@ Public Class Filechooser
         Catch ex As Exception                        ' Handle the generic Exceptions here.
             OutputLog.AppendText(ex.Message)
         End Try
+    End Sub
+    Sub IncludeFinder()
+        Dim ShortPath As String = ""
+        For j = 0 To Filepaths.Count - 1
+            Try
+                doc.Load(Filepaths(j))
+                elementlist = doc.SelectNodes("//include")
+                For i = 0 To elementlist.Count - 1
+                    If Not elementlist(i).Attributes("name") Is Nothing Then
+                        If Not IncludeList.Contains(elementlist(i).Attributes("name").InnerText) Then
+                            IncludeList.Add(elementlist(i).Attributes("name").InnerText)
+                        End If
+                    End If
+                Next
+                'elementlist = doc.SelectNodes("//include[not(@*)]")
+                'For i = 0 To elementlist.Count - 1
+                '    If Not IncludeList2.Contains(elementlist(i).InnerXml) Then
+                '        IncludeList2.Add(elementlist(i).InnerXml)
+                '    End If
+
+                'Next
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(xmlex.Message)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(ex.Message)
+            End Try
+        Next
+    End Sub
+    Private Sub CheckIncludesButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckIncludesButton.Click
+        OutputLog.AppendText("Building Include List" & vbCrLf)
+        IncludeFinder()
+        OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the includes of the upcoming list for usage." & vbCrLf)
+        For j = 0 To Filepaths.Count - 1
+            Try
+                doc.Load(Filepaths(j))
+                elementlist = doc.GetElementsByTagName("include")
+                For i = 0 To elementlist.Count - 1
+                    If DebugOutput.Checked Then
+                        OutputLog.AppendText(elementlist(i).InnerXml.ToString & vbCrLf)
+                    End If
+                    If IncludeList.Contains(elementlist(i).InnerXml) Then
+                        IncludeList.Remove(elementlist(i).InnerXml)
+                    End If
+                Next i
+                'elementlist = doc.SelectNodes("//include")
+                'For i = 0 To elementlist.Count - 1
+                '    If Not elementlist(i).Attributes("name") Is Nothing Then
+                '        IncludeList.Remove(elementlist(i).Attributes("name").InnerText)
+                '    End If
+                'Next
+                '    OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
+                '        OutputLog.AppendText("Removed " + elementlist(i).InnerXml.ToLower & vbCrLf)
+
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(xmlex.Message)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(ex.Message)
+            End Try
+        Next j
+        OutputLog.AppendText("Unused Includes:" & vbCrLf)
+        Dim str As String
+        For Each str In IncludeList
+            OutputLog.AppendText(str & vbCrLf)
+        Next
+        'OutputLog.AppendText("Undefined Includes:" & vbCrLf)
+        'For Each str In IncludeList2
+        '    OutputLog.AppendText(str & vbCrLf)
+        'Next
     End Sub
 End Class
 
