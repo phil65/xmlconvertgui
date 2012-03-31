@@ -517,13 +517,12 @@ Public Class Filechooser
                         End If
                     End If
                 Next
-                'elementlist = doc.SelectNodes("//include[not(@*)]")
-                'For i = 0 To elementlist.Count - 1
-                '    If Not IncludeList2.Contains(elementlist(i).InnerXml) Then
-                '        IncludeList2.Add(elementlist(i).InnerXml)
-                '    End If
-
-                'Next
+                elementlist = doc.SelectNodes("//include[not(@*)]")
+                For i = 0 To elementlist.Count - 1
+                    If Not IncludeList2.Contains(elementlist(i).InnerXml) Then
+                        IncludeList2.Add(elementlist(i).InnerXml)
+                    End If
+                Next
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(xmlex.Message)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
@@ -538,6 +537,7 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
+                '   OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
                 elementlist = doc.GetElementsByTagName("include")
                 For i = 0 To elementlist.Count - 1
                     If DebugOutput.Checked Then
@@ -547,14 +547,13 @@ Public Class Filechooser
                         IncludeList.Remove(elementlist(i).InnerXml)
                     End If
                 Next i
-                'elementlist = doc.SelectNodes("//include")
-                'For i = 0 To elementlist.Count - 1
-                '    If Not elementlist(i).Attributes("name") Is Nothing Then
-                '        IncludeList.Remove(elementlist(i).Attributes("name").InnerText)
-                '    End If
-                'Next
-                '    OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
-                '        OutputLog.AppendText("Removed " + elementlist(i).InnerXml.ToLower & vbCrLf)
+                elementlist = doc.SelectNodes("//include")
+                For i = 0 To elementlist.Count - 1
+                    If Not elementlist(i).Attributes("name") Is Nothing Then
+                        IncludeList2.Remove(elementlist(i).Attributes("name").InnerText)
+                        '    OutputLog.AppendText("Removed " + elementlist(i).Attributes("name").InnerText & vbCrLf)
+                    End If
+                Next
 
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(xmlex.Message)
@@ -567,10 +566,10 @@ Public Class Filechooser
         For Each str In IncludeList
             OutputLog.AppendText(str & vbCrLf)
         Next
-        'OutputLog.AppendText("Undefined Includes:" & vbCrLf)
-        'For Each str In IncludeList2
-        '    OutputLog.AppendText(str & vbCrLf)
-        'Next
+        OutputLog.AppendText("Undefined Includes:" & vbCrLf)
+        For Each str In IncludeList2
+            OutputLog.AppendText(str & vbCrLf)
+        Next
     End Sub
 End Class
 
