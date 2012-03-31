@@ -127,7 +127,7 @@ Public Class Filechooser
             If (strOutputFolder + "\" + SafeFilepaths(0) = Filepaths(0)) Then
                 MsgBox("You´ve chosen the soure directory. please change the output path.")
             End If
-        Loop While (strOutputFolder + "\" + SafeFilepaths(0) = SafeFilepaths(0))
+        Loop While (strOutputFolder + "\" + SafeFilepaths(0) = Filepaths(0))
 
 
     End Sub
