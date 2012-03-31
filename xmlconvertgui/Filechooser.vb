@@ -26,7 +26,10 @@ Public Class Filechooser
     Private Sub Filechooser_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         ConversionDropDown.Items.Add("720p --> 1080p")
         ConversionDropDown.Items.Add("No Change")
+        IndentingDropDown.Items.Add("Indenting: 2")
+        IndentingDropDown.Items.Add("Indenting: 4")
         ConversionDropDown.SelectedIndex = 0
+        IndentingDropDown.SelectedIndex = 0
         EncodingDropDown.Items.Add("UTF-8")
         EncodingDropDown.Items.Add("ANSI")
         EncodingDropDown.SelectedIndex = 0
@@ -92,7 +95,15 @@ Public Class Filechooser
                         wrtr = New XmlTextWriter(strOutputFolder + "\" + SafeFilepaths(j).ToString, Encoding.ASCII)
                 End Select
                 wrtr.Formatting = Formatting.Indented
-                wrtr.Indentation = 8
+                Select Case IndentingDropDown.SelectedIndex
+                    Case 0
+                        wrtr.Indentation = 2
+                        OutputLog.AppendText("Indenting: 2" & vbCrLf)
+                    Case 1
+                        wrtr.Indentation = 4
+                        OutputLog.AppendText("Indenting: 4" & vbCrLf)
+                End Select
+
 
                 doc.WriteTo(wrtr)
                 wrtr.Close()

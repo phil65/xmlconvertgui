@@ -42,6 +42,7 @@ Partial Class Filechooser
         Me.Label1 = New System.Windows.Forms.Label()
         Me.Splitter1 = New System.Windows.Forms.Splitter()
         Me.CheckIncludesButton = New System.Windows.Forms.Button()
+        Me.IndentingDropDown = New System.Windows.Forms.ComboBox()
         Me.SuspendLayout()
         '
         'OpenFileDialog
@@ -101,7 +102,7 @@ Partial Class Filechooser
         Me.ConversionDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ConversionDropDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ConversionDropDown.ImeMode = System.Windows.Forms.ImeMode.Off
-        Me.ConversionDropDown.Location = New System.Drawing.Point(12, 222)
+        Me.ConversionDropDown.Location = New System.Drawing.Point(9, 222)
         Me.ConversionDropDown.Name = "ConversionDropDown"
         Me.ConversionDropDown.Size = New System.Drawing.Size(121, 21)
         Me.ConversionDropDown.TabIndex = 8
@@ -109,7 +110,7 @@ Partial Class Filechooser
         'HeaderOption
         '
         Me.HeaderOption.AutoSize = True
-        Me.HeaderOption.Location = New System.Drawing.Point(12, 295)
+        Me.HeaderOption.Location = New System.Drawing.Point(12, 305)
         Me.HeaderOption.Name = "HeaderOption"
         Me.HeaderOption.Size = New System.Drawing.Size(108, 17)
         Me.HeaderOption.TabIndex = 9
@@ -121,7 +122,7 @@ Partial Class Filechooser
         Me.EncodingDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.EncodingDropDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.EncodingDropDown.ImeMode = System.Windows.Forms.ImeMode.Off
-        Me.EncodingDropDown.Location = New System.Drawing.Point(12, 259)
+        Me.EncodingDropDown.Location = New System.Drawing.Point(9, 251)
         Me.EncodingDropDown.Name = "EncodingDropDown"
         Me.EncodingDropDown.Size = New System.Drawing.Size(121, 21)
         Me.EncodingDropDown.TabIndex = 10
@@ -129,7 +130,7 @@ Partial Class Filechooser
         'DebugOutput
         '
         Me.DebugOutput.AutoSize = True
-        Me.DebugOutput.Location = New System.Drawing.Point(12, 318)
+        Me.DebugOutput.Location = New System.Drawing.Point(12, 328)
         Me.DebugOutput.Name = "DebugOutput"
         Me.DebugOutput.Size = New System.Drawing.Size(115, 17)
         Me.DebugOutput.TabIndex = 11
@@ -140,7 +141,7 @@ Partial Class Filechooser
         'ConvertBorders
         '
         Me.ConvertBorders.AutoSize = True
-        Me.ConvertBorders.Location = New System.Drawing.Point(12, 341)
+        Me.ConvertBorders.Location = New System.Drawing.Point(12, 351)
         Me.ConvertBorders.Name = "ConvertBorders"
         Me.ConvertBorders.Size = New System.Drawing.Size(102, 17)
         Me.ConvertBorders.TabIndex = 12
@@ -211,11 +212,22 @@ Partial Class Filechooser
         Me.CheckIncludesButton.Text = "Check Includes"
         Me.CheckIncludesButton.UseVisualStyleBackColor = True
         '
+        'IndentingDropDown
+        '
+        Me.IndentingDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.IndentingDropDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.IndentingDropDown.ImeMode = System.Windows.Forms.ImeMode.Off
+        Me.IndentingDropDown.Location = New System.Drawing.Point(9, 278)
+        Me.IndentingDropDown.Name = "IndentingDropDown"
+        Me.IndentingDropDown.Size = New System.Drawing.Size(121, 21)
+        Me.IndentingDropDown.TabIndex = 20
+        '
         'Filechooser
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(913, 380)
+        Me.Controls.Add(Me.IndentingDropDown)
         Me.Controls.Add(Me.CheckIncludesButton)
         Me.Controls.Add(Me.Splitter1)
         Me.Controls.Add(Me.Label1)
@@ -259,5 +271,6 @@ Partial Class Filechooser
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents Splitter1 As System.Windows.Forms.Splitter
     Friend WithEvents CheckIncludesButton As System.Windows.Forms.Button
+    Friend WithEvents IndentingDropDown As System.Windows.Forms.ComboBox
 
 End Class
