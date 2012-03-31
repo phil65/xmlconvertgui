@@ -14,7 +14,6 @@ Public Class Filechooser
     Public xmlattributes As String(,)
     Public doc As New XmlDocument()
     Public multiplyFactor As Double = 1.5
-    Public Filenames As String() = {}
     Public ShortenedTexturePaths As New ArrayList()
     Public Filepaths As New ArrayList()
     Public SafeFilepaths As New ArrayList()
@@ -41,7 +40,7 @@ Public Class Filechooser
             xmlname.Text = SafeFilepaths(0)
         Else
             OutputLog.AppendText("Amount Of Files Chosen: " + Filepaths.Count.ToString & vbCrLf)
-            For i = 0 To Filenames.Length - 1
+            For i = 0 To Filepaths.Count - 1
                 OutputLog.AppendText(SafeFilepaths(i) & vbCrLf)
             Next i
             xmlname.Text = Filepaths.Count.ToString + " Files chosen"
@@ -63,10 +62,10 @@ Public Class Filechooser
         End Select
         ElementCounter = 0
         Dim errorcounter = 0
-        For j = 0 To Filenames.Length - 1
+        For j = 0 To Filepaths.Count - 1
             Try
                 OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
-                doc.Load(Filenames(j))
+                doc.Load(Filepaths(j))
                 If HeaderOption.Checked Then
                     Dim root As XmlElement = doc.DocumentElement
                     doc.InsertBefore(xmldecl, root)
@@ -118,7 +117,7 @@ Public Class Filechooser
 
             Else
                 strOutputFolder = FolderBrowserDialog.SelectedPath
-                If Filenames(0) <> "" Then
+                If Filepaths(0) <> "" Then
                     ConvertButton.Enabled = True
                 End If
                 OutputLabel.Text = strOutputFolder + "\"
@@ -128,7 +127,7 @@ Public Class Filechooser
             If (strOutputFolder + "\" + SafeFilepaths(0) = Filepaths(0)) Then
                 MsgBox("You´ve chosen the soure directory. please change the output path.")
             End If
-        Loop While (strOutputFolder + "\" + SafeFilepaths(0) = Filenames(0))
+        Loop While (strOutputFolder + "\" + SafeFilepaths(0) = SafeFilepaths(0))
 
 
     End Sub
