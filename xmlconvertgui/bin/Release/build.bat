@@ -17,7 +17,7 @@
  if exist %1\themes (
      Echo Building theme skin XBT Files
      ECHO ----------------------------------------
-     for /f "tokens=*" %%f in ('dir /b/ad %1\themes') do START /B /WAIT %2 -dupecheck -input %1\themes\%%f -output %3\%1\media\%%f.xbt
+     for /f "tokens=*" %%f in ('dir /b/ad %1\themes') do START /B /WAIT %2 -dupecheck -input %1\themes\%%f -output %3\media\%%f.xbt
      Echo Finished Building theme skin XBT Files
  )
  ECHO ----------------------------------------
