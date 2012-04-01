@@ -6,6 +6,8 @@ Imports System.Security
 Imports System.Security.Principal.WindowsIdentity
 Public Class Filechooser
     Public strOutputFolder As String = ""
+    Public TexturePackerPath As String = ""
+    Public BuildFolder As String = ""
     Public XMLFolder As String = ""
     Public SkinFolder As String = ""
     Public xmlelements As String() = {"posx", "posy", "width", "height", "textoffsetx", "textoffsety", "radiowidth", "radioheight", "radioposx", "radioposy", "textwidth", "size", "itemgap"}
@@ -16,6 +18,7 @@ Public Class Filechooser
     Public multiplyFactor As Double = 1.5
     Public ShortenedTexturePaths As New ArrayList()
     Public FontList As New ArrayList()
+    Public FontList2 As New ArrayList()
     Public IncludeList As New ArrayList()
     Public IncludeList2 As New ArrayList()
     Public Filepaths As New ArrayList()
@@ -28,12 +31,21 @@ Public Class Filechooser
         ConversionDropDown.Items.Add("No Change")
         IndentingDropDown.Items.Add("Indenting: 2")
         IndentingDropDown.Items.Add("Indenting: 4")
+        EOLComboBox.Items.Add("No Change")
+        EOLComboBox.Items.Add("Windows Line Endings")
+        EOLComboBox.Items.Add("Linux Line Endings")
         ConversionDropDown.SelectedIndex = 0
         IndentingDropDown.SelectedIndex = 0
+        EOLComboBox.SelectedIndex = 0
         EncodingDropDown.Items.Add("UTF-8")
         EncodingDropDown.Items.Add("ANSI")
         EncodingDropDown.SelectedIndex = 0
         OutputLog.AppendText("Program started" & vbCrLf)
+        My.Computer.Registry.CurrentUser.CreateSubKey("XBMCSkinningTool")
+        ' Change MyTestKeyValue to This is a test value. 
+        My.Computer.Registry.GetValue("HKEY_CURRENT_USER\XBMCSkinningTool", _
+        "texturepackerpath", TexturePackerPath)
+        OutputLog.AppendText(TexturePackerPath & vbCrLf)
     End Sub
 
 
@@ -94,6 +106,18 @@ Public Class Filechooser
                     Case 1
                         myXmlSettings.Encoding = Encoding.ASCII
                 End Select
+                Select Case EOLComboBox.SelectedIndex
+                    Case 0
+                        myXmlSettings.NewLineHandling = NewLineHandling.None
+                    Case 1
+                        myXmlSettings.NewLineHandling = NewLineHandling.Replace
+                        myXmlSettings.NewLineChars = "\r\n"
+                        OutputLog.AppendText("Windows Line Endings selected" & vbCrLf)
+                    Case 2
+                        myXmlSettings.NewLineHandling = NewLineHandling.Replace
+                        myXmlSettings.NewLineChars = "\n"
+                        OutputLog.AppendText("Linux Line Endings selected" & vbCrLf)
+                End Select
                 myXmlSettings.Indent = True
                 Select Case IndentingDropDown.SelectedIndex
                     Case 0
@@ -125,13 +149,13 @@ Public Class Filechooser
 
     Private Sub OutputButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OutputButton.Click
         Do
-            FolderBrowserDialog.Description = "Choose Output Folder"
+            OutputFolderDialog.Description = "Choose Output Folder"
 
-            Dim DidWork As Integer = FolderBrowserDialog.ShowDialog()
+            Dim DidWork As Integer = OutputFolderDialog.ShowDialog()
             If DidWork = DialogResult.Cancel Then
 
             Else
-                strOutputFolder = FolderBrowserDialog.SelectedPath
+                strOutputFolder = OutputFolderDialog.SelectedPath
                 If Filepaths(0) <> "" Then
                     ConvertButton.Enabled = True
                 End If
@@ -163,7 +187,8 @@ Public Class Filechooser
     Function ConvertValue(ByVal InputString As String) As String
         Dim number As Integer
         ConvertValue = InputString
-        If Int32.TryParse(InputString, number) And (InputString <> "1") Then
+        If Double.TryParse(InputString, number) And (InputString <> "1") Then
+            InputString = XmlConvert.ToDouble(InputString)
             ConvertValue = Math.Round(InputString * multiplyFactor)
         Else
             If InputString.Length > 1 Then
@@ -327,7 +352,6 @@ Public Class Filechooser
     Sub FileFinder(ByVal dir As String)
         Dim ShortPath As String = ""
         Try
-            ' Display all files in a directory
             For Each fname As String In Directory.GetFiles(dir)
                 Dim number As Integer = 0
                 ShortPath = fname.Substring(SkinFolder.Length + 7, fname.Length - (SkinFolder.Length + 7))
@@ -338,12 +362,10 @@ Public Class Filechooser
                     (Not ShortPath.ToLower.Contains("\576p.png")) And (Not ShortPath.ToLower.Contains("\1080p.png")) And (Not ShortPath.ToLower.Contains("overlaywatched.png")) And
                     (Not Int32.TryParse(ShortPath.Substring(0, ShortPath.Length - 5), number))) Then 'SHortpath length needs to be checked before substring
                     ShortPath = ShortPath.Replace("\", "/")
-                    ShortPath = ShortPath.ToLower
-                    '    OutputLog.AppendText(ShortPath & vbCrLf)
+                    '   ShortPath = ShortPath.ToLower
                     ShortenedTexturePaths.Add(ShortPath)
                 End If
             Next
-            ' A recursive call for all the subdirectories in this directory.
             For Each subdir As String In Directory.GetDirectories(dir)
                 FileFinder(subdir)
             Next
@@ -498,6 +520,28 @@ Public Class Filechooser
         For Each str In FontList
             OutputLog.AppendText(str & vbCrLf)
         Next
+        OutputLog.AppendText("Building Font List" & vbCrLf)
+        FileFinder(SkinFolder + "\fonts")
+        OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the fonts of the upcoming list for usage." & vbCrLf)
+        For j = 0 To ShortenedTexturePaths.Count - 1
+            Try
+                '    OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
+                doc.Load(Filepaths(j))
+                If FontList2.Contains(ShortenedTexturePaths(j).ToString) Then
+                    FontList2.Remove(ShortenedTexturePaths(j).ToString)
+                    '        OutputLog.AppendText("Removed " + elementlist(i).InnerXml.ToLower & vbCrLf)
+                End If
+
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(xmlex.Message)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(ex.Message)
+            End Try
+        Next j
+        OutputLog.AppendText("Unused Fonts:" & vbCrLf)
+        For Each str In ShortenedTexturePaths
+            OutputLog.AppendText(str & vbCrLf)
+        Next
     End Sub
     Sub FontFinder()
         Dim ShortPath As String = ""
@@ -510,6 +554,15 @@ Public Class Filechooser
                 End If
                 If Not FontList.Contains(elementlist(i).InnerXml) Then
                     FontList.Add(elementlist(i).InnerXml)
+                End If
+            Next i
+            elementlist = doc.GetElementsByTagName("filename")
+            For i = 0 To elementlist.Count - 1
+                If DebugOutput.Checked Then
+                    OutputLog.AppendText(elementlist(i).InnerXml & vbCrLf)
+                End If
+                If Not FontList2.Contains(elementlist(i).InnerXml) Then
+                    FontList2.Add(elementlist(i).InnerXml)
                 End If
             Next i
         Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
@@ -584,6 +637,46 @@ Public Class Filechooser
         For Each str In IncludeList2
             OutputLog.AppendText(str & vbCrLf)
         Next
+    End Sub
+
+    Private Sub Button4_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button4.Click
+        Process.Start("build.bat", SkinFolder + " " + TexturePackerPath + " " + BuildFolder)
+    End Sub
+
+    Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
+        OpenFileDialog.Title = "Choose EXE file"
+        OpenFileDialog.Filter = "EXE Files|*.exe"
+        Dim DidWork As Integer = OpenFileDialog.ShowDialog()
+        If DidWork = DialogResult.Cancel Then
+
+        Else
+            OutputButton.Visible = True
+            OutputLabel.Visible = True
+            TexturePackerPath = OpenFileDialog.FileName
+            OutputLog.AppendText("TexturePacker Path: " + TexturePackerPath & vbCrLf)
+            'If strOutputFolder <> "" Then
+            '    ConvertButton.Enabled = True
+            'End If
+            My.Computer.Registry.CurrentUser.CreateSubKey("XBMCSkinningTool")
+            ' Change MyTestKeyValue to This is a test value. 
+            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\XBMCSkinningTool", _
+            "texturepackerpath", TexturePackerPath)
+
+        End If
+    End Sub
+
+    Private Sub Button3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button3.Click
+        BuildFolderDialog.Description = "Choose Build Folder"
+
+        Dim DidWork As Integer = BuildFolderDialog.ShowDialog()
+        If DidWork = DialogResult.Cancel Then
+
+        Else
+            BuildFolder = BuildFolderDialog.SelectedPath
+            '     OutputLabel.Text = BuildFolder + "\"
+            OutputLog.AppendText("Build Folder chosen:" & vbCrLf)
+            OutputLog.AppendText(BuildFolder & vbCrLf)
+        End If
     End Sub
 End Class
 

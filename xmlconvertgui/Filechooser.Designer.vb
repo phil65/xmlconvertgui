@@ -26,7 +26,7 @@ Partial Class Filechooser
         Me.ConvertButton = New System.Windows.Forms.Button()
         Me.xmlname = New System.Windows.Forms.Label()
         Me.OutputButton = New System.Windows.Forms.Button()
-        Me.FolderBrowserDialog = New System.Windows.Forms.FolderBrowserDialog()
+        Me.OutputFolderDialog = New System.Windows.Forms.FolderBrowserDialog()
         Me.OutputLabel = New System.Windows.Forms.Label()
         Me.OutputLog = New System.Windows.Forms.TextBox()
         Me.ConversionDropDown = New System.Windows.Forms.ComboBox()
@@ -43,17 +43,21 @@ Partial Class Filechooser
         Me.Splitter1 = New System.Windows.Forms.Splitter()
         Me.CheckIncludesButton = New System.Windows.Forms.Button()
         Me.IndentingDropDown = New System.Windows.Forms.ComboBox()
+        Me.Button2 = New System.Windows.Forms.Button()
+        Me.Button3 = New System.Windows.Forms.Button()
+        Me.Button4 = New System.Windows.Forms.Button()
+        Me.BuildFolderDialog = New System.Windows.Forms.FolderBrowserDialog()
+        Me.EOLComboBox = New System.Windows.Forms.ComboBox()
         Me.SuspendLayout()
         '
         'OpenFileDialog
         '
-        Me.OpenFileDialog.FileName = "OpenFileDialog1"
-        Me.OpenFileDialog.Multiselect = True
+        Me.OpenFileDialog.FileName = "TexturePackerDialog"
         '
         'ConvertButton
         '
         Me.ConvertButton.Enabled = False
-        Me.ConvertButton.Location = New System.Drawing.Point(202, 306)
+        Me.ConvertButton.Location = New System.Drawing.Point(202, 322)
         Me.ConvertButton.Name = "ConvertButton"
         Me.ConvertButton.Size = New System.Drawing.Size(75, 23)
         Me.ConvertButton.TabIndex = 3
@@ -71,7 +75,7 @@ Partial Class Filechooser
         '
         'OutputButton
         '
-        Me.OutputButton.Location = New System.Drawing.Point(202, 259)
+        Me.OutputButton.Location = New System.Drawing.Point(202, 229)
         Me.OutputButton.Name = "OutputButton"
         Me.OutputButton.Size = New System.Drawing.Size(75, 24)
         Me.OutputButton.TabIndex = 5
@@ -81,7 +85,7 @@ Partial Class Filechooser
         '
         'OutputLabel
         '
-        Me.OutputLabel.Location = New System.Drawing.Point(180, 232)
+        Me.OutputLabel.Location = New System.Drawing.Point(193, 194)
         Me.OutputLabel.Name = "OutputLabel"
         Me.OutputLabel.Size = New System.Drawing.Size(152, 24)
         Me.OutputLabel.TabIndex = 6
@@ -102,7 +106,7 @@ Partial Class Filechooser
         Me.ConversionDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ConversionDropDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ConversionDropDown.ImeMode = System.Windows.Forms.ImeMode.Off
-        Me.ConversionDropDown.Location = New System.Drawing.Point(9, 222)
+        Me.ConversionDropDown.Location = New System.Drawing.Point(9, 194)
         Me.ConversionDropDown.Name = "ConversionDropDown"
         Me.ConversionDropDown.Size = New System.Drawing.Size(121, 21)
         Me.ConversionDropDown.TabIndex = 8
@@ -110,7 +114,7 @@ Partial Class Filechooser
         'HeaderOption
         '
         Me.HeaderOption.AutoSize = True
-        Me.HeaderOption.Location = New System.Drawing.Point(12, 305)
+        Me.HeaderOption.Location = New System.Drawing.Point(9, 322)
         Me.HeaderOption.Name = "HeaderOption"
         Me.HeaderOption.Size = New System.Drawing.Size(108, 17)
         Me.HeaderOption.TabIndex = 9
@@ -122,7 +126,7 @@ Partial Class Filechooser
         Me.EncodingDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.EncodingDropDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.EncodingDropDown.ImeMode = System.Windows.Forms.ImeMode.Off
-        Me.EncodingDropDown.Location = New System.Drawing.Point(9, 251)
+        Me.EncodingDropDown.Location = New System.Drawing.Point(9, 229)
         Me.EncodingDropDown.Name = "EncodingDropDown"
         Me.EncodingDropDown.Size = New System.Drawing.Size(121, 21)
         Me.EncodingDropDown.TabIndex = 10
@@ -130,7 +134,7 @@ Partial Class Filechooser
         'DebugOutput
         '
         Me.DebugOutput.AutoSize = True
-        Me.DebugOutput.Location = New System.Drawing.Point(12, 328)
+        Me.DebugOutput.Location = New System.Drawing.Point(9, 345)
         Me.DebugOutput.Name = "DebugOutput"
         Me.DebugOutput.Size = New System.Drawing.Size(115, 17)
         Me.DebugOutput.TabIndex = 11
@@ -141,7 +145,7 @@ Partial Class Filechooser
         'ConvertBorders
         '
         Me.ConvertBorders.AutoSize = True
-        Me.ConvertBorders.Location = New System.Drawing.Point(12, 351)
+        Me.ConvertBorders.Location = New System.Drawing.Point(9, 368)
         Me.ConvertBorders.Name = "ConvertBorders"
         Me.ConvertBorders.Size = New System.Drawing.Size(102, 17)
         Me.ConvertBorders.TabIndex = 12
@@ -189,7 +193,7 @@ Partial Class Filechooser
         '
         Me.Label1.AutoSize = True
         Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(83, 182)
+        Me.Label1.Location = New System.Drawing.Point(75, 155)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(143, 16)
         Me.Label1.TabIndex = 17
@@ -199,7 +203,7 @@ Partial Class Filechooser
         '
         Me.Splitter1.Location = New System.Drawing.Point(0, 0)
         Me.Splitter1.Name = "Splitter1"
-        Me.Splitter1.Size = New System.Drawing.Size(3, 380)
+        Me.Splitter1.Size = New System.Drawing.Size(3, 619)
         Me.Splitter1.TabIndex = 18
         Me.Splitter1.TabStop = False
         '
@@ -217,16 +221,57 @@ Partial Class Filechooser
         Me.IndentingDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.IndentingDropDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.IndentingDropDown.ImeMode = System.Windows.Forms.ImeMode.Off
-        Me.IndentingDropDown.Location = New System.Drawing.Point(9, 278)
+        Me.IndentingDropDown.Location = New System.Drawing.Point(9, 262)
         Me.IndentingDropDown.Name = "IndentingDropDown"
         Me.IndentingDropDown.Size = New System.Drawing.Size(121, 21)
         Me.IndentingDropDown.TabIndex = 20
+        '
+        'Button2
+        '
+        Me.Button2.Location = New System.Drawing.Point(78, 419)
+        Me.Button2.Name = "Button2"
+        Me.Button2.Size = New System.Drawing.Size(154, 23)
+        Me.Button2.TabIndex = 21
+        Me.Button2.Text = "Choose TexutePacker EXE"
+        Me.Button2.UseVisualStyleBackColor = True
+        '
+        'Button3
+        '
+        Me.Button3.Location = New System.Drawing.Point(78, 465)
+        Me.Button3.Name = "Button3"
+        Me.Button3.Size = New System.Drawing.Size(154, 23)
+        Me.Button3.TabIndex = 22
+        Me.Button3.Text = "Choose BUILD Path"
+        Me.Button3.UseVisualStyleBackColor = True
+        '
+        'Button4
+        '
+        Me.Button4.Location = New System.Drawing.Point(78, 508)
+        Me.Button4.Name = "Button4"
+        Me.Button4.Size = New System.Drawing.Size(154, 23)
+        Me.Button4.TabIndex = 23
+        Me.Button4.Text = "Start bat file"
+        Me.Button4.UseVisualStyleBackColor = True
+        '
+        'EOLComboBox
+        '
+        Me.EOLComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.EOLComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.EOLComboBox.ImeMode = System.Windows.Forms.ImeMode.Off
+        Me.EOLComboBox.Location = New System.Drawing.Point(9, 295)
+        Me.EOLComboBox.Name = "EOLComboBox"
+        Me.EOLComboBox.Size = New System.Drawing.Size(121, 21)
+        Me.EOLComboBox.TabIndex = 24
         '
         'Filechooser
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(913, 380)
+        Me.ClientSize = New System.Drawing.Size(913, 619)
+        Me.Controls.Add(Me.EOLComboBox)
+        Me.Controls.Add(Me.Button4)
+        Me.Controls.Add(Me.Button3)
+        Me.Controls.Add(Me.Button2)
         Me.Controls.Add(Me.IndentingDropDown)
         Me.Controls.Add(Me.CheckIncludesButton)
         Me.Controls.Add(Me.Splitter1)
@@ -255,7 +300,7 @@ Partial Class Filechooser
     Friend WithEvents ConvertButton As System.Windows.Forms.Button
     Friend WithEvents xmlname As System.Windows.Forms.Label
     Friend WithEvents OutputButton As System.Windows.Forms.Button
-    Friend WithEvents FolderBrowserDialog As System.Windows.Forms.FolderBrowserDialog
+    Friend WithEvents OutputFolderDialog As System.Windows.Forms.FolderBrowserDialog
     Friend WithEvents OutputLabel As System.Windows.Forms.Label
     Friend WithEvents OutputLog As System.Windows.Forms.TextBox
     Friend WithEvents ConversionDropDown As System.Windows.Forms.ComboBox
@@ -272,5 +317,10 @@ Partial Class Filechooser
     Friend WithEvents Splitter1 As System.Windows.Forms.Splitter
     Friend WithEvents CheckIncludesButton As System.Windows.Forms.Button
     Friend WithEvents IndentingDropDown As System.Windows.Forms.ComboBox
+    Friend WithEvents Button2 As System.Windows.Forms.Button
+    Friend WithEvents Button3 As System.Windows.Forms.Button
+    Friend WithEvents Button4 As System.Windows.Forms.Button
+    Friend WithEvents BuildFolderDialog As System.Windows.Forms.FolderBrowserDialog
+    Friend WithEvents EOLComboBox As System.Windows.Forms.ComboBox
 
 End Class
