@@ -12,7 +12,7 @@ Public Class Filechooser
     Public SkinFolder As String = ""
     Public xmlelements As String() = {"posx", "posy", "width", "height", "textoffsetx", "textoffsety", "radiowidth", "radioheight", "radioposx", "radioposy", "textwidth", "size", "itemgap"}
     Public xmlelementsBorder As String() = {"border", "bordersize"}
-    Public xmlelementsTexture As String() = {"texture", "texturefocus", "texturenofocus", "texturebg", "bordertexture", "value", "icon", "thumb", "alttexturefocus", "alttexturenofocus", "texturesliderbackground", "texturesliderbar", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "midtexture"}
+    Public xmlelementsTexture As String() = {"texture", "texturefocus", "texturenofocus", "texturebg", "bordertexture", "value", "icon", "thumb", "alttexturefocus", "alttexturenofocus", "texturesliderbackground", "texturesliderbar", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "midtexture", "righttexture", "lefttexture"}
     Public xmlattributes As String(,)
     Public doc As New XmlDocument()
     Public multiplyFactor As Double = 1.5
@@ -26,6 +26,12 @@ Public Class Filechooser
     Public elementlist As XmlNodeList
     Public TempLetter As String
     Public ElementCounter As String
+
+    Private Sub Filechooser_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        If MsgBox("Save Changes", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+            My.Settings.TexturePackerPath = TexturePackerPath
+        End If
+    End Sub
     Private Sub Filechooser_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         ConversionDropDown.Items.Add("720p --> 1080p")
         ConversionDropDown.Items.Add("No Change")
@@ -40,11 +46,8 @@ Public Class Filechooser
         EncodingDropDown.Items.Add("UTF-8")
         EncodingDropDown.Items.Add("ANSI")
         EncodingDropDown.SelectedIndex = 0
+        TexturePackerPath = My.Settings.TexturePackerPath
         OutputLog.AppendText("Program started" & vbCrLf)
-        My.Computer.Registry.CurrentUser.CreateSubKey("XBMCSkinningTool")
-        ' Change MyTestKeyValue to This is a test value. 
-        My.Computer.Registry.GetValue("HKEY_CURRENT_USER\XBMCSkinningTool", _
-        "texturepackerpath", TexturePackerPath)
         OutputLog.AppendText(TexturePackerPath & vbCrLf)
     End Sub
 
@@ -360,7 +363,7 @@ Public Class Filechooser
                     (Not ShortPath.ToLower.Contains("rating3.png")) And (Not ShortPath.ToLower.Contains("rating4.png")) And (Not ShortPath.ToLower.Contains("rating5.png")) And
                     (Not ShortPath.ToLower.Contains("\480p.png")) And (Not ShortPath.ToLower.Contains("\540p.png")) And (Not ShortPath.ToLower.Contains("\720p.png")) And
                     (Not ShortPath.ToLower.Contains("\576p.png")) And (Not ShortPath.ToLower.Contains("\1080p.png")) And (Not ShortPath.ToLower.Contains("overlaywatched.png")) And
-                    (Not Int32.TryParse(ShortPath.Substring(0, ShortPath.Length - 5), number))) Then 'SHortpath length needs to be checked before substring
+                    (Not Int32.TryParse(ShortPath.Substring(ShortPath.Length - 8, ShortPath.Length - 5), number))) Then 'SHortpath length needs to be checked before substring
                     ShortPath = ShortPath.Replace("\", "/")
                     '   ShortPath = ShortPath.ToLower
                     ShortenedTexturePaths.Add(ShortPath)
@@ -520,28 +523,29 @@ Public Class Filechooser
         For Each str In FontList
             OutputLog.AppendText(str & vbCrLf)
         Next
-        OutputLog.AppendText("Building Font List" & vbCrLf)
-        FileFinder(SkinFolder + "\fonts")
-        OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the fonts of the upcoming list for usage." & vbCrLf)
-        For j = 0 To ShortenedTexturePaths.Count - 1
-            Try
-                '    OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
-                doc.Load(Filepaths(j))
-                If FontList2.Contains(ShortenedTexturePaths(j).ToString) Then
-                    FontList2.Remove(ShortenedTexturePaths(j).ToString)
-                    '        OutputLog.AppendText("Removed " + elementlist(i).InnerXml.ToLower & vbCrLf)
-                End If
+        'OutputLog.AppendText("Building Font List" & vbCrLf)
+        'ShortenedTexturePaths.Clear()
+        'FileFinder(SkinFolder + "\fonts")
+        'OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the fonts of the upcoming list for usage." & vbCrLf)
+        'For j = 0 To ShortenedTexturePaths.Count - 1
+        '    Try
+        '        '    OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
+        '        doc.Load(Filepaths(j))
+        '        If FontList2.Contains(ShortenedTexturePaths(j).ToString.ToLower) Then
+        '            FontList2.Remove(ShortenedTexturePaths(j).ToString.ToLower)
+        '            '        OutputLog.AppendText("Removed " + elementlist(i).InnerXml.ToLower & vbCrLf)
+        '        End If
 
-            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-                OutputLog.AppendText(xmlex.Message)
-            Catch ex As Exception                        ' Handle the generic Exceptions here.
-                OutputLog.AppendText(ex.Message)
-            End Try
-        Next j
-        OutputLog.AppendText("Unused Fonts:" & vbCrLf)
-        For Each str In ShortenedTexturePaths
-            OutputLog.AppendText(str & vbCrLf)
-        Next
+        '    Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+        '        OutputLog.AppendText(xmlex.Message)
+        '    Catch ex As Exception                        ' Handle the generic Exceptions here.
+        '        OutputLog.AppendText(ex.Message)
+        '    End Try
+        'Next j
+        'OutputLog.AppendText("Unused Fonts:" & vbCrLf)
+        'For Each str In ShortenedTexturePaths
+        '    OutputLog.AppendText(str & vbCrLf)
+        'Next
     End Sub
     Sub FontFinder()
         Dim ShortPath As String = ""
@@ -563,6 +567,7 @@ Public Class Filechooser
                 End If
                 If Not FontList2.Contains(elementlist(i).InnerXml) Then
                     FontList2.Add(elementlist(i).InnerXml)
+                    OutputLog.AppendText("Added" + elementlist(i).InnerXml & vbCrLf)
                 End If
             Next i
         Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
