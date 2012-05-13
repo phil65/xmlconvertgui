@@ -34,6 +34,7 @@ Public Class Filechooser
     End Sub
     Private Sub Filechooser_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         ConversionDropDown.Items.Add("720p --> 1080p")
+        ConversionDropDown.Items.Add("1080p --> 720p")
         ConversionDropDown.Items.Add("No Change")
         IndentingDropDown.Items.Add("Indenting: 2")
         IndentingDropDown.Items.Add("Indenting: 4")
@@ -78,6 +79,9 @@ Public Class Filechooser
                 multiplyFactor = 1.5
                 OutputLog.AppendText("converting 720 ==> 1080: Factor 1.5" & vbCrLf)
             Case 1
+                multiplyFactor = 0.66
+                OutputLog.AppendText("converting 1080 ==> 720: Factor 1.5" & vbCrLf)
+            Case 2
                 multiplyFactor = 1
                 OutputLog.AppendText("only converting Encoding / adding Headers" & vbCrLf)
         End Select
@@ -352,7 +356,7 @@ Public Class Filechooser
             End If
         Next
     End Sub
-    Sub FileFinder(ByVal dir As String)
+    Sub TextureFinder(ByVal dir As String)
         Dim ShortPath As String = ""
         Try
             For Each fname As String In Directory.GetFiles(dir)
@@ -370,7 +374,7 @@ Public Class Filechooser
                 End If
             Next
             For Each subdir As String In Directory.GetDirectories(dir)
-                FileFinder(subdir)
+                TextureFinder(subdir)
             Next
         Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
             OutputLog.AppendText(xmlex.Message)
@@ -380,7 +384,7 @@ Public Class Filechooser
     End Sub
     Private Sub TextureCheckButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TextureCheckButton.Click
         OutputLog.AppendText("Building Texture List" & vbCrLf)
-        FileFinder(SkinFolder + "\media")
+        TextureFinder(SkinFolder + "\media")
         OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the textures of the upcoming list for usage." & vbCrLf)
         For j = 0 To Filepaths.Count - 1
             Try
@@ -430,7 +434,6 @@ Public Class Filechooser
         Catch
         End Try
     End Sub
-
     Private Function CheckPath(ByVal strPath As String) As Boolean
         If Dir$(strPath) <> "" Then
             CheckPath = True
@@ -438,7 +441,6 @@ Public Class Filechooser
             CheckPath = False
         End If
     End Function
-
     Private Sub SkinFolderButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SkinFolderButton.Click
         SafeFilepaths.Clear()
         Filepaths.Clear()
@@ -525,7 +527,7 @@ Public Class Filechooser
         Next
         'OutputLog.AppendText("Building Font List" & vbCrLf)
         'ShortenedTexturePaths.Clear()
-        'FileFinder(SkinFolder + "\fonts")
+        'TextureFinder(SkinFolder + "\fonts")
         'OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the fonts of the upcoming list for usage." & vbCrLf)
         'For j = 0 To ShortenedTexturePaths.Count - 1
         '    Try
@@ -576,12 +578,13 @@ Public Class Filechooser
             OutputLog.AppendText(ex.Message)
         End Try
     End Sub
-    Sub IncludeFinder()
+    Private Sub CheckIncludesButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckIncludesButton.Click
+        OutputLog.AppendText("Building Include List" & vbCrLf)
         Dim ShortPath As String = ""
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
-                elementlist = doc.SelectNodes("//include")
+                elementlist = doc.SelectNodes("//include[(@name)]")
                 For i = 0 To elementlist.Count - 1
                     If Not elementlist(i).Attributes("name") Is Nothing Then
                         If Not IncludeList.Contains(elementlist(i).Attributes("name").InnerText) Then
@@ -589,7 +592,7 @@ Public Class Filechooser
                         End If
                     End If
                 Next
-                elementlist = doc.SelectNodes("//include[not(@*)]")
+                elementlist = doc.SelectNodes("//include[not(@name)]")
                 For i = 0 To elementlist.Count - 1
                     If Not IncludeList2.Contains(elementlist(i).InnerXml) Then
                         IncludeList2.Add(elementlist(i).InnerXml)
@@ -601,38 +604,8 @@ Public Class Filechooser
                 OutputLog.AppendText(ex.Message)
             End Try
         Next
-    End Sub
-    Private Sub CheckIncludesButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckIncludesButton.Click
-        OutputLog.AppendText("Building Include List" & vbCrLf)
-        IncludeFinder()
-        OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the includes of the upcoming list for usage." & vbCrLf)
-        For j = 0 To Filepaths.Count - 1
-            Try
-                doc.Load(Filepaths(j))
-                '   OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
-                elementlist = doc.GetElementsByTagName("include")
-                For i = 0 To elementlist.Count - 1
-                    If DebugOutput.Checked Then
-                        OutputLog.AppendText(elementlist(i).InnerXml.ToString & vbCrLf)
-                    End If
-                    If IncludeList.Contains(elementlist(i).InnerXml) Then
-                        IncludeList.Remove(elementlist(i).InnerXml)
-                    End If
-                Next i
-                elementlist = doc.SelectNodes("//include")
-                For i = 0 To elementlist.Count - 1
-                    If Not elementlist(i).Attributes("name") Is Nothing Then
-                        IncludeList2.Remove(elementlist(i).Attributes("name").InnerText)
-                        '    OutputLog.AppendText("Removed " + elementlist(i).Attributes("name").InnerText & vbCrLf)
-                    End If
-                Next
+        OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the upcoming List of Includes." & vbCrLf)
 
-            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-                OutputLog.AppendText(xmlex.Message)
-            Catch ex As Exception                        ' Handle the generic Exceptions here.
-                OutputLog.AppendText(ex.Message)
-            End Try
-        Next j
         OutputLog.AppendText("Unused Includes:" & vbCrLf)
         Dim str As String
         For Each str In IncludeList
