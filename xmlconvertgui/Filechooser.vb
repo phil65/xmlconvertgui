@@ -103,6 +103,18 @@ Public Class Filechooser
                     End If
                     changeAttributes()
                 End If
+                Dim Number As Double
+                If (AnimationMultiplier.Text <> 1) And (Double.TryParse(AnimationMultiplier.Text, number)) Then
+                    elementlist = doc.SelectNodes("//animation | //effect")
+                    For i = 0 To elementlist.Count - 1
+                        If Not elementlist(i).Attributes("time") Is Nothing Then
+                            elementlist(i).Attributes("time").InnerText = elementlist(i).Attributes("time").InnerText * AnimationMultiplier.Text
+                        End If
+                        If Not elementlist(i).Attributes("delay") Is Nothing Then
+                            elementlist(i).Attributes("delay").InnerText = elementlist(i).Attributes("delay").InnerText * AnimationMultiplier.Text
+                        End If
+                    Next
+                End If
                 Dim myXmlSettings As New XmlWriterSettings
                 If Not HeaderOption.Checked Then
                     myXmlSettings.OmitXmlDeclaration = True
@@ -670,6 +682,7 @@ Public Class Filechooser
             OutputLog.AppendText(BuildFolder & vbCrLf)
         End If
     End Sub
+
 End Class
 
 

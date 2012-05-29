@@ -48,6 +48,8 @@ Partial Class Filechooser
         Me.Button4 = New System.Windows.Forms.Button()
         Me.BuildFolderDialog = New System.Windows.Forms.FolderBrowserDialog()
         Me.EOLComboBox = New System.Windows.Forms.ComboBox()
+        Me.AnimationMultiplier = New System.Windows.Forms.TextBox()
+        Me.Label2 = New System.Windows.Forms.Label()
         Me.SuspendLayout()
         '
         'OpenFileDialog
@@ -75,7 +77,7 @@ Partial Class Filechooser
         '
         'OutputButton
         '
-        Me.OutputButton.Location = New System.Drawing.Point(202, 229)
+        Me.OutputButton.Location = New System.Drawing.Point(202, 277)
         Me.OutputButton.Name = "OutputButton"
         Me.OutputButton.Size = New System.Drawing.Size(75, 24)
         Me.OutputButton.TabIndex = 5
@@ -85,7 +87,7 @@ Partial Class Filechooser
         '
         'OutputLabel
         '
-        Me.OutputLabel.Location = New System.Drawing.Point(193, 194)
+        Me.OutputLabel.Location = New System.Drawing.Point(184, 250)
         Me.OutputLabel.Name = "OutputLabel"
         Me.OutputLabel.Size = New System.Drawing.Size(152, 24)
         Me.OutputLabel.TabIndex = 6
@@ -263,11 +265,30 @@ Partial Class Filechooser
         Me.EOLComboBox.Size = New System.Drawing.Size(121, 21)
         Me.EOLComboBox.TabIndex = 24
         '
+        'AnimationMultiplier
+        '
+        Me.AnimationMultiplier.Location = New System.Drawing.Point(275, 194)
+        Me.AnimationMultiplier.Name = "AnimationMultiplier"
+        Me.AnimationMultiplier.Size = New System.Drawing.Size(37, 20)
+        Me.AnimationMultiplier.TabIndex = 25
+        Me.AnimationMultiplier.Text = "1"
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(153, 197)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(116, 13)
+        Me.Label2.TabIndex = 26
+        Me.Label2.Text = "Animation Scale Factor"
+        '
         'Filechooser
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(913, 619)
+        Me.Controls.Add(Me.Label2)
+        Me.Controls.Add(Me.AnimationMultiplier)
         Me.Controls.Add(Me.EOLComboBox)
         Me.Controls.Add(Me.Button4)
         Me.Controls.Add(Me.Button3)
@@ -322,5 +343,7 @@ Partial Class Filechooser
     Friend WithEvents Button4 As System.Windows.Forms.Button
     Friend WithEvents BuildFolderDialog As System.Windows.Forms.FolderBrowserDialog
     Friend WithEvents EOLComboBox As System.Windows.Forms.ComboBox
+    Friend WithEvents AnimationMultiplier As System.Windows.Forms.TextBox
+    Friend WithEvents Label2 As System.Windows.Forms.Label
 
 End Class
