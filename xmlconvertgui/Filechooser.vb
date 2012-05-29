@@ -20,6 +20,7 @@ Public Class Filechooser
     Public FontList As New ArrayList()
     Public FontList2 As New ArrayList()
     Public IncludeList As New ArrayList()
+    Public IncludeListBackup As New ArrayList()
     Public IncludeList2 As New ArrayList()
     Public Filepaths As New ArrayList()
     Public SafeFilepaths As New ArrayList()
@@ -581,21 +582,23 @@ Public Class Filechooser
     Private Sub CheckIncludesButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckIncludesButton.Click
         OutputLog.AppendText("Building Include List" & vbCrLf)
         Dim ShortPath As String = ""
+        IncludeList2.Clear()
+        IncludeListBackup.Clear()
+        IncludeList.Clear()
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
                 elementlist = doc.SelectNodes("//include[(@name)]")
                 For i = 0 To elementlist.Count - 1
-                    If Not elementlist(i).Attributes("name") Is Nothing Then
-                        If Not IncludeList.Contains(elementlist(i).Attributes("name").InnerText) Then
-                            IncludeList.Add(elementlist(i).Attributes("name").InnerText)
-                        End If
+                    If Not IncludeList.Contains(elementlist(i).Attributes("name").InnerText) Then
+                        IncludeList.Add(elementlist(i).Attributes("name").InnerText)
                     End If
                 Next
                 elementlist = doc.SelectNodes("//include[not(@name)]")
                 For i = 0 To elementlist.Count - 1
                     If Not IncludeList2.Contains(elementlist(i).InnerXml) Then
                         IncludeList2.Add(elementlist(i).InnerXml)
+                        IncludeListBackup.Add(elementlist(i).InnerXml)
                     End If
                 Next
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
@@ -604,6 +607,18 @@ Public Class Filechooser
                 OutputLog.AppendText(ex.Message)
             End Try
         Next
+        For i = 0 To IncludeList.Count - 1
+            If IncludeList2.Contains(IncludeList(i)) Then
+                IncludeList2.Remove(IncludeList(i))
+            End If
+        Next
+        For i = 0 To IncludeListBackup.Count - 1
+            OutputLog.AppendText("Bla" & vbCrLf)
+            If IncludeList.Contains(IncludeListBackup(i)) Then
+                IncludeList.Remove(IncludeListBackup(i))
+            End If
+        Next
+
         OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the upcoming List of Includes." & vbCrLf)
 
         OutputLog.AppendText("Unused Includes:" & vbCrLf)
