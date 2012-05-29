@@ -613,7 +613,6 @@ Public Class Filechooser
             End If
         Next
         For i = 0 To IncludeListBackup.Count - 1
-            OutputLog.AppendText("Bla" & vbCrLf)
             If IncludeList.Contains(IncludeListBackup(i)) Then
                 IncludeList.Remove(IncludeListBackup(i))
             End If
