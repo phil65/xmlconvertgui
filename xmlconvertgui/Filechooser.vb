@@ -104,14 +104,16 @@ Public Class Filechooser
                     changeAttributes()
                 End If
                 Dim Number As Double
-                If (AnimationMultiplier.Text <> 1) And (Double.TryParse(AnimationMultiplier.Text, number)) Then
+                Dim AnimationScale As Double
+                AnimationScale = XmlConvert.ToDouble(AnimationMultiplier.Text)
+                If (AnimationMultiplier.Text <> 1) And (Double.TryParse(AnimationMultiplier.Text, Number)) Then
                     elementlist = doc.SelectNodes("//animation | //effect")
                     For i = 0 To elementlist.Count - 1
                         If Not elementlist(i).Attributes("time") Is Nothing Then
-                            elementlist(i).Attributes("time").InnerText = elementlist(i).Attributes("time").InnerText * AnimationMultiplier.Text
+                            elementlist(i).Attributes("time").InnerText = elementlist(i).Attributes("time").InnerText * AnimationScale
                         End If
                         If Not elementlist(i).Attributes("delay") Is Nothing Then
-                            elementlist(i).Attributes("delay").InnerText = elementlist(i).Attributes("delay").InnerText * AnimationMultiplier.Text
+                            elementlist(i).Attributes("delay").InnerText = elementlist(i).Attributes("delay").InnerText * AnimationScale
                         End If
                     Next
                 End If
@@ -379,8 +381,7 @@ Public Class Filechooser
                     (Not ShortPath.ToLower.Contains("stars\")) And (Not ShortPath.ToLower.Contains("rating1.png")) And (Not ShortPath.ToLower.Contains("rating2.png")) And
                     (Not ShortPath.ToLower.Contains("rating3.png")) And (Not ShortPath.ToLower.Contains("rating4.png")) And (Not ShortPath.ToLower.Contains("rating5.png")) And
                     (Not ShortPath.ToLower.Contains("\480p.png")) And (Not ShortPath.ToLower.Contains("\540p.png")) And (Not ShortPath.ToLower.Contains("\720p.png")) And
-                    (Not ShortPath.ToLower.Contains("\576p.png")) And (Not ShortPath.ToLower.Contains("\1080p.png")) And (Not ShortPath.ToLower.Contains("overlaywatched.png")) And
-                    (Not Int32.TryParse(ShortPath.Substring(ShortPath.Length - 8, ShortPath.Length - 5), number))) Then 'SHortpath length needs to be checked before substring
+                    (Not ShortPath.ToLower.Contains("\576p.png")) And (Not ShortPath.ToLower.Contains("\1080p.png")) And (Not ShortPath.ToLower.Contains("overlaywatched.png"))) Then
                     ShortPath = ShortPath.Replace("\", "/")
                     '   ShortPath = ShortPath.ToLower
                     ShortenedTexturePaths.Add(ShortPath)
@@ -515,18 +516,21 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
-                elementlist = doc.GetElementsByTagName("font")
-                For i = 0 To elementlist.Count - 1
-                    If DebugOutput.Checked Then
-                        OutputLog.AppendText(elementlist(i).InnerXml.ToString & vbCrLf)
-                    End If
-                    If FontList.Contains(elementlist(i).InnerXml) Then
-                        FontList.Remove(elementlist(i).InnerXml)
-                    End If
-                Next i
-                '    OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
-                '        OutputLog.AppendText("Removed " + elementlist(i).InnerXml.ToLower & vbCrLf)
+                If Not Filepaths(j).ToString.Contains("ont.xml") Then
 
+
+                    elementlist = doc.GetElementsByTagName("font")
+                    For i = 0 To elementlist.Count - 1
+                        If DebugOutput.Checked Then
+                            OutputLog.AppendText(elementlist(i).InnerXml.ToString & vbCrLf)
+                        End If
+                        If FontList.Contains(elementlist(i).InnerXml) Then
+                            FontList.Remove(elementlist(i).InnerXml)
+                        End If
+                    Next i
+                    '    OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
+                    '        OutputLog.AppendText("Removed " + elementlist(i).InnerXml.ToLower & vbCrLf)
+                End If
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(xmlex.Message)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
@@ -681,6 +685,10 @@ Public Class Filechooser
             OutputLog.AppendText("Build Folder chosen:" & vbCrLf)
             OutputLog.AppendText(BuildFolder & vbCrLf)
         End If
+    End Sub
+
+    Private Sub Label2_Click(sender As System.Object, e As System.EventArgs) Handles Label2.Click
+
     End Sub
 
 End Class

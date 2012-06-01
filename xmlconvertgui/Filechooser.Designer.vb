@@ -267,7 +267,7 @@ Partial Class Filechooser
         '
         'AnimationMultiplier
         '
-        Me.AnimationMultiplier.Location = New System.Drawing.Point(275, 194)
+        Me.AnimationMultiplier.Location = New System.Drawing.Point(289, 203)
         Me.AnimationMultiplier.Name = "AnimationMultiplier"
         Me.AnimationMultiplier.Size = New System.Drawing.Size(37, 20)
         Me.AnimationMultiplier.TabIndex = 25
@@ -278,9 +278,9 @@ Partial Class Filechooser
         Me.Label2.AutoSize = True
         Me.Label2.Location = New System.Drawing.Point(153, 197)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(116, 13)
+        Me.Label2.Size = New System.Drawing.Size(111, 26)
         Me.Label2.TabIndex = 26
-        Me.Label2.Text = "Animation Scale Factor"
+        Me.Label2.Text = "Animation Time/Delay" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Multiplier"
         '
         'Filechooser
         '
