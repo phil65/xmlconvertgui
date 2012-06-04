@@ -109,10 +109,12 @@ Public Class Filechooser
                 If (AnimationMultiplier.Text <> 1) And (Double.TryParse(AnimationMultiplier.Text, Number)) Then
                     elementlist = doc.SelectNodes("//animation | //effect")
                     For i = 0 To elementlist.Count - 1
-                        If Not elementlist(i).Attributes("time") Is Nothing Then
+                        elementlist(i).Attributes("time").InnerText = XmlConvert.ToDouble(elementlist(i).Attributes("time").InnerText)
+                        If (Not elementlist(i).Attributes("time") Is Nothing) And (Double.TryParse(elementlist(i).Attributes("time").InnerText, Number)) Then
                             elementlist(i).Attributes("time").InnerText = elementlist(i).Attributes("time").InnerText * AnimationScale
                         End If
-                        If Not elementlist(i).Attributes("delay") Is Nothing Then
+                        elementlist(i).Attributes("delay").InnerText = XmlConvert.ToDouble(elementlist(i).Attributes("delay").InnerText)
+                        If (Not elementlist(i).Attributes("delay") Is Nothing) And (Double.TryParse(elementlist(i).Attributes("delay").InnerText, Number)) Then
                             elementlist(i).Attributes("delay").InnerText = elementlist(i).Attributes("delay").InnerText * AnimationScale
                         End If
                     Next
@@ -476,31 +478,26 @@ Public Class Filechooser
                 If strOutputFolder <> "" Then
                     ConvertButton.Enabled = True
                 End If
-                Dim TempString As String = SkinFolder + "\720p"
-                Const ATTR_DIRECTORY = 16
-                If Dir$(SkinFolder + "\720p", ATTR_DIRECTORY) <> "" Then
-                    XMLFolder = SkinFolder + "\720p"
-                    OutputLog.AppendText("720p Folder detected" & vbCrLf)
-                ElseIf Dir$(SkinFolder + "\1080i", ATTR_DIRECTORY) <> "" Then
-                    XMLFolder = SkinFolder + "\1080i"
-                    OutputLog.AppendText("1080i Folder detected" & vbCrLf)
-                Else
-                    doc.Load(SkinFolder + "\addon.xml")
-                    elementlist = doc.SelectNodes("//res")
-                    For i = 0 To elementlist.Count - 1
-                        If Not elementlist(i).Attributes("folder") Is Nothing Then
-                            XMLFolder = SkinFolder + elementlist(i).Attributes("folder").InnerText
-                        End If
-                    Next
-                    XMLFolder = SkinFolder
-                End If
-                Dim DirInfo As New DirectoryInfo(XMLFolder)
-                Dim FileObj As IO.FileSystemInfo
-                For Each FileObj In DirInfo.GetFileSystemInfos
-                    Filepaths.Add(FileObj.FullName)
-                    SafeFilepaths.Add(FileObj.Name)
-                    '  OutputLog.AppendText(FileObj.FullName & vbCrLf)
+                doc.Load(SkinFolder + "\addon.xml")
+                elementlist = doc.SelectNodes("//res")
+                For i = 0 To elementlist.Count - 1
+                    If Not elementlist(i).Attributes("folder") Is Nothing Then
+                        XMLFolder = SkinFolder + "\" + elementlist(i).Attributes("folder").InnerText
+                    End If
                 Next
+                OutputLog.AppendText("XML Folder:" & XMLFolder & vbCrLf)
+                Const ATTR_DIRECTORY = 16
+                If Dir$(XMLFolder, ATTR_DIRECTORY) <> "" Then
+                    Dim DirInfo As New DirectoryInfo(XMLFolder)
+                    Dim FileObj As IO.FileSystemInfo
+                    For Each FileObj In DirInfo.GetFileSystemInfos
+                        Filepaths.Add(FileObj.FullName)
+                        SafeFilepaths.Add(FileObj.Name)
+                        '  OutputLog.AppendText(FileObj.FullName & vbCrLf)
+                    Next
+                Else
+                    MsgBox("Path from addon.xml does not exist.")
+                End If
             End If
         End If
     End Sub
