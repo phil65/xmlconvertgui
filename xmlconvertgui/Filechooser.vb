@@ -81,7 +81,7 @@ Public Class Filechooser
                 OutputLog.AppendText("converting 720 ==> 1080: Factor 1.5" & vbCrLf)
             Case 1
                 multiplyFactor = 0.66666666666666663
-                OutputLog.AppendText("converting 1080 ==> 720: Factor 1.5" & vbCrLf)
+                OutputLog.AppendText("converting 1080 ==> 720: Factor 0.6666666" & vbCrLf)
             Case 2
                 multiplyFactor = 1
                 OutputLog.AppendText("only converting Encoding / adding Headers" & vbCrLf)
