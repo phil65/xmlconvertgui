@@ -10,3 +10,15 @@ C:\Users\Phil\Documents\Visual Studio 2010\Projects\xmlconvertgui\xmlconvertgui\
 C:\Users\Phil\Documents\Visual Studio 2010\Projects\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v0.9 beta.exe
 C:\Users\Phil\Documents\Visual Studio 2010\Projects\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v0.9 beta.xml
 C:\Users\Phil\Documents\Visual Studio 2010\Projects\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v0.9 beta.pdb
+C:\Dev\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v0.9 beta.exe.config
+C:\Dev\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v0.9 beta.exe
+C:\Dev\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v0.9 beta.xml
+C:\Dev\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v0.9 beta.pdb
+C:\Dev\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v0.9 beta.exe
+C:\Dev\xmlconvertgui\xmlconvertgui\obj\x86\Release\ResolveAssemblyReference.cache
+C:\Dev\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMCSkinningTool.Filechooser.resources
+C:\Dev\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMCSkinningTool.Resources.resources
+C:\Dev\xmlconvertgui\xmlconvertgui\obj\x86\Release\GenerateResource.read.1.tlog
+C:\Dev\xmlconvertgui\xmlconvertgui\obj\x86\Release\GenerateResource.write.1.tlog
+C:\Dev\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v0.9 beta.pdb
+C:\Dev\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v0.9 beta.xml
