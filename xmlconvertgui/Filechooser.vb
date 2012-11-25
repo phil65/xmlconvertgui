@@ -13,6 +13,7 @@ Public Class Filechooser
     Public xmlelements As String() = {"posx", "posy", "width", "height", "textoffsetx", "textoffsety", "radiowidth", "radioheight", "radioposx", "radioposy", "textwidth", "size", "itemgap", "spinwidth", "spinheight"}
     Public xmlelementsBorder As String() = {"border", "bordersize"}
     Public xmlelementsTexture As String() = {"texture", "texturefocus", "texturenofocus", "texturebg", "bordertexture", "value", "icon", "thumb", "alttexturefocus", "alttexturenofocus", "texturesliderbackground", "texturesliderbar", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "midtexture", "righttexture", "lefttexture"}
+    Public xmlelementsBrackets As String() = {"visible", "enable", "usealttexture", "selected"}
     Public xmlattributes As String(,)
     Public doc As New XmlDocument()
     Public multiplyFactor As Double = 1.5
@@ -697,16 +698,18 @@ Public Class Filechooser
             Try
                 doc.Load(Filepaths(j))
                 OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
-                elementlist = doc.GetElementsByTagName("visible")
-                For i = 0 To elementlist.Count - 1
+                For k = 0 To xmlelementsBrackets.Length - 1
+                    elementlist = doc.GetElementsByTagName(xmlelementsBrackets(k))
+                    For i = 0 To elementlist.Count - 1
 
-                    If Not (CountCharacter(elementlist(i).InnerXml, "[") = CountCharacter(elementlist(i).InnerXml, "]")) Then
-                        OutputLog.AppendText("Unmatched parenthesis: " + elementlist(i).InnerXml.ToString & vbCrLf)
-                    End If
-                    If Not (CountCharacter(elementlist(i).InnerXml, "(") = CountCharacter(elementlist(i).InnerXml, ")")) Then
-                        OutputLog.AppendText("Unmatched parenthesis: " + elementlist(i).InnerXml.ToString & vbCrLf)
-                    End If
-                Next i
+                        If Not (CountCharacter(elementlist(i).InnerXml, "[") = CountCharacter(elementlist(i).InnerXml, "]")) Then
+                            OutputLog.AppendText("Unmatched parenthesis: " + elementlist(i).InnerXml.ToString & vbCrLf)
+                        End If
+                        If Not (CountCharacter(elementlist(i).InnerXml, "(") = CountCharacter(elementlist(i).InnerXml, ")")) Then
+                            OutputLog.AppendText("Unmatched parenthesis: " + elementlist(i).InnerXml.ToString & vbCrLf)
+                        End If
+                    Next i
+                Next k
                 elementlist = doc.SelectNodes("//include | //onup | //ondown | //onleft | //onright | //animation | //onload | //onunload | //onclick | //onback | //focusedlayout | //itemlayout | //onfocus | //value")
                 For i = 0 To elementlist.Count - 1
 
