@@ -683,11 +683,49 @@ Public Class Filechooser
             OutputLog.AppendText(BuildFolder & vbCrLf)
         End If
     End Sub
+	Public Function CountCharacter(ByVal value As String, ByVal ch As Char) As Integer
+	    Dim cnt As Integer = 0
+	    For Each c As Char In value
+	    	If c = ch Then cnt += 1
+        Next
+	    Return cnt
+	End Function
 
-    Private Sub Label2_Click(sender As System.Object, e As System.EventArgs) Handles Label2.Click
+    Private Sub CheckBracketsButton_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBracketsButton.Click
+        OutputLog.AppendText("Checking the brackets..." & vbCrLf)
+        For j = 0 To Filepaths.Count - 1
+            Try
+                doc.Load(Filepaths(j))
+                OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
+                elementlist = doc.GetElementsByTagName("visible")
+                For i = 0 To elementlist.Count - 1
 
+                    If Not (CountCharacter(elementlist(i).InnerXml, "[") = CountCharacter(elementlist(i).InnerXml, "]")) Then
+                        OutputLog.AppendText("Unmatched parenthesis: " + elementlist(i).InnerXml.ToString & vbCrLf)
+                    End If
+                    If Not (CountCharacter(elementlist(i).InnerXml, "(") = CountCharacter(elementlist(i).InnerXml, ")")) Then
+                        OutputLog.AppendText("Unmatched parenthesis: " + elementlist(i).InnerXml.ToString & vbCrLf)
+                    End If
+                Next i
+                elementlist = doc.SelectNodes("//include | //onup | //ondown | //onleft | //onright | //animation | //onload | //onunload | //onclick | //onback | //focusedlayout | //itemlayout | //onfocus | //value")
+                For i = 0 To elementlist.Count - 1
+
+                    If Not elementlist(i).Attributes("condition") Is Nothing Then
+                        If Not (CountCharacter(elementlist(i).Attributes("condition").InnerText, "[") = CountCharacter(elementlist(i).Attributes("condition").InnerText, "]")) Then
+                            OutputLog.AppendText("Unmatched parenthesis: " + elementlist(i).Attributes("condition").InnerText & vbCrLf)
+                        End If
+                        If Not (CountCharacter(elementlist(i).Attributes("condition").InnerText, "(") = CountCharacter(elementlist(i).Attributes("condition").InnerText, ")")) Then
+                            OutputLog.AppendText("Unmatched parenthesis: " + elementlist(i).Attributes("condition").InnerText & vbCrLf)
+                        End If
+                    End If
+                Next i
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(xmlex.Message)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(ex.Message)
+            End Try
+        Next
     End Sub
-
 End Class
 
 

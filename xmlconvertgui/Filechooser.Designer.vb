@@ -50,6 +50,7 @@ Partial Class Filechooser
         Me.EOLComboBox = New System.Windows.Forms.ComboBox()
         Me.AnimationMultiplier = New System.Windows.Forms.TextBox()
         Me.Label2 = New System.Windows.Forms.Label()
+        Me.CheckBracketsButton = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'OpenFileDialog
@@ -282,11 +283,21 @@ Partial Class Filechooser
         Me.Label2.TabIndex = 26
         Me.Label2.Text = "Animation Time/Delay" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Multiplier"
         '
+        'CheckBracketsButton
+        '
+        Me.CheckBracketsButton.Location = New System.Drawing.Point(166, 117)
+        Me.CheckBracketsButton.Name = "CheckBracketsButton"
+        Me.CheckBracketsButton.Size = New System.Drawing.Size(95, 23)
+        Me.CheckBracketsButton.TabIndex = 27
+        Me.CheckBracketsButton.Text = "Check Brackets"
+        Me.CheckBracketsButton.UseVisualStyleBackColor = True
+        '
         'Filechooser
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(913, 619)
+        Me.Controls.Add(Me.CheckBracketsButton)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.AnimationMultiplier)
         Me.Controls.Add(Me.EOLComboBox)
@@ -345,5 +356,6 @@ Partial Class Filechooser
     Friend WithEvents EOLComboBox As System.Windows.Forms.ComboBox
     Friend WithEvents AnimationMultiplier As System.Windows.Forms.TextBox
     Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents CheckBracketsButton As System.Windows.Forms.Button
 
 End Class
