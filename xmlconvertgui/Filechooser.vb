@@ -1,6 +1,7 @@
 ﻿Imports System.Xml
 Imports System.Text
 Imports System
+Imports System.Text.RegularExpressions
 Imports System.IO
 Imports System.Security
 Imports System.Security.Principal.WindowsIdentity
@@ -19,6 +20,9 @@ Public Class Filechooser
     Public multiplyFactor As Double = 1.5
     Public ShortenedTexturePaths As New ArrayList()
     Public FontList As New ArrayList()
+    Public IDList As New ArrayList()
+    Public IDList2 As New ArrayList()
+    Public IDListBackup As New ArrayList()
     Public FontList2 As New ArrayList()
     Public IncludeList As New ArrayList()
     Public IncludeListBackup As New ArrayList()
@@ -32,6 +36,8 @@ Public Class Filechooser
     Private Sub Filechooser_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
         If MsgBox("Save Changes", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
             My.Settings.TexturePackerPath = TexturePackerPath
+            My.Settings.XMLFolder = XMLFolder
+            My.Settings.SkinFolder = SkinFolder
         End If
     End Sub
     Private Sub Filechooser_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
@@ -50,8 +56,12 @@ Public Class Filechooser
         EncodingDropDown.Items.Add("ANSI")
         EncodingDropDown.SelectedIndex = 0
         TexturePackerPath = My.Settings.TexturePackerPath
+        XMLFolder = My.Settings.XMLFolder
+        SkinFolder = My.Settings.SkinFolder
         OutputLog.AppendText("Program started" & vbCrLf)
         OutputLog.AppendText(TexturePackerPath & vbCrLf)
+        OutputLog.AppendText(XMLFolder & vbCrLf)
+        OutputLog.AppendText(SkinFolder & vbCrLf)
     End Sub
 
 
@@ -728,6 +738,90 @@ Public Class Filechooser
                 OutputLog.AppendText(ex.Message)
             End Try
         Next
+    End Sub
+
+    Private Sub CheckIDsButton_Click(sender As System.Object, e As System.EventArgs) Handles CheckIDsButton.Click
+        Dim charsToTrim() As Char = {"("c, ")"c}
+        Dim pattern As String = "\([0-9]+\)"
+        IDList.Clear()
+        IDList2.Clear()
+        IDListBackup.Clear()
+        '   Dim pattern as String = "\([a-zA-Z0-9]*\)"
+        OutputLog.AppendText("Checking the IDs..." & vbCrLf)
+        For j = 0 To Filepaths.Count - 1
+            Try
+                doc.Load(Filepaths(j))
+                OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
+                For k = 0 To xmlelementsBrackets.Length - 1
+                    elementlist = doc.GetElementsByTagName(xmlelementsBrackets(k))
+                    For i = 0 To elementlist.Count - 1
+                        If Not elementlist(i).InnerXml Is Nothing Then
+                            Dim r As Regex = New Regex(pattern, RegexOptions.IgnoreCase)
+                            Dim m As Match = r.Match(elementlist(i).InnerXml.ToString)
+                            While (m.Success)
+                                Dim tempText As String = m.Value.ToString()
+                                tempText = Replace(tempText, "(", "")
+                                tempText = Replace(tempText, ")", "")
+                                If Not IDList.Contains(tempText) Then
+                                    IDList.Add(tempText)
+                                    '      OutputLog.AppendText(tempText & vbCrLf)
+                                End If
+                                m = m.NextMatch()
+                            End While
+                        End If
+                    Next i
+                Next k
+                elementlist = doc.SelectNodes("//include | //onup | //ondown | //onleft | //onright | //animation | //onload | //onunload | //onclick | //onback | //focusedlayout | //itemlayout | //onfocus | //value")
+                For i = 0 To elementlist.Count - 1
+
+                    If Not elementlist(i).Attributes("condition") Is Nothing Then
+                        Dim r As Regex = New Regex(pattern, RegexOptions.IgnoreCase)
+                        Dim m As Match = r.Match(elementlist(i).Attributes("condition").InnerText)
+                        While (m.Success)
+                            Dim tempText As String = m.Value.ToString()
+                            tempText = Replace(tempText, "(", "")
+                            tempText = Replace(tempText, ")", "")
+                            If Not IDList.Contains(tempText) Then
+                                IDList.Add(tempText)
+                                ' OutputLog.AppendText(tempText & vbCrLf)
+                            End If
+                            m = m.NextMatch()
+                        End While
+                    End If
+                Next i
+                elementlist = doc.SelectNodes("//control[(@id)] | //window[(@id)]")
+                For i = 0 To elementlist.Count - 1
+                    If Not IDList2.Contains(elementlist(i).Attributes("id").InnerText) Then
+                        IDList2.Add(elementlist(i).Attributes("id").InnerText)
+                        IDListBackup.Add(elementlist(i).Attributes("id").InnerText)
+                    End If
+                Next
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(xmlex.Message)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(ex.Message)
+            End Try
+        Next
+        For i = 0 To IDList.Count - 1
+            If IDList2.Contains(IDList(i)) Then
+                IDList2.Remove(IDList(i))
+            End If
+        Next
+        For i = 0 To IDListBackup.Count - 1
+            If IDList.Contains(IDListBackup(i)) Then
+                IDList.Remove(IDListBackup(i))
+            End If
+        Next
+
+        OutputLog.AppendText("Undefined IDs:" & vbCrLf)
+        Dim str As String
+        For Each str In IDList
+            OutputLog.AppendText(str & vbCrLf)
+        Next
+        '       OutputLog.AppendText("Undefined IDs:" & vbCrLf)
+        '      For Each str In IDList2
+        ' OutputLog.AppendText(str & vbCrLf)
+        '  Next
     End Sub
 End Class
 

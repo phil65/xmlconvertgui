@@ -51,6 +51,7 @@ Partial Class Filechooser
         Me.AnimationMultiplier = New System.Windows.Forms.TextBox()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.CheckBracketsButton = New System.Windows.Forms.Button()
+        Me.CheckIDsButton = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'OpenFileDialog
@@ -285,18 +286,28 @@ Partial Class Filechooser
         '
         'CheckBracketsButton
         '
-        Me.CheckBracketsButton.Location = New System.Drawing.Point(166, 117)
+        Me.CheckBracketsButton.Location = New System.Drawing.Point(166, 88)
         Me.CheckBracketsButton.Name = "CheckBracketsButton"
         Me.CheckBracketsButton.Size = New System.Drawing.Size(95, 23)
         Me.CheckBracketsButton.TabIndex = 27
         Me.CheckBracketsButton.Text = "Check Brackets"
         Me.CheckBracketsButton.UseVisualStyleBackColor = True
         '
+        'CheckIDsButton
+        '
+        Me.CheckIDsButton.Location = New System.Drawing.Point(166, 117)
+        Me.CheckIDsButton.Name = "CheckIDsButton"
+        Me.CheckIDsButton.Size = New System.Drawing.Size(95, 23)
+        Me.CheckIDsButton.TabIndex = 28
+        Me.CheckIDsButton.Text = "Check IDs"
+        Me.CheckIDsButton.UseVisualStyleBackColor = True
+        '
         'Filechooser
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(913, 619)
+        Me.Controls.Add(Me.CheckIDsButton)
         Me.Controls.Add(Me.CheckBracketsButton)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.AnimationMultiplier)
@@ -357,5 +368,6 @@ Partial Class Filechooser
     Friend WithEvents AnimationMultiplier As System.Windows.Forms.TextBox
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents CheckBracketsButton As System.Windows.Forms.Button
+    Friend WithEvents CheckIDsButton As System.Windows.Forms.Button
 
 End Class
