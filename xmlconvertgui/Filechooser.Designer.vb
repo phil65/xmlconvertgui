@@ -31,7 +31,6 @@ Partial Class Filechooser
         Me.OutputLog = New System.Windows.Forms.TextBox()
         Me.ConversionDropDown = New System.Windows.Forms.ComboBox()
         Me.HeaderOption = New System.Windows.Forms.CheckBox()
-        Me.EncodingDropDown = New System.Windows.Forms.ComboBox()
         Me.DebugOutput = New System.Windows.Forms.CheckBox()
         Me.ConvertBorders = New System.Windows.Forms.CheckBox()
         Me.TextureCheckButton = New System.Windows.Forms.Button()
@@ -125,16 +124,6 @@ Partial Class Filechooser
         Me.HeaderOption.Text = "Add XML Header"
         Me.HeaderOption.UseVisualStyleBackColor = True
         '
-        'EncodingDropDown
-        '
-        Me.EncodingDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.EncodingDropDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.EncodingDropDown.ImeMode = System.Windows.Forms.ImeMode.Off
-        Me.EncodingDropDown.Location = New System.Drawing.Point(9, 229)
-        Me.EncodingDropDown.Name = "EncodingDropDown"
-        Me.EncodingDropDown.Size = New System.Drawing.Size(121, 21)
-        Me.EncodingDropDown.TabIndex = 10
-        '
         'DebugOutput
         '
         Me.DebugOutput.AutoSize = True
@@ -225,7 +214,7 @@ Partial Class Filechooser
         Me.IndentingDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.IndentingDropDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.IndentingDropDown.ImeMode = System.Windows.Forms.ImeMode.Off
-        Me.IndentingDropDown.Location = New System.Drawing.Point(9, 262)
+        Me.IndentingDropDown.Location = New System.Drawing.Point(9, 238)
         Me.IndentingDropDown.Name = "IndentingDropDown"
         Me.IndentingDropDown.Size = New System.Drawing.Size(121, 21)
         Me.IndentingDropDown.TabIndex = 20
@@ -262,7 +251,7 @@ Partial Class Filechooser
         Me.EOLComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.EOLComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.EOLComboBox.ImeMode = System.Windows.Forms.ImeMode.Off
-        Me.EOLComboBox.Location = New System.Drawing.Point(9, 295)
+        Me.EOLComboBox.Location = New System.Drawing.Point(9, 277)
         Me.EOLComboBox.Name = "EOLComboBox"
         Me.EOLComboBox.Size = New System.Drawing.Size(121, 21)
         Me.EOLComboBox.TabIndex = 24
@@ -325,7 +314,6 @@ Partial Class Filechooser
         Me.Controls.Add(Me.TextureCheckButton)
         Me.Controls.Add(Me.ConvertBorders)
         Me.Controls.Add(Me.DebugOutput)
-        Me.Controls.Add(Me.EncodingDropDown)
         Me.Controls.Add(Me.HeaderOption)
         Me.Controls.Add(Me.ConversionDropDown)
         Me.Controls.Add(Me.OutputLog)
@@ -348,7 +336,6 @@ Partial Class Filechooser
     Friend WithEvents OutputLog As System.Windows.Forms.TextBox
     Friend WithEvents ConversionDropDown As System.Windows.Forms.ComboBox
     Friend WithEvents HeaderOption As System.Windows.Forms.CheckBox
-    Friend WithEvents EncodingDropDown As System.Windows.Forms.ComboBox
     Friend WithEvents DebugOutput As System.Windows.Forms.CheckBox
     Friend WithEvents ConvertBorders As System.Windows.Forms.CheckBox
     Friend WithEvents TextureCheckButton As System.Windows.Forms.Button

@@ -52,9 +52,6 @@ Public Class Filechooser
         ConversionDropDown.SelectedIndex = 0
         IndentingDropDown.SelectedIndex = 0
         EOLComboBox.SelectedIndex = 0
-        EncodingDropDown.Items.Add("UTF-8")
-        EncodingDropDown.Items.Add("ANSI")
-        EncodingDropDown.SelectedIndex = 0
         TexturePackerPath = My.Settings.TexturePackerPath
         XMLFolder = My.Settings.XMLFolder
         SkinFolder = My.Settings.SkinFolder
@@ -67,8 +64,6 @@ Public Class Filechooser
 
     Public Sub ConvertButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ConvertButton.Click
         ' Create an XML declaration. 
-        Dim xmldecl As XmlDeclaration
-        xmldecl = doc.CreateXmlDeclaration("1.0", Nothing, Nothing)
         If Filepaths.Count = 1 Then
             OutputLog.AppendText("XML File chosen: " + SafeFilepaths(0) & vbCrLf)
             xmlname.Text = SafeFilepaths(0)
@@ -79,13 +74,6 @@ Public Class Filechooser
             Next i
             xmlname.Text = Filepaths.Count.ToString + " Files chosen"
         End If
-        Select Case EncodingDropDown.SelectedIndex
-            Case 0
-                xmldecl.Encoding = "UTF-8"
-            Case 1
-                xmldecl.Encoding = "ISO-8859-1"
-        End Select
-        xmldecl.Standalone = "yes"
         Select Case ConversionDropDown.SelectedIndex
             Case 0
                 multiplyFactor = 1.5
@@ -135,12 +123,8 @@ Public Class Filechooser
                     myXmlSettings.OmitXmlDeclaration = True
                 End If
                 myXmlSettings.Indent = True
-                Select Case EncodingDropDown.SelectedIndex
-                    Case 0
-                        myXmlSettings.Encoding = Encoding.UTF8
-                    Case 1
-                        myXmlSettings.Encoding = Encoding.ASCII
-                End Select
+                Dim UTF8NoBom As Encoding = New UTF8Encoding(False)
+                myXmlSettings.Encoding = UTF8NoBom
                 Select Case EOLComboBox.SelectedIndex
                     Case 0
                         myXmlSettings.NewLineHandling = NewLineHandling.None
