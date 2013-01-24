@@ -46,6 +46,7 @@ Public Class Filechooser
         ConversionDropDown.Items.Add("No Change")
         IndentingDropDown.Items.Add("Indenting: 2")
         IndentingDropDown.Items.Add("Indenting: 4")
+        IndentingDropDown.Items.Add("Indenting: Tab")
         EOLComboBox.Items.Add("No Change")
         EOLComboBox.Items.Add("Windows Line Endings")
         EOLComboBox.Items.Add("Linux Line Endings")
@@ -143,6 +144,9 @@ Public Class Filechooser
                     Case 1
                         myXmlSettings.IndentChars = "    "
                         OutputLog.AppendText("Indenting: 4" & vbCrLf)
+                    Case 1
+                        myXmlSettings.IndentChars = "\t"
+                        OutputLog.AppendText("Indenting: Tab" & vbCrLf)
                 End Select
                 Dim wrtr As XmlWriter = XmlWriter.Create(strOutputFolder + "\" + SafeFilepaths(j).ToString, myXmlSettings)
                 doc.WriteTo(wrtr)
