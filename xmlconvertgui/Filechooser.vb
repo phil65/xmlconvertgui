@@ -69,9 +69,6 @@ Public Class Filechooser
             xmlname.Text = SafeFilepaths(0)
         Else
             OutputLog.AppendText("Amount Of Files Chosen: " + Filepaths.Count.ToString & vbCrLf)
-            For i = 0 To Filepaths.Count - 1
-                OutputLog.AppendText(SafeFilepaths(i) & vbCrLf)
-            Next i
             xmlname.Text = Filepaths.Count.ToString + " Files chosen"
         End If
         Select Case ConversionDropDown.SelectedIndex
@@ -89,7 +86,6 @@ Public Class Filechooser
         Dim errorcounter = 0
         For j = 0 To Filepaths.Count - 1
             Try
-                OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
                 doc.Load(Filepaths(j))
                 If multiplyFactor <> 1 Then
                     For i = 0 To xmlelements.Length - 1
@@ -154,10 +150,10 @@ Public Class Filechooser
                 OutputLog.AppendText(SafeFilepaths(j) + " created successfully" & vbCrLf)
                 ElementCounter = ElementCounter + 1
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-                OutputLog.AppendText(xmlex.Message)
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
                 errorcounter = errorcounter + 1
             Catch ex As Exception                        ' Handle the generic Exceptions here.
-                OutputLog.AppendText(ex.Message)
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
                 errorcounter = errorcounter + 1
             End Try
         Next j
@@ -401,13 +397,12 @@ Public Class Filechooser
         OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the textures of the upcoming list for usage." & vbCrLf)
         For j = 0 To Filepaths.Count - 1
             Try
-                '    OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
                 doc.Load(Filepaths(j))
                 RemoveTexturesFromArray()
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-                OutputLog.AppendText(xmlex.Message)
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
-                OutputLog.AppendText(ex.Message)
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
             End Try
         Next j
         OutputLog.AppendText("Unused Textures:" & vbCrLf)
@@ -522,13 +517,11 @@ Public Class Filechooser
                             FontList.Remove(elementlist(i).InnerXml)
                         End If
                     Next i
-                    '    OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
-                    '        OutputLog.AppendText("Removed " + elementlist(i).InnerXml.ToLower & vbCrLf)
                 End If
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-                OutputLog.AppendText(xmlex.Message)
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
-                OutputLog.AppendText(ex.Message)
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
             End Try
         Next j
         OutputLog.AppendText("Unused Fonts:" & vbCrLf)
@@ -536,30 +529,8 @@ Public Class Filechooser
         For Each str In FontList
             OutputLog.AppendText(str & vbCrLf)
         Next
-        'OutputLog.AppendText("Building Font List" & vbCrLf)
-        'ShortenedTexturePaths.Clear()
-        'TextureFinder(SkinFolder + "\fonts")
-        'OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the fonts of the upcoming list for usage." & vbCrLf)
-        'For j = 0 To ShortenedTexturePaths.Count - 1
-        '    Try
-        '        '    OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
-        '        doc.Load(Filepaths(j))
-        '        If FontList2.Contains(ShortenedTexturePaths(j).ToString.ToLower) Then
-        '            FontList2.Remove(ShortenedTexturePaths(j).ToString.ToLower)
-        '            '        OutputLog.AppendText("Removed " + elementlist(i).InnerXml.ToLower & vbCrLf)
-        '        End If
-
-        '    Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-        '        OutputLog.AppendText(xmlex.Message)
-        '    Catch ex As Exception                        ' Handle the generic Exceptions here.
-        '        OutputLog.AppendText(ex.Message)
-        '    End Try
-        'Next j
-        'OutputLog.AppendText("Unused Fonts:" & vbCrLf)
-        'For Each str In ShortenedTexturePaths
-        '    OutputLog.AppendText(str & vbCrLf)
-        'Next
     End Sub
+
     Sub FontFinder()
         Dim ShortPath As String = ""
         Try
@@ -612,9 +583,9 @@ Public Class Filechooser
                     End If
                 Next
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-                OutputLog.AppendText(xmlex.Message)
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
-                OutputLog.AppendText(ex.Message)
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
             End Try
         Next
         For i = 0 To IncludeList.Count - 1
@@ -680,20 +651,19 @@ Public Class Filechooser
             OutputLog.AppendText(BuildFolder & vbCrLf)
         End If
     End Sub
-	Public Function CountCharacter(ByVal value As String, ByVal ch As Char) As Integer
-	    Dim cnt As Integer = 0
-	    For Each c As Char In value
-	    	If c = ch Then cnt += 1
+    Public Function CountCharacter(ByVal value As String, ByVal ch As Char) As Integer
+        Dim cnt As Integer = 0
+        For Each c As Char In value
+            If c = ch Then cnt += 1
         Next
-	    Return cnt
-	End Function
+        Return cnt
+    End Function
 
     Private Sub CheckBracketsButton_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBracketsButton.Click
         OutputLog.AppendText("Checking the brackets..." & vbCrLf)
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
-                OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
                 For k = 0 To xmlelementsBrackets.Length - 1
                     elementlist = doc.GetElementsByTagName(xmlelementsBrackets(k))
                     For i = 0 To elementlist.Count - 1
@@ -719,9 +689,9 @@ Public Class Filechooser
                     End If
                 Next i
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-                OutputLog.AppendText(xmlex.Message)
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
-                OutputLog.AppendText(ex.Message)
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
             End Try
         Next
     End Sub
@@ -737,7 +707,6 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
-                OutputLog.AppendText("Processing " + SafeFilepaths(j) & vbCrLf)
                 For k = 0 To xmlelementsBrackets.Length - 1
                     elementlist = doc.GetElementsByTagName(xmlelementsBrackets(k))
                     For i = 0 To elementlist.Count - 1
@@ -783,9 +752,9 @@ Public Class Filechooser
                     End If
                 Next
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-                OutputLog.AppendText(xmlex.Message)
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
-                OutputLog.AppendText(ex.Message)
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
             End Try
         Next
         For i = 0 To IDList.Count - 1

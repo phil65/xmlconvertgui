@@ -322,7 +322,7 @@ Partial Class Filechooser
         Me.Controls.Add(Me.xmlname)
         Me.Controls.Add(Me.ConvertButton)
         Me.Name = "Filechooser"
-        Me.Text = "Skin XML Converter 0.9 BETA - by phil65"
+        Me.Text = "Skin XML Converter 1.0 - by phil65"
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
