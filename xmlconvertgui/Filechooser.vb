@@ -34,7 +34,7 @@ Public Class Filechooser
     Public ElementCounter As String
 
     Private Sub Filechooser_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
-        If MsgBox("Save Changes", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+        If MsgBox("Save Path Values?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
             My.Settings.TexturePackerPath = TexturePackerPath
             My.Settings.XMLFolder = XMLFolder
             My.Settings.SkinFolder = SkinFolder
@@ -52,6 +52,7 @@ Public Class Filechooser
         EOLComboBox.Items.Add("Linux Line Endings")
         ConversionDropDown.SelectedIndex = 2
         IndentingDropDown.SelectedIndex = 1
+        HeaderOption.Checked = Not HeaderOption.Checked
         EOLComboBox.SelectedIndex = 0
         TexturePackerPath = My.Settings.TexturePackerPath
         XMLFolder = My.Settings.XMLFolder
@@ -145,7 +146,7 @@ Public Class Filechooser
                         myXmlSettings.IndentChars = "    "
                         OutputLog.AppendText("Indenting: 4" & vbCrLf)
                     Case 2
-                        myXmlSettings.IndentChars = "\t"
+                        myXmlSettings.IndentChars = (ControlChars.Tab)
                         OutputLog.AppendText("Indenting: Tab" & vbCrLf)
                 End Select
                 Dim wrtr As XmlWriter = XmlWriter.Create(strOutputFolder + "\" + SafeFilepaths(j).ToString, myXmlSettings)
