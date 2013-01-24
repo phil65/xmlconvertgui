@@ -49,8 +49,8 @@ Public Class Filechooser
         EOLComboBox.Items.Add("No Change")
         EOLComboBox.Items.Add("Windows Line Endings")
         EOLComboBox.Items.Add("Linux Line Endings")
-        ConversionDropDown.SelectedIndex = 0
-        IndentingDropDown.SelectedIndex = 0
+        ConversionDropDown.SelectedIndex = 2
+        IndentingDropDown.SelectedIndex = 1
         EOLComboBox.SelectedIndex = 0
         TexturePackerPath = My.Settings.TexturePackerPath
         XMLFolder = My.Settings.XMLFolder
@@ -108,13 +108,15 @@ Public Class Filechooser
                 If (AnimationMultiplier.Text <> 1) And (Double.TryParse(AnimationMultiplier.Text, Number)) Then
                     elementlist = doc.SelectNodes("//animation | //effect")
                     For i = 0 To elementlist.Count - 1
-                        elementlist(i).Attributes("time").InnerText = XmlConvert.ToDouble(elementlist(i).Attributes("time").InnerText)
-                        If (Not elementlist(i).Attributes("time") Is Nothing) And (Double.TryParse(elementlist(i).Attributes("time").InnerText, Number)) Then
-                            elementlist(i).Attributes("time").InnerText = elementlist(i).Attributes("time").InnerText * AnimationScale
+                        If (Not elementlist(i).Attributes("time") Is Nothing) Then
+                            If (Double.TryParse(elementlist(i).Attributes("time").InnerText, Number)) Then
+                                elementlist(i).Attributes("time").InnerText = XmlConvert.ToDouble(Number) * AnimationScale
+                            End If
                         End If
-                        elementlist(i).Attributes("delay").InnerText = XmlConvert.ToDouble(elementlist(i).Attributes("delay").InnerText)
-                        If (Not elementlist(i).Attributes("delay") Is Nothing) And (Double.TryParse(elementlist(i).Attributes("delay").InnerText, Number)) Then
-                            elementlist(i).Attributes("delay").InnerText = elementlist(i).Attributes("delay").InnerText * AnimationScale
+                        If (Not elementlist(i).Attributes("delay") Is Nothing) Then
+                            If (Double.TryParse(elementlist(i).Attributes("delay").InnerText, Number)) Then
+                                elementlist(i).Attributes("delay").InnerText = XmlConvert.ToDouble(Number) * AnimationScale
+                            End If
                         End If
                     Next
                 End If
