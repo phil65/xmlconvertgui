@@ -106,12 +106,12 @@ Public Class Filechooser
                     For i = 0 To elementlist.Count - 1
                         If (Not elementlist(i).Attributes("time") Is Nothing) Then
                             If (Double.TryParse(elementlist(i).Attributes("time").InnerText, Number)) Then
-                                elementlist(i).Attributes("time").InnerText = XmlConvert.ToDouble(Number) * AnimationScale
+                                elementlist(i).Attributes("time").InnerText = Math.Round(XmlConvert.ToDouble(Number) * AnimationScale)
                             End If
                         End If
                         If (Not elementlist(i).Attributes("delay") Is Nothing) Then
                             If (Double.TryParse(elementlist(i).Attributes("delay").InnerText, Number)) Then
-                                elementlist(i).Attributes("delay").InnerText = XmlConvert.ToDouble(Number) * AnimationScale
+                                elementlist(i).Attributes("delay").InnerText = Math.Round(XmlConvert.ToDouble(Number) * AnimationScale)
                             End If
                         End If
                     Next
