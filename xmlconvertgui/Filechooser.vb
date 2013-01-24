@@ -144,7 +144,7 @@ Public Class Filechooser
                     Case 1
                         myXmlSettings.IndentChars = "    "
                         OutputLog.AppendText("Indenting: 4" & vbCrLf)
-                    Case 1
+                    Case 2
                         myXmlSettings.IndentChars = "\t"
                         OutputLog.AppendText("Indenting: Tab" & vbCrLf)
                 End Select
