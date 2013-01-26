@@ -189,15 +189,15 @@ Public Class Filechooser
             ConvertValue = Math.Round(InputString * multiplyFactor)
         Else
             If InputString.Length > 1 Then
-                TempLetter = InputString.ToString.Substring(InputString.Length - 1, 1)
-                InputString = InputString.ToString.Substring(0, InputString.Length - 1)
+                TempLetter = InputString.Substring(InputString.Length - 1, 1)
+                InputString = InputString.Substring(0, InputString.Length - 1)
                 If Int32.TryParse(InputString, number) Then
                     ConvertValue = Math.Round(number * multiplyFactor).ToString + TempLetter
                     OutputLog.AppendText(InputString & vbCrLf)
                 Else
                     If InputString.Length > 1 Then
-                        TempLetter = InputString.ToString.Substring(InputString.Length - 1, 1)
-                        InputString = InputString.ToString.Substring(0, InputString.Length - 1)
+                        TempLetter = InputString.Substring(InputString.Length - 1, 1)
+                        InputString = InputString.Substring(0, InputString.Length - 1)
                         If Int32.TryParse(InputString, number) Then
                             ConvertValue = Math.Round(number * multiplyFactor).ToString
                         Else
@@ -209,86 +209,58 @@ Public Class Filechooser
         End If
     End Function
 
-    Sub convertString(ByRef CompleteString As String, Optional ByVal ConvertAll As Boolean = True)
-        Dim NewString As String = ""
-        Dim IndexStart = 0
-        If CompleteString.Contains(",") Or (ConvertAll = True) Then
-            For i = 0 To CompleteString.Length - 1
-                If CompleteString(i) = "," Then
-                    NewString = NewString + ConvertValue(CompleteString.Substring(IndexStart, i - IndexStart)) + ","
-                    IndexStart = i + 1
+    Sub convertString(ByRef Node As XmlNode, ByVal Tags As String(), Optional ByVal ConvertAll As Boolean = True)
+        Dim Tag As String
+        For Each Tag In Tags
+            Dim IndexStart = 0
+            Dim CompleteString As String = Node.Attributes(Tag).InnerText
+            Dim NewString As String = ""
+            If Not Node.Attributes(Tag) Is Nothing Then
+                If CompleteString.Contains(",") Or (ConvertAll = True) Then
+                    For i = 0 To CompleteString.Length - 1
+                        If CompleteString(i) = "," Then
+                            NewString = NewString + ConvertValue(CompleteString.Substring(IndexStart, i - IndexStart)) + ","
+                            IndexStart = i + 1
+                        End If
+                    Next
+                    CompleteString = NewString + ConvertValue((CompleteString.Substring(IndexStart, CompleteString.Length - IndexStart)))
                 End If
-            Next
-            CompleteString = NewString + ConvertValue((CompleteString.Substring(IndexStart, CompleteString.Length - IndexStart)))
-        End If
+            End If
+            Node.Attributes(Tag).InnerText = CompleteString
+        Next
     End Sub
 
     Sub changeAttributes()
         elementlist = doc.SelectNodes("//animation[@effect='zoom'] | //effect[@type='zoom']")
         For Each element In elementlist
-            If Not element.Attributes("start") Is Nothing Then
-                convertString(element.Attributes("start").InnerText, False)
-            End If
-            If Not element.Attributes("end") Is Nothing Then
-                convertString(element.Attributes("end").InnerText, False)
-            End If
+            convertString(element, {"start", "end"}, False)
         Next
         elementlist = doc.SelectNodes("//animation[@effect='slide'] | //effect[@type='slide']")
         For Each element In elementlist
-            If Not element.Attributes("start") Is Nothing Then
-                convertString(element.Attributes("start").InnerText)
-            End If
-            If Not element.Attributes("end") Is Nothing Then
-                convertString(element.Attributes("end").InnerText)
-            End If
+            convertString(element, {"start", "end"})
         Next
         elementlist = doc.SelectNodes("//animation[@effect='rotatex'] | //animation[@effect='rotatey'] | //animation[@effect='rotate'] | //effect[@type='rotate'] | //effect[@type='rotatex'] | //effect[@type='rotatey'] | //animation[@effect='slide'] | //effect[@type='slide']")
         For Each element In elementlist
-            If Not element.Attributes("center") Is Nothing Then
-                convertString(element.Attributes("center").InnerText)
-            End If
+            convertString(element, {"end"})
+        Next
+        elementlist = doc.SelectNodes("//focusedlayout | //itemlayout | //channellayout | //focusedchannellayout | //rulerlayout")
+        For Each element In elementlist
+            convertString(element, {"width", "height"})
+        Next
+        elementlist = doc.SelectNodes("//hitrect | //camera")
+        For Each element In elementlist
+            convertString(element, {"x", "y", "w", "h"})
+        Next
+        elementlist = doc.SelectNodes("//width | //height")
+        For Each element In elementlist
+            convertString(element, {"min", "max"})
         Next
         If ConvertBorders.Checked Then
             elementlist = doc.SelectNodes("//texturefocus | //texture | //texturenofocus | //bordertexture | //texturesliderbackground | //texturesliderbar | //texturesliderbarfocus | //alttexturenofocus | //alttexturefocus | //midtexture")
             For Each element In elementlist
-                If Not element.Attributes("border") Is Nothing Then
-                    convertString(element.Attributes("border").InnerText)
-                End If
+                convertString(element, {"border"})
             Next
         End If
-        elementlist = doc.SelectNodes("//focusedlayout | //itemlayout | //channellayout | //focusedchannellayout | //rulerlayout")
-        For Each element In elementlist
-            If Not element.Attributes("width") Is Nothing Then
-                convertString(element.Attributes("width").InnerText)
-            End If
-            If Not element.Attributes("height") Is Nothing Then
-                convertString(element.Attributes("height").InnerText)
-            End If
-        Next
-        elementlist = doc.SelectNodes("//hitrect | //camera")
-        For Each element In elementlist
-            If Not element.Attributes("x") Is Nothing Then
-                convertString(element.Attributes("x").InnerText)
-            End If
-            If Not element.Attributes("y") Is Nothing Then
-                convertString(element.Attributes("y").InnerText)
-            End If
-            If Not element.Attributes("h") Is Nothing Then
-                convertString(element.Attributes("h").InnerText)
-            End If
-            If Not element.Attributes("w") Is Nothing Then
-                convertString(element.Attributes("w").InnerText)
-            End If
-        Next
-        elementlist = doc.SelectNodes("//width | //height")
-        For Each element In elementlist
-            If Not element.Attributes("min") Is Nothing Then
-                convertString(element.Attributes("min").InnerText)
-            End If
-            If Not element.Attributes("max") Is Nothing Then
-                convertString(element.Attributes("max").InnerText)
-            End If
-        Next
     End Sub
 
     Sub TextureFinder(ByVal dir As String)
@@ -643,7 +615,6 @@ Public Class Filechooser
                 Next k
                 elementlist = doc.SelectNodes("//include | //onup | //ondown | //onleft | //onright | //animation | //onload | //onunload | //onclick | //onback | //focusedlayout | //itemlayout | //onfocus | //value")
                 For Each element In elementlist
-
                     If Not element.Attributes("condition") Is Nothing Then
                         Dim r As Regex = New Regex(pattern, RegexOptions.IgnoreCase)
                         Dim m As Match = r.Match(element.Attributes("condition").InnerText)
