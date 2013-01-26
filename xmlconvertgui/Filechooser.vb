@@ -86,9 +86,9 @@ Public Class Filechooser
                 Dim Number As Double
                 If (AnimationMultiplier.Text <> 1) And (Double.TryParse(AnimationMultiplier.Text, Number)) Then
                     elementlist = doc.SelectNodes("//animation | //effect")
-                    For Each element In elementlist
-                        ScaleXMLNode(element, "time", AnimationMultiplier.Text)
-                        ScaleXMLNode(element, "delay", AnimationMultiplier.Text)
+                    For i = 0 To elementlist.Count - 1
+                        ScaleXMLNode(elementlist(i), "time", AnimationMultiplier.Text)
+                        ScaleXMLNode(elementlist(i), "delay", AnimationMultiplier.Text)
                     Next
                 End If
                 Dim myXmlSettings As New XmlWriterSettings
@@ -158,9 +158,9 @@ Public Class Filechooser
 
     Sub changeElements(ByVal tag As String)
         elementlist = doc.GetElementsByTagName(tag)
-        For Each element In elementlist
-            element.InnerXml = ConvertValue(element.InnerXml, multiplyFactor)
-        Next element
+        For i = 0 To elementlist.Count - 1
+            elementlist(i).InnerXml = ConvertValue(elementlist(i).InnerXml, multiplyFactor)
+        Next i
     End Sub
 
     Sub ScaleXMLNode(ByRef Element As XmlNode, ByVal tag As String, ByVal ScaleFactor As String)
@@ -224,33 +224,33 @@ Public Class Filechooser
 
     Sub changeAttributes()
         elementlist = doc.SelectNodes("//animation[@effect='zoom'] | //effect[@type='zoom']")
-        For Each element In elementlist
-            convertString(element, {"start", "end"}, False)
+        For i = 0 To elementlist.Count - 1
+            convertString(elementlist(i), {"start", "end"}, False)
         Next
         elementlist = doc.SelectNodes("//animation[@effect='slide'] | //effect[@type='slide']")
-        For Each element In elementlist
-            convertString(element, {"start", "end"})
+        For i = 0 To elementlist.Count - 1
+            convertString(elementlist(i), {"start", "end"})
         Next
         elementlist = doc.SelectNodes("//animation[@effect='rotatex'] | //animation[@effect='rotatey'] | //animation[@effect='rotate'] | //effect[@type='rotate'] | //effect[@type='rotatex'] | //effect[@type='rotatey'] | //animation[@effect='slide'] | //effect[@type='slide']")
-        For Each element In elementlist
-            convertString(element, {"end"})
+        For i = 0 To elementlist.Count - 1
+            convertString(elementlist(i), {"end"})
         Next
         elementlist = doc.SelectNodes("//focusedlayout | //itemlayout | //channellayout | //focusedchannellayout | //rulerlayout")
-        For Each element In elementlist
-            convertString(element, {"width", "height"})
+        For i = 0 To elementlist.Count - 1
+            convertString(elementlist(i), {"width", "height"})
         Next
         elementlist = doc.SelectNodes("//hitrect | //camera")
-        For Each element In elementlist
-            convertString(element, {"x", "y", "w", "h"})
+        For i = 0 To elementlist.Count - 1
+            convertString(elementlist(i), {"x", "y", "w", "h"})
         Next
         elementlist = doc.SelectNodes("//width | //height")
-        For Each element In elementlist
-            convertString(element, {"min", "max"})
+        For i = 0 To elementlist.Count - 1
+            convertString(elementlist(i), {"min", "max"})
         Next
         If ConvertBorders.Checked Then
             elementlist = doc.SelectNodes("//texturefocus | //texture | //texturenofocus | //bordertexture | //texturesliderbackground | //texturesliderbar | //texturesliderbarfocus | //alttexturenofocus | //alttexturefocus | //midtexture")
-            For Each element In elementlist
-                convertString(element, {"border"})
+            For i = 0 To elementlist.Count - 1
+                convertString(elementlist(i), {"border"})
             Next
         End If
     End Sub
@@ -308,12 +308,11 @@ Public Class Filechooser
     Sub RemoveAttributesFromArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, ByVal Attributes As String(), Optional ByVal Lowercase As Boolean = False)
         Try
             elementlist = doc.SelectNodes(NodeSelection)
-            Dim element As XmlNode
-            For Each element In elementlist
+            For i = 0 To elementlist.Count - 1
                 For Each Attribute In Attributes
-                    If Not element.Attributes(Attribute) Is Nothing Then
+                    If Not elementlist(i).Attributes(Attribute) Is Nothing Then
                         Dim CompareString As String
-                        CompareString = element.Attributes(Attribute).InnerText.ToString
+                        CompareString = elementlist(i).Attributes(Attribute).InnerText.ToString
                         If Lowercase = True Then
                             CompareString = CompareString.ToLower
                         End If
@@ -328,12 +327,11 @@ Public Class Filechooser
     End Sub
     Sub RemoveNodesFromArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, Optional ByVal Lowercase As Boolean = False)
         Try
-            Dim element As XmlNode
             elementlist = doc.GetElementsByTagName(NodeSelection)
-            For Each element In elementlist
-                If Not element.InnerXML Is Nothing Then
+            For i = 0 To elementlist.Count - 1
+                If Not elementlist(i).InnerXml Is Nothing Then
                     Dim CompareString As String
-                    CompareString = element.InnerXml
+                    CompareString = elementlist(i).InnerXml
                     If Lowercase = True Then
                         CompareString = CompareString.ToLower
                     End If
@@ -347,12 +345,11 @@ Public Class Filechooser
     End Sub
     Sub AddNodesToArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, Optional ByVal Lowercase As Boolean = False)
         Try
-            Dim element As XmlNode
             elementlist = doc.GetElementsByTagName(NodeSelection)
-            For Each element In elementlist
-                If Not element.InnerXML Is Nothing Then
+            For i = 0 To elementlist.Count - 1
+                If Not elementlist(i).InnerXml Is Nothing Then
                     Dim CompareString As String
-                    CompareString = element.InnerXml
+                    CompareString = elementlist(i).InnerXml
                     If Lowercase = True Then
                         CompareString = CompareString.ToLower
                     End If
@@ -367,13 +364,12 @@ Public Class Filechooser
 
     Sub AddAttributesToArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, ByVal AttributeList As String(), Optional ByVal Lowercase As Boolean = False)
         Try
-            Dim element As XmlNode
             elementlist = doc.SelectNodes(NodeSelection)
-            For Each element In elementlist
+            For i = 0 To elementlist.Count - 1
                 For Each Attribute In AttributeList
-                    If Not element.Attributes(Attribute) Is Nothing Then
+                    If Not elementlist(i).Attributes(Attribute) Is Nothing Then
                         Dim CompareString As String
-                        CompareString = element.Attributes(Attribute).InnerText.ToString
+                        CompareString = elementlist(i).Attributes(Attribute).InnerText.ToString
                         If Lowercase = True Then
                             CompareString = CompareString.ToLower
                         End If
@@ -398,9 +394,9 @@ Public Class Filechooser
 
     Private Sub CheckNodeValue(ByVal XMLTag As String, ByVal ValidValues As String(), Optional ByRef FileName As String = "")
         elementlist = doc.GetElementsByTagName(XMLTag)
-        For Each element In elementlist
-            If Not ValidValues.Contains(element.InnerXml.ToString.ToLower) Then
-                OutputLog.AppendText(FileName + ": Invalid Value for " & XMLTag & ": " & element.InnerXml & vbCrLf)
+        For i = 0 To elementlist.Count - 1
+            If Not ValidValues.Contains(elementlist(i).InnerXml.ToString.ToLower) Then
+                OutputLog.AppendText(FileName + ": Invalid Value for " & XMLTag & ": " & elementlist(i).InnerXml & vbCrLf)
             End If
         Next
     End Sub
@@ -504,10 +500,10 @@ Public Class Filechooser
                 doc.Load(Filepaths(j))
                 AddAttributesToArray(IncludeList, "//include[(@name)]", {"name"})
                 elementlist = doc.SelectNodes("//include[not(@name)]")
-                For Each element In elementlist
-                    If Not IncludeList2.Contains(element.InnerXml) Then
-                        IncludeList2.Add(element.InnerXml)
-                        IncludeListBackup.Add(element.InnerXml)
+                For i = 0 To elementlist.Count - 1
+                    If Not IncludeList2.Contains(elementlist(i).InnerXml) Then
+                        IncludeList2.Add(elementlist(i).InnerXml)
+                        IncludeListBackup.Add(elementlist(i).InnerXml)
                     End If
                 Next
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
@@ -573,19 +569,19 @@ Public Class Filechooser
                 doc.Load(Filepaths(j))
                 For k = 0 To xmlelementsBrackets.Length - 1
                     elementlist = doc.GetElementsByTagName(xmlelementsBrackets(k))
-                    For Each element In elementlist
-                        SameCharNumber(element.InnerXML, "[", "]")
-                        SameCharNumber(element.InnerXML, "(", ")")
-                    Next element
+                    For i = 0 To elementlist.Count - 1
+                        SameCharNumber(elementlist(i).InnerXml, "[", "]")
+                        SameCharNumber(elementlist(i).InnerXml, "(", ")")
+                    Next i
                 Next k
                 elementlist = doc.SelectNodes("//include | //onup | //ondown | //onleft | //onright | //animation | //onload | //onunload | //onclick | //onback | //focusedlayout | //itemlayout | //onfocus | //value")
-                For Each element In elementlist
-                    If Not element.Attributes("condition") Is Nothing Then
-                        Dim CompareString As String = element.Attributes("condition").InnerText.ToString
+                For i = 0 To elementlist.Count - 1
+                    If Not elementlist(i).Attributes("condition") Is Nothing Then
+                        Dim CompareString As String = elementlist(i).Attributes("condition").InnerText.ToString
                         SameCharNumber(CompareString, "[", "]")
                         SameCharNumber(CompareString, "(", ")")
                     End If
-                Next element
+                Next i
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
@@ -624,10 +620,10 @@ Public Class Filechooser
                 doc.Load(Filepaths(j))
                 For k = 0 To xmlelementsBrackets.Length - 1
                     elementlist = doc.GetElementsByTagName(xmlelementsBrackets(k))
-                    For Each element In elementlist
-                        If Not element.InnerXml Is Nothing Then
+                    For i = 0 To elementlist.Count - 1
+                        If Not elementlist(i).InnerXml Is Nothing Then
                             Dim r As Regex = New Regex(pattern, RegexOptions.IgnoreCase)
-                            Dim m As Match = r.Match(element.InnerXml.ToString)
+                            Dim m As Match = r.Match(elementlist(i).InnerXml.ToString)
                             While (m.Success)
                                 Dim tempText As String = m.Value.ToString()
                                 tempText = Replace(tempText, "(", "")
@@ -640,13 +636,13 @@ Public Class Filechooser
                                 m = m.NextMatch()
                             End While
                         End If
-                    Next element
+                    Next i
                 Next k
                 elementlist = doc.SelectNodes("//include | //onup | //ondown | //onleft | //onright | //animation | //onload | //onunload | //onclick | //onback | //focusedlayout | //itemlayout | //onfocus | //value")
-                For Each element In elementlist
-                    If Not element.Attributes("condition") Is Nothing Then
+                For i = 0 To elementlist.Count - 1
+                    If Not elementlist(i).Attributes("condition") Is Nothing Then
                         Dim r As Regex = New Regex(pattern, RegexOptions.IgnoreCase)
-                        Dim m As Match = r.Match(element.Attributes("condition").InnerText.ToString)
+                        Dim m As Match = r.Match(elementlist(i).Attributes("condition").InnerText.ToString)
                         While (m.Success)
                             Dim tempText As String = m.Value.ToString()
                             tempText = Replace(tempText, "(", "")
@@ -658,15 +654,15 @@ Public Class Filechooser
                             m = m.NextMatch()
                         End While
                     End If
-                Next element
+                Next i
                 AddAttributesToArray(IDList2, "//control[(@id)] | //window[(@id)]", {"id"})
-                IDListBackup = IDList2
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
             End Try
         Next
+        IDListBackup = IDList2
         For i = 0 To IDList.Count - 1
             If IDList2.Contains(IDList(i)) Then
                 IDList2.Remove(IDList(i))
