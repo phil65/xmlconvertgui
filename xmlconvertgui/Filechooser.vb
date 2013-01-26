@@ -366,11 +366,11 @@ Public Class Filechooser
             CheckPath = False
         End If
     End Function
-    Private Sub CheckNodeValue(ByVal XMLTag As String, ByVal ValidValues As String())
+    Private Sub CheckNodeValue(ByVal XMLTag As String, ByVal ValidValues As String(), Optional ByRef FileName As String = "")
         elementlist = doc.GetElementsByTagName(XMLTag)
         For Each element In elementlist
             If Not ValidValues.Contains(element.InnerXml) Then
-                OutputLog.AppendText("Invalid Value for " & XMLTag & ": " & element.InnerXml & vbCrLf)
+                OutputLog.AppendText(FileName + ": Invalid Value for " & XMLTag & ": " & element.InnerXml & vbCrLf)
             End If
         Next
     End Sub
@@ -700,10 +700,18 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
-                CheckNodeValue("align", {"left", "center", "right", "justify"})
-                CheckNodeValue("aligny", {"top", "center", "bottom"})
-                CheckNodeValue("orientation", {"horizontal", "vertical"})
-                CheckNodeValue("scroll", {"false", "true"})
+                CheckNodeValue("align", {"left", "center", "right", "justify"}, SafeFilepaths(j))
+                CheckNodeValue("aspectratio", {"keep", "scale", "stretch", "center"}, SafeFilepaths(j))
+                CheckNodeValue("aligny", {"top", "center", "bottom"}, SafeFilepaths(j))
+                CheckNodeValue("orientation", {"horizontal", "vertical"}, SafeFilepaths(j))
+                CheckNodeValue("subtype", {"page", "int", "float", "text"}, SafeFilepaths(j))
+                CheckNodeValue("action", {"volume", "seek"}, SafeFilepaths(j))
+                CheckNodeValue("scroll", {"false", "true", "yes", "no"}, SafeFilepaths(j))
+                CheckNodeValue("randomize", {"false", "true", "yes", "no"}, SafeFilepaths(j))
+                CheckNodeValue("scrollout", {"false", "true", "yes", "no"}, SafeFilepaths(j))
+                CheckNodeValue("pulseonselect", {"false", "true", "yes", "no"}, SafeFilepaths(j))
+                CheckNodeValue("reverse", {"false", "true", "yes", "no"}, SafeFilepaths(j))
+                CheckNodeValue("usecontrolcoords", {"false", "true", "yes", "no"}, SafeFilepaths(j))
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
