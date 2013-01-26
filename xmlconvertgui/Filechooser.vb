@@ -32,7 +32,7 @@ Public Class Filechooser
     Public elementlist As XmlNodeList
     Public TempLetter As String
     Public ElementCounter As String
-
+    Public RoundFactor As Integer
     Private Sub Filechooser_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
         If MsgBox("Save Path Values?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
             My.Settings.TexturePackerPath = TexturePackerPath
@@ -57,6 +57,7 @@ Public Class Filechooser
         TexturePackerPath = My.Settings.TexturePackerPath
         XMLFolder = My.Settings.XMLFolder
         SkinFolder = My.Settings.SkinFolder
+        RoundFactor = 1
         OutputLog.AppendText("Program started" & vbCrLf)
         OutputLog.AppendText(TexturePackerPath & vbCrLf)
         OutputLog.AppendText(XMLFolder & vbCrLf)
@@ -108,12 +109,12 @@ Public Class Filechooser
                     For i = 0 To elementlist.Count - 1
                         If (Not elementlist(i).Attributes("time") Is Nothing) Then
                             If (Double.TryParse(elementlist(i).Attributes("time").InnerText, Number)) Then
-                                elementlist(i).Attributes("time").InnerText = Math.Round(XmlConvert.ToDouble(Number) * AnimationScale)
+                                elementlist(i).Attributes("time").InnerText = Math.Round(XmlConvert.ToDouble(Number) / RoundFactor * AnimationScale) * RoundFactor
                             End If
                         End If
                         If (Not elementlist(i).Attributes("delay") Is Nothing) Then
                             If (Double.TryParse(elementlist(i).Attributes("delay").InnerText, Number)) Then
-                                elementlist(i).Attributes("delay").InnerText = Math.Round(XmlConvert.ToDouble(Number) * AnimationScale)
+                                elementlist(i).Attributes("delay").InnerText = Math.Round(XmlConvert.ToDouble(Number) / RoundFactor * AnimationScale) * RoundFactor
                             End If
                         End If
                     Next
@@ -194,14 +195,8 @@ Public Class Filechooser
     End Sub
 
     Sub changeElements(ByVal tag As String)
-        If DebugOutput.Checked Then
-            OutputLog.AppendText("Changing " + tag + " values..." & vbCrLf)
-        End If
         elementlist = doc.GetElementsByTagName(tag)
         For i = 0 To elementlist.Count - 1
-            If DebugOutput.Checked Then
-                OutputLog.AppendText(elementlist(i).InnerXml.ToString & " ==> " & ConvertValue(elementlist(i).InnerXml) & vbCrLf)
-            End If
             elementlist(i).InnerXml = ConvertValue(elementlist(i).InnerXml)
         Next i
     End Sub
@@ -214,46 +209,22 @@ Public Class Filechooser
             ConvertValue = Math.Round(InputString * multiplyFactor)
         Else
             If InputString.Length > 1 Then
-                If DebugOutput.Checked Then
-                    OutputLog.AppendText("Attempted conversion of " + InputString + " failed." & vbCrLf)
-                End If
                 TempLetter = InputString.ToString.Substring(InputString.Length - 1, 1)
                 InputString = InputString.ToString.Substring(0, InputString.Length - 1)
-                If DebugOutput.Checked Then
-                    OutputLog.AppendText("Removed last letter... " & vbCrLf)
-                    OutputLog.AppendText(InputString & vbCrLf)
-                End If
                 If Int32.TryParse(InputString, number) Then
                     ConvertValue = Math.Round(number * multiplyFactor).ToString + TempLetter
                     '   ConvertValue = Math.Round(number * multiplyFactor).ToString
-                    If DebugOutput.Checked Then
-                        OutputLog.AppendText("Conversion successful" & vbCrLf)
-                    End If
                     OutputLog.AppendText(InputString & vbCrLf)
                 Else
                     If InputString.Length > 1 Then
                         TempLetter = InputString.ToString.Substring(InputString.Length - 1, 1)
                         InputString = InputString.ToString.Substring(0, InputString.Length - 1)
-                        If DebugOutput.Checked Then
-                            OutputLog.AppendText("Removed last letter... " & vbCrLf)
-                            OutputLog.AppendText(InputString & vbCrLf)
-                        End If
                         If Int32.TryParse(InputString, number) Then
                             '      ConvertValue = Math.Round(number * multiplyFactor).ToString + TempLetter
                             ConvertValue = Math.Round(number * multiplyFactor).ToString
-                            If DebugOutput.Checked Then
-                                OutputLog.AppendText("Conversion successful" & vbCrLf)
-                            End If
-                            OutputLog.AppendText(InputString & vbCrLf)
                         Else
-                            If DebugOutput.Checked Then
-                                OutputLog.AppendText("not converted... " & vbCrLf)
-                            End If
                         End If
                     Else
-                        If DebugOutput.Checked Then
-                            OutputLog.AppendText("not converted... " & vbCrLf)
-                        End If
                     End If
                 End If
             End If
@@ -265,17 +236,11 @@ Public Class Filechooser
         Dim IndexStart = 0
         For i = 0 To CompleteString.Length - 1
             If CompleteString(i) = "," Then
-                If DebugOutput.Checked Then
-                    OutputLog.AppendText("comma detected. Pos i:" + i.ToString & vbCrLf)
-                End If
                 NewString = NewString + ConvertValue(CompleteString.Substring(IndexStart, i - IndexStart)) + ","
                 IndexStart = i + 1
             End If
         Next
         CompleteString = NewString + ConvertValue((CompleteString.Substring(IndexStart, CompleteString.Length - IndexStart)))
-        If DebugOutput.Checked Then
-            OutputLog.AppendText(TempString & " ==> " & CompleteString & vbCrLf)
-        End If
     End Sub
 
     Sub convertStringifseveral(ByRef CompleteString As String)
@@ -285,23 +250,14 @@ Public Class Filechooser
         If CompleteString.Contains(",") Then
             For i = 0 To CompleteString.Length - 1
                 If CompleteString(i) = "," Then
-                    If DebugOutput.Checked Then
-                        OutputLog.AppendText("comma detected. Pos i:" + i.ToString & vbCrLf)
-                    End If
                     NewString = NewString + ConvertValue(CompleteString.Substring(IndexStart, i - IndexStart)) + ","
                     IndexStart = i + 1
                 End If
             Next
             CompleteString = NewString + ConvertValue((CompleteString.Substring(IndexStart, CompleteString.Length - IndexStart)))
-            If DebugOutput.Checked Then
-                OutputLog.AppendText(TempString & " ==> " & CompleteString & vbCrLf)
-            End If
         End If
     End Sub
     Sub changeAttributes()
-        If DebugOutput.Checked Then
-            OutputLog.AppendText("Changing Attributes..." & vbCrLf)
-        End If
         elementlist = doc.SelectNodes("//animation[@effect='zoom'] | //effect[@type='zoom']")
         For i = 0 To elementlist.Count - 1
             If Not elementlist(i).Attributes("start") Is Nothing Then
@@ -435,12 +391,8 @@ Public Class Filechooser
             For j = 0 To xmlelementsTexture.Length
                 elementlist = doc.GetElementsByTagName(xmlelementsTexture(j))
                 For i = 0 To elementlist.Count - 1
-                    If DebugOutput.Checked Then
-                        OutputLog.AppendText(elementlist(i).InnerXml.ToString & vbCrLf)
-                    End If
                     If ShortenedTexturePaths.Contains(elementlist(i).InnerXml.ToLower) Then
                         ShortenedTexturePaths.Remove(elementlist(i).InnerXml.ToLower)
-                        '        OutputLog.AppendText("Removed " + elementlist(i).InnerXml.ToLower & vbCrLf)
                     End If
                 Next i
             Next j
@@ -470,30 +422,27 @@ Public Class Filechooser
             MsgBox("Please choose a skin folder.")
         Else
             If SkinFolder <> "" Then
-                OutputButton.Visible = True
-                OutputLabel.Visible = True
-                If strOutputFolder <> "" Then
-                    ConvertButton.Enabled = True
-                End If
                 doc.Load(SkinFolder + "\addon.xml")
                 elementlist = doc.SelectNodes("//res")
-                For i = 0 To elementlist.Count - 1
-                    If Not elementlist(i).Attributes("folder") Is Nothing Then
-                        XMLFolder = SkinFolder + "\" + elementlist(i).Attributes("folder").InnerText
+                If Not elementlist(0).Attributes("folder") Is Nothing Then
+                    XMLFolder = SkinFolder + "\" + elementlist(0).Attributes("folder").InnerText
+                    OutputLog.AppendText("XML Folder:" & XMLFolder & vbCrLf)
+                    Const ATTR_DIRECTORY = 16
+                    If Dir$(XMLFolder, ATTR_DIRECTORY) <> "" Then
+                        Dim DirInfo As New DirectoryInfo(XMLFolder)
+                        Dim FileObj As IO.FileSystemInfo
+                        For Each FileObj In DirInfo.GetFileSystemInfos
+                            Filepaths.Add(FileObj.FullName)
+                            SafeFilepaths.Add(FileObj.Name)
+                        Next
+                        OutputButton.Visible = True
+                        OutputLabel.Visible = True
+                        If strOutputFolder <> "" Then
+                            ConvertButton.Enabled = True
+                        End If
+                    Else
+                        MsgBox("Path from addon.xml does not exist.")
                     End If
-                Next
-                OutputLog.AppendText("XML Folder:" & XMLFolder & vbCrLf)
-                Const ATTR_DIRECTORY = 16
-                If Dir$(XMLFolder, ATTR_DIRECTORY) <> "" Then
-                    Dim DirInfo As New DirectoryInfo(XMLFolder)
-                    Dim FileObj As IO.FileSystemInfo
-                    For Each FileObj In DirInfo.GetFileSystemInfos
-                        Filepaths.Add(FileObj.FullName)
-                        SafeFilepaths.Add(FileObj.Name)
-                        '  OutputLog.AppendText(FileObj.FullName & vbCrLf)
-                    Next
-                Else
-                    MsgBox("Path from addon.xml does not exist.")
                 End If
             End If
         End If
@@ -511,13 +460,8 @@ Public Class Filechooser
             Try
                 doc.Load(Filepaths(j))
                 If Not Filepaths(j).ToString.Contains("ont.xml") Then
-
-
                     elementlist = doc.GetElementsByTagName("font")
                     For i = 0 To elementlist.Count - 1
-                        If DebugOutput.Checked Then
-                            OutputLog.AppendText(elementlist(i).InnerXml.ToString & vbCrLf)
-                        End If
                         If FontList.Contains(elementlist(i).InnerXml) Then
                             FontList.Remove(elementlist(i).InnerXml)
                         End If
@@ -542,18 +486,12 @@ Public Class Filechooser
             doc.Load(XMLFolder + "\font.xml")
             elementlist = doc.GetElementsByTagName("name")
             For i = 0 To elementlist.Count - 1
-                If DebugOutput.Checked Then
-                    OutputLog.AppendText(elementlist(i).InnerXml & vbCrLf)
-                End If
                 If Not FontList.Contains(elementlist(i).InnerXml) Then
                     FontList.Add(elementlist(i).InnerXml)
                 End If
             Next i
             elementlist = doc.GetElementsByTagName("filename")
             For i = 0 To elementlist.Count - 1
-                If DebugOutput.Checked Then
-                    OutputLog.AppendText(elementlist(i).InnerXml & vbCrLf)
-                End If
                 If Not FontList2.Contains(elementlist(i).InnerXml) Then
                     FontList2.Add(elementlist(i).InnerXml)
                     OutputLog.AppendText("Added" + elementlist(i).InnerXml & vbCrLf)
