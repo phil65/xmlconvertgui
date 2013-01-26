@@ -44,6 +44,7 @@ Public Class Filechooser
         SkinFolder = My.Settings.SkinFolder
         IndentingDropDown.SelectedIndex = My.Settings.Indenting
         EOLComboBox.SelectedIndex = My.Settings.EndOfLine
+        ConversionDropDown.SelectedIndex = My.Settings.ConversionType
         HeaderOption.Checked = My.Settings.XMLHeader
         ConvertBorders.Checked = My.Settings.ConvertBorders
         OutputLog.AppendText("Program started" & vbCrLf)
@@ -51,7 +52,6 @@ Public Class Filechooser
         OutputLog.AppendText("XML Folder Path:" & XMLFolder & vbCrLf)
         OutputLog.AppendText("Skin Path:" & SkinFolder & vbCrLf)
     End Sub
-
 
     Public Sub ConvertButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ConvertButton.Click
         OutputLog.AppendText("Amount Of Files Chosen: " + Filepaths.Count.ToString & vbCrLf)
@@ -532,32 +532,20 @@ Public Class Filechooser
         OpenFileDialog.Filter = "EXE Files|*.exe"
         Dim DidWork As Integer = OpenFileDialog.ShowDialog()
         If DidWork = DialogResult.Cancel Then
-
         Else
             OutputButton.Visible = True
             OutputLabel.Visible = True
             TexturePackerPath = OpenFileDialog.FileName
             OutputLog.AppendText("TexturePacker Path: " + TexturePackerPath & vbCrLf)
-            'If strOutputFolder <> "" Then
-            '    ConvertButton.Enabled = True
-            'End If
-            My.Computer.Registry.CurrentUser.CreateSubKey("XBMCSkinningTool")
-            ' Change MyTestKeyValue to This is a test value. 
-            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\XBMCSkinningTool", _
-            "texturepackerpath", TexturePackerPath)
-
         End If
     End Sub
 
     Private Sub Button3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button3.Click
         BuildFolderDialog.Description = "Choose Build Folder"
-
         Dim DidWork As Integer = BuildFolderDialog.ShowDialog()
         If DidWork = DialogResult.Cancel Then
-
         Else
             BuildFolder = BuildFolderDialog.SelectedPath
-            '     OutputLabel.Text = BuildFolder + "\"
             OutputLog.AppendText("Build Folder chosen:" & vbCrLf)
             OutputLog.AppendText(BuildFolder & vbCrLf)
         End If

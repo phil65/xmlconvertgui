@@ -104,7 +104,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("1")>  _
         Public Property Indenting() As Integer
             Get
                 Return CType(Me("Indenting"),Integer)
@@ -116,7 +116,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("2")>  _
         Public Property EndOfLine() As Integer
             Get
                 Return CType(Me("EndOfLine"),Integer)
@@ -135,6 +135,18 @@ Namespace My
             End Get
             Set
                 Me("XMLHeader") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("2")>  _
+        Public Property ConversionType() As String
+            Get
+                Return CType(Me("ConversionType"),String)
+            End Get
+            Set
+                Me("ConversionType") = value
             End Set
         End Property
     End Class
