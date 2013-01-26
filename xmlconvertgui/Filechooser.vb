@@ -266,9 +266,6 @@ Public Class Filechooser
             If Not elementlist(i).Attributes("end") Is Nothing Then
                 convertStringifseveral(elementlist(i).Attributes("end").InnerText)
             End If
-            If Not elementlist(i).Attributes("zoom") Is Nothing Then
-                convertStringifseveral(elementlist(i).Attributes("zoom").InnerText)
-            End If
         Next
         elementlist = doc.SelectNodes("//animation[@effect='slide'] | //effect[@type='slide']")
         For i = 0 To elementlist.Count - 1
