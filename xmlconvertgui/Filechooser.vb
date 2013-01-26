@@ -131,11 +131,11 @@ Public Class Filechooser
                         myXmlSettings.NewLineHandling = NewLineHandling.None
                     Case 1
                         myXmlSettings.NewLineHandling = NewLineHandling.Replace
-                        myXmlSettings.NewLineChars = "\r\n"
+                        myXmlSettings.NewLineChars = ControlChars.CrLf
                         OutputLog.AppendText("Windows Line Endings selected" & vbCrLf)
                     Case 2
                         myXmlSettings.NewLineHandling = NewLineHandling.Replace
-                        myXmlSettings.NewLineChars = "\n"
+                        myXmlSettings.NewLineChars = ControlChars.NewLine
                         OutputLog.AppendText("Linux Line Endings selected" & vbCrLf)
                 End Select
                 myXmlSettings.Indent = True

@@ -31,7 +31,6 @@ Partial Class Filechooser
         Me.OutputLog = New System.Windows.Forms.TextBox()
         Me.ConversionDropDown = New System.Windows.Forms.ComboBox()
         Me.HeaderOption = New System.Windows.Forms.CheckBox()
-        Me.DebugOutput = New System.Windows.Forms.CheckBox()
         Me.ConvertBorders = New System.Windows.Forms.CheckBox()
         Me.TextureCheckButton = New System.Windows.Forms.Button()
         Me.SkinFolderButton = New System.Windows.Forms.Button()
@@ -117,23 +116,12 @@ Partial Class Filechooser
         'HeaderOption
         '
         Me.HeaderOption.AutoSize = True
-        Me.HeaderOption.Location = New System.Drawing.Point(9, 322)
+        Me.HeaderOption.Location = New System.Drawing.Point(9, 345)
         Me.HeaderOption.Name = "HeaderOption"
         Me.HeaderOption.Size = New System.Drawing.Size(108, 17)
         Me.HeaderOption.TabIndex = 9
         Me.HeaderOption.Text = "Add XML Header"
         Me.HeaderOption.UseVisualStyleBackColor = True
-        '
-        'DebugOutput
-        '
-        Me.DebugOutput.AutoSize = True
-        Me.DebugOutput.Location = New System.Drawing.Point(9, 345)
-        Me.DebugOutput.Name = "DebugOutput"
-        Me.DebugOutput.Size = New System.Drawing.Size(115, 17)
-        Me.DebugOutput.TabIndex = 11
-        Me.DebugOutput.Text = "Enable Debug Log"
-        Me.DebugOutput.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
-        Me.DebugOutput.UseVisualStyleBackColor = True
         '
         'ConvertBorders
         '
@@ -313,7 +301,6 @@ Partial Class Filechooser
         Me.Controls.Add(Me.SkinFolderButton)
         Me.Controls.Add(Me.TextureCheckButton)
         Me.Controls.Add(Me.ConvertBorders)
-        Me.Controls.Add(Me.DebugOutput)
         Me.Controls.Add(Me.HeaderOption)
         Me.Controls.Add(Me.ConversionDropDown)
         Me.Controls.Add(Me.OutputLog)
@@ -336,7 +323,6 @@ Partial Class Filechooser
     Friend WithEvents OutputLog As System.Windows.Forms.TextBox
     Friend WithEvents ConversionDropDown As System.Windows.Forms.ComboBox
     Friend WithEvents HeaderOption As System.Windows.Forms.CheckBox
-    Friend WithEvents DebugOutput As System.Windows.Forms.CheckBox
     Friend WithEvents ConvertBorders As System.Windows.Forms.CheckBox
     Friend WithEvents TextureCheckButton As System.Windows.Forms.Button
     Friend WithEvents SkinFolderButton As System.Windows.Forms.Button
