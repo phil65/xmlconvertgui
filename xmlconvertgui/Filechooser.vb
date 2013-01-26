@@ -167,7 +167,7 @@ Public Class Filechooser
     Sub changeElements(ByVal tag As String)
         elementlist = doc.GetElementsByTagName(tag)
         For Each element In elementlist
-            element.InnerXml = ConvertValue(element.InnerXml)
+            element.InnerXml = ConvertValue(element.InnerXml, multiplyFactor)
         Next element
     End Sub
 
@@ -180,13 +180,13 @@ Public Class Filechooser
         End If
     End Sub
 
-    Function ConvertValue(ByVal InputString As String) As String
+    Function ConvertValue(ByVal InputString As String, ByVal ScaleFactor As Double) As String
         Dim number As Integer
         Dim TempLetter As String
         ConvertValue = InputString
         If Double.TryParse(InputString, number) And (InputString <> "1") Then
             InputString = XmlConvert.ToDouble(InputString)
-            ConvertValue = Math.Round(InputString * multiplyFactor)
+            ConvertValue = Math.Round(InputString * ScaleFactor).ToString
         Else
             If InputString.Length > 1 Then
                 TempLetter = InputString.Substring(InputString.Length - 1, 1)
@@ -219,11 +219,11 @@ Public Class Filechooser
                 If CompleteString.Contains(",") Or (ConvertAll = True) Then
                     For i = 0 To CompleteString.Length - 1
                         If CompleteString(i) = "," Then
-                            NewString = NewString + ConvertValue(CompleteString.Substring(IndexStart, i - IndexStart)) + ","
+                            NewString = NewString + ConvertValue(CompleteString.Substring(IndexStart, i - IndexStart), multiplyFactor) + ","
                             IndexStart = i + 1
                         End If
                     Next
-                    CompleteString = NewString + ConvertValue((CompleteString.Substring(IndexStart, CompleteString.Length - IndexStart)))
+                    CompleteString = NewString + ConvertValue((CompleteString.Substring(IndexStart, CompleteString.Length - IndexStart)), multiplyFactor)
                 End If
             End If
             Node.Attributes(Tag).InnerText = CompleteString
