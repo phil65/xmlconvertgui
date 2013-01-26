@@ -170,6 +170,7 @@ Public Class Filechooser
             element.InnerXml = ConvertValue(element.InnerXml)
         Next element
     End Sub
+
     Sub ScaleXMLNode(ByRef Element As XmlNode, ByVal tag As String, ByVal ScaleFactor As String)
         Dim Number As Double
         If (Not Element.Attributes(tag) Is Nothing) Then
@@ -207,10 +208,10 @@ Public Class Filechooser
             End If
         End If
     End Function
+
     Sub convertString(ByRef CompleteString As String, Optional ByVal ConvertAll As Boolean = True)
         Dim NewString As String = ""
         Dim IndexStart = 0
-        Dim TempString As String = CompleteString
         If CompleteString.Contains(",") Or (ConvertAll = True) Then
             For i = 0 To CompleteString.Length - 1
                 If CompleteString(i) = "," Then
@@ -221,6 +222,7 @@ Public Class Filechooser
             CompleteString = NewString + ConvertValue((CompleteString.Substring(IndexStart, CompleteString.Length - IndexStart)))
         End If
     End Sub
+
     Sub changeAttributes()
         elementlist = doc.SelectNodes("//animation[@effect='zoom'] | //effect[@type='zoom']")
         For Each element In elementlist
@@ -288,6 +290,7 @@ Public Class Filechooser
             End If
         Next
     End Sub
+
     Sub TextureFinder(ByVal dir As String)
         Dim ShortPath As String = ""
         Try
@@ -313,6 +316,7 @@ Public Class Filechooser
             OutputLog.AppendText(ex.Message)
         End Try
     End Sub
+
     Private Sub TextureCheckButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TextureCheckButton.Click
         OutputLog.AppendText("Building Texture List" & vbCrLf)
         TextureFinder(SkinFolder + "\media")
@@ -333,6 +337,7 @@ Public Class Filechooser
             OutputLog.AppendText(str & vbCrLf)
         Next
     End Sub
+
     Sub RemoveTexturesFromArray()
         Try
             elementlist = doc.SelectNodes("//texture")
@@ -359,6 +364,7 @@ Public Class Filechooser
         Catch
         End Try
     End Sub
+
     Private Function CheckPath(ByVal strPath As String) As Boolean
         If Dir$(strPath) <> "" Then
             CheckPath = True
@@ -366,14 +372,16 @@ Public Class Filechooser
             CheckPath = False
         End If
     End Function
+
     Private Sub CheckNodeValue(ByVal XMLTag As String, ByVal ValidValues As String(), Optional ByRef FileName As String = "")
         elementlist = doc.GetElementsByTagName(XMLTag)
         For Each element In elementlist
-            If Not ValidValues.Contains(element.InnerXml) Then
+            If Not ValidValues.Contains(element.InnerXml.ToString.ToLower) Then
                 OutputLog.AppendText(FileName + ": Invalid Value for " & XMLTag & ": " & element.InnerXml & vbCrLf)
             End If
         Next
     End Sub
+
     Private Sub SkinFolderButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SkinFolderButton.Click
         SafeFilepaths.Clear()
         Filepaths.Clear()
@@ -383,8 +391,7 @@ Public Class Filechooser
         If DidWork = DialogResult.Cancel Then
         Else
             SkinFolder = SkinFolderDialog.SelectedPath
-            OutputLog.AppendText("Skin Folder chosen:" & vbCrLf)
-            OutputLog.AppendText(SkinFolder & vbCrLf)
+            OutputLog.AppendText("Skin Folder chosen:" & vbCrLf & SkinFolder & vbCrLf)
         End If
         If Not CheckPath(SkinFolder + "\addon.xml") Then
             MsgBox("Please choose a skin folder.")
@@ -475,6 +482,7 @@ Public Class Filechooser
             OutputLog.AppendText(str & vbCrLf)
         Next
     End Sub
+
     Private Sub CheckIncludesButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckIncludesButton.Click
         OutputLog.AppendText("Building Include List" & vbCrLf)
         Dim IncludeList As New ArrayList()
@@ -528,11 +536,11 @@ Public Class Filechooser
         Next
     End Sub
 
-    Private Sub Button4_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button4.Click
+    Private Sub StartSkinBuildButton(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button4.Click
         Process.Start("build.bat", SkinFolder + " " + TexturePackerPath + " " + BuildFolder)
     End Sub
 
-    Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
+    Private Sub ChooseTexturePackerButton(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
         OpenFileDialog.Title = "Choose EXE file"
         OpenFileDialog.Filter = "EXE Files|*.exe"
         Dim DidWork As Integer = OpenFileDialog.ShowDialog()
@@ -545,7 +553,7 @@ Public Class Filechooser
         End If
     End Sub
 
-    Private Sub Button3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button3.Click
+    Private Sub BuildFolderButton(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button3.Click
         BuildFolderDialog.Description = "Choose Build Folder"
         Dim DidWork As Integer = BuildFolderDialog.ShowDialog()
         If DidWork = DialogResult.Cancel Then
@@ -555,6 +563,7 @@ Public Class Filechooser
             OutputLog.AppendText(BuildFolder & vbCrLf)
         End If
     End Sub
+
     Public Function CountCharacter(ByVal value As String, ByVal ch As Char) As Integer
         Dim cnt As Integer = 0
         For Each c As Char In value
