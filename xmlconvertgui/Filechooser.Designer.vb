@@ -36,7 +36,7 @@ Partial Class Filechooser
         Me.SkinFolderButton = New System.Windows.Forms.Button()
         Me.SkinFolderDialog = New System.Windows.Forms.FolderBrowserDialog()
         Me.ClearLogButton = New System.Windows.Forms.Button()
-        Me.Button1 = New System.Windows.Forms.Button()
+        Me.CheckFontsButton = New System.Windows.Forms.Button()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.Splitter1 = New System.Windows.Forms.Splitter()
         Me.CheckIncludesButton = New System.Windows.Forms.Button()
@@ -162,14 +162,14 @@ Partial Class Filechooser
         Me.ClearLogButton.Text = "Clear Log"
         Me.ClearLogButton.UseVisualStyleBackColor = True
         '
-        'Button1
+        'CheckFontsButton
         '
-        Me.Button1.Location = New System.Drawing.Point(49, 88)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(95, 23)
-        Me.Button1.TabIndex = 16
-        Me.Button1.Text = "Check Fonts"
-        Me.Button1.UseVisualStyleBackColor = True
+        Me.CheckFontsButton.Location = New System.Drawing.Point(49, 88)
+        Me.CheckFontsButton.Name = "CheckFontsButton"
+        Me.CheckFontsButton.Size = New System.Drawing.Size(95, 23)
+        Me.CheckFontsButton.TabIndex = 16
+        Me.CheckFontsButton.Text = "Check Fonts"
+        Me.CheckFontsButton.UseVisualStyleBackColor = True
         '
         'Label1
         '
@@ -307,7 +307,7 @@ Partial Class Filechooser
         Me.Controls.Add(Me.CheckIncludesButton)
         Me.Controls.Add(Me.Splitter1)
         Me.Controls.Add(Me.Label1)
-        Me.Controls.Add(Me.Button1)
+        Me.Controls.Add(Me.CheckFontsButton)
         Me.Controls.Add(Me.ClearLogButton)
         Me.Controls.Add(Me.SkinFolderButton)
         Me.Controls.Add(Me.TextureCheckButton)
@@ -339,7 +339,7 @@ Partial Class Filechooser
     Friend WithEvents SkinFolderButton As System.Windows.Forms.Button
     Friend WithEvents SkinFolderDialog As System.Windows.Forms.FolderBrowserDialog
     Friend WithEvents ClearLogButton As System.Windows.Forms.Button
-    Friend WithEvents Button1 As System.Windows.Forms.Button
+    Friend WithEvents CheckFontsButton As System.Windows.Forms.Button
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents Splitter1 As System.Windows.Forms.Splitter
     Friend WithEvents CheckIncludesButton As System.Windows.Forms.Button

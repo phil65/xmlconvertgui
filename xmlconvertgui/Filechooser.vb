@@ -19,19 +19,16 @@ Public Class Filechooser
     Public doc As New XmlDocument()
     Public multiplyFactor As Double = 1.5
     Public ShortenedTexturePaths As New ArrayList()
-    Public FontList As New ArrayList()
     Public IDList As New ArrayList()
     Public IDList2 As New ArrayList()
     Public IDListBackup As New ArrayList()
-    Public FontList2 As New ArrayList()
     Public IncludeList As New ArrayList()
     Public IncludeListBackup As New ArrayList()
     Public IncludeList2 As New ArrayList()
     Public Filepaths As New ArrayList()
     Public SafeFilepaths As New ArrayList()
     Public elementlist As XmlNodeList
-    Public TempLetter As String
-    Public ElementCounter As String
+    Public XMLCounter As String
     Public RoundFactor As Integer
     Private Sub Filechooser_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         ConversionDropDown.Items.Add("720p --> 1080p")
@@ -59,14 +56,8 @@ Public Class Filechooser
 
 
     Public Sub ConvertButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ConvertButton.Click
-        ' Create an XML declaration. 
-        If Filepaths.Count = 1 Then
-            OutputLog.AppendText("XML File chosen: " + SafeFilepaths(0) & vbCrLf)
-            xmlname.Text = SafeFilepaths(0)
-        Else
-            OutputLog.AppendText("Amount Of Files Chosen: " + Filepaths.Count.ToString & vbCrLf)
-            xmlname.Text = Filepaths.Count.ToString + " Files chosen"
-        End If
+        OutputLog.AppendText("Amount Of Files Chosen: " + Filepaths.Count.ToString & vbCrLf)
+        xmlname.Text = Filepaths.Count.ToString + " Files chosen"
         Select Case ConversionDropDown.SelectedIndex
             Case 0
                 multiplyFactor = 1.5
@@ -78,7 +69,7 @@ Public Class Filechooser
                 multiplyFactor = 1
                 OutputLog.AppendText("only converting Encoding / adding Headers" & vbCrLf)
         End Select
-        ElementCounter = 0
+        XMLCounter = 0
         Dim errorcounter = 0
         For j = 0 To Filepaths.Count - 1
             Try
@@ -147,7 +138,7 @@ Public Class Filechooser
                 doc.WriteTo(wrtr)
                 wrtr.Close()
                 OutputLog.AppendText(SafeFilepaths(j) + " created successfully" & vbCrLf)
-                ElementCounter = ElementCounter + 1
+                XMLCounter = XMLCounter + 1
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
                 errorcounter = errorcounter + 1
@@ -157,7 +148,7 @@ Public Class Filechooser
             End Try
         Next j
         OutputLog.AppendText("All Files converted" & vbCrLf)
-        MsgBox(ElementCounter + " XML Files converted." & vbCrLf & "Errors: " + errorcounter.ToString)
+        MsgBox(XMLCounter + " XML Files converted." & vbCrLf & "Errors: " + errorcounter.ToString)
         errorcounter = 0
         ConvertButton.Enabled = False
 
@@ -195,6 +186,7 @@ Public Class Filechooser
 
     Function ConvertValue(ByVal InputString As String) As String
         Dim number As Integer
+        Dim TempLetter As String
         ConvertValue = InputString
         If Double.TryParse(InputString, number) And (InputString <> "1") Then
             InputString = XmlConvert.ToDouble(InputString)
@@ -205,14 +197,12 @@ Public Class Filechooser
                 InputString = InputString.ToString.Substring(0, InputString.Length - 1)
                 If Int32.TryParse(InputString, number) Then
                     ConvertValue = Math.Round(number * multiplyFactor).ToString + TempLetter
-                    '   ConvertValue = Math.Round(number * multiplyFactor).ToString
                     OutputLog.AppendText(InputString & vbCrLf)
                 Else
                     If InputString.Length > 1 Then
                         TempLetter = InputString.ToString.Substring(InputString.Length - 1, 1)
                         InputString = InputString.ToString.Substring(0, InputString.Length - 1)
                         If Int32.TryParse(InputString, number) Then
-                            '      ConvertValue = Math.Round(number * multiplyFactor).ToString + TempLetter
                             ConvertValue = Math.Round(number * multiplyFactor).ToString
                         Else
                         End If
@@ -433,9 +423,31 @@ Public Class Filechooser
         OutputLog.Clear()
     End Sub
 
-    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+    Private Sub CheckFontsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckFontsButton.Click
         OutputLog.AppendText("Building Font List" & vbCrLf)
-        FontFinder()
+        Dim ShortPath As String = ""
+        Dim FontList As New ArrayList()
+        Dim FontList2 As New ArrayList()
+        Try
+            doc.Load(XMLFolder + "\font.xml")
+            elementlist = doc.GetElementsByTagName("name")
+            For Each element In elementlist
+                If Not FontList.Contains(element.InnerXml) Then
+                    FontList.Add(element.InnerXml)
+                End If
+            Next element
+            elementlist = doc.GetElementsByTagName("filename")
+            For Each element In elementlist
+                If Not FontList2.Contains(element.InnerXml) Then
+                    FontList2.Add(element.InnerXml)
+                    OutputLog.AppendText("Added" + element.InnerXml & vbCrLf)
+                End If
+            Next element
+        Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+            OutputLog.AppendText(xmlex.Message)
+        Catch ex As Exception                        ' Handle the generic Exceptions here.
+            OutputLog.AppendText(ex.Message)
+        End Try
         OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the fonts of the upcoming list for usage." & vbCrLf)
         For j = 0 To Filepaths.Count - 1
             Try
@@ -459,30 +471,6 @@ Public Class Filechooser
         For Each str In FontList
             OutputLog.AppendText(str & vbCrLf)
         Next
-    End Sub
-
-    Sub FontFinder()
-        Dim ShortPath As String = ""
-        Try
-            doc.Load(XMLFolder + "\font.xml")
-            elementlist = doc.GetElementsByTagName("name")
-            For i = 0 To elementlist.Count - 1
-                If Not FontList.Contains(elementlist(i).InnerXml) Then
-                    FontList.Add(elementlist(i).InnerXml)
-                End If
-            Next i
-            elementlist = doc.GetElementsByTagName("filename")
-            For i = 0 To elementlist.Count - 1
-                If Not FontList2.Contains(elementlist(i).InnerXml) Then
-                    FontList2.Add(elementlist(i).InnerXml)
-                    OutputLog.AppendText("Added" + elementlist(i).InnerXml & vbCrLf)
-                End If
-            Next i
-        Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-            OutputLog.AppendText(xmlex.Message)
-        Catch ex As Exception                        ' Handle the generic Exceptions here.
-            OutputLog.AppendText(ex.Message)
-        End Try
     End Sub
     Private Sub CheckIncludesButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckIncludesButton.Click
         OutputLog.AppendText("Building Include List" & vbCrLf)
