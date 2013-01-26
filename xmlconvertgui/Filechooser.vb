@@ -33,13 +33,6 @@ Public Class Filechooser
     Public TempLetter As String
     Public ElementCounter As String
     Public RoundFactor As Integer
-    Private Sub Filechooser_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
-        If MsgBox("Save Path Values?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
-            My.Settings.TexturePackerPath = TexturePackerPath
-            My.Settings.XMLFolder = XMLFolder
-            My.Settings.SkinFolder = SkinFolder
-        End If
-    End Sub
     Private Sub Filechooser_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         ConversionDropDown.Items.Add("720p --> 1080p")
         ConversionDropDown.Items.Add("1080p --> 720p")
@@ -183,8 +176,7 @@ Public Class Filechooser
                     ConvertButton.Enabled = True
                 End If
                 OutputLabel.Text = strOutputFolder + "\"
-                OutputLog.AppendText("Output Folder chosen:" & vbCrLf)
-                OutputLog.AppendText(strOutputFolder & vbCrLf)
+                OutputLog.AppendText("Output Folder chosen:" & vbCrLf & strOutputFolder & vbCrLf)
             End If
             If (strOutputFolder + "\" + SafeFilepaths(0) = Filepaths(0)) Then
                 MsgBox("You´ve chosen the soure directory. please change the output path.")
@@ -704,6 +696,17 @@ Public Class Filechooser
         '      For Each str In IDList2
         ' OutputLog.AppendText(str & vbCrLf)
         '  Next
+    End Sub
+
+    Private Sub SaveButton_Click(sender As System.Object, e As System.EventArgs) Handles SaveButton.Click
+        My.Settings.TexturePackerPath = TexturePackerPath
+        My.Settings.XMLFolder = XMLFolder
+        My.Settings.SkinFolder = SkinFolder
+        My.Settings.XMLHeader = HeaderOption.Checked
+        My.Settings.ConvertBorders = ConvertBorders.Checked
+        My.Settings.EndOfLine = EOLComboBox.SelectedIndex
+        My.Settings.Indenting = IndentingDropDown.SelectedIndex
+        MsgBox("Settings saved")
     End Sub
 End Class
 
