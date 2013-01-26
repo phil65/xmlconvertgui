@@ -138,16 +138,13 @@ Public Class Filechooser
         MsgBox(XMLCounter + " XML Files converted." & vbCrLf & "Errors: " + errorcounter.ToString)
         errorcounter = 0
         ConvertButton.Enabled = False
-
     End Sub
 
     Private Sub OutputButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OutputButton.Click
         Do
             OutputFolderDialog.Description = "Choose Output Folder"
-
             Dim DidWork As Integer = OutputFolderDialog.ShowDialog()
             If DidWork = DialogResult.Cancel Then
-
             Else
                 strOutputFolder = OutputFolderDialog.SelectedPath
                 If Filepaths(0) <> "" Then
@@ -156,12 +153,7 @@ Public Class Filechooser
                 OutputLabel.Text = strOutputFolder + "\"
                 OutputLog.AppendText("Output Folder chosen:" & vbCrLf & strOutputFolder & vbCrLf)
             End If
-            If (strOutputFolder + "\" + SafeFilepaths(0) = Filepaths(0)) Then
-                MsgBox("You´ve chosen the soure directory. please change the output path.")
-            End If
         Loop While (strOutputFolder + "\" + SafeFilepaths(0) = Filepaths(0))
-
-
     End Sub
 
     Sub changeElements(ByVal tag As String)
@@ -296,7 +288,10 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
-                RemoveTexturesFromArray()
+                RemoveAttributesFromArray(ShortenedTexturePaths, "//texture", {"diffuse", "fallback"})
+                For k = 0 To xmlelementsTexture.Length
+                    RemoveNodesFromArray(ShortenedTexturePaths, xmlelementsTexture(k))
+                Next k
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
@@ -310,29 +305,85 @@ Public Class Filechooser
         Next
     End Sub
 
-    Sub RemoveTexturesFromArray()
+    Sub RemoveAttributesFromArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, ByVal Attributes As String(), Optional ByVal Lowercase As Boolean = False)
         Try
-            elementlist = doc.SelectNodes("//texture")
+            elementlist = doc.SelectNodes(NodeSelection)
             For Each element In elementlist
-                If Not element.Attributes("diffuse") Is Nothing Then
-                    If ShortenedTexturePaths.Contains(element.Attributes("diffuse").InnerText.ToString.ToLower) Then
-                        ShortenedTexturePaths.Remove(element.Attributes("diffuse").InnerText.ToString.ToLower)
+                For Each Attribute In Attributes
+                    If Not element.Attributes(Attribute) Is Nothing Then
+                        Dim CompareString
+                        If Lowercase = True Then
+                            CompareString = element.Attributes(Attribute).InnerText.ToString.ToLower
+                        Else
+                            CompareString = element.Attributes(Attribute).InnerText.ToString
+                        End If
+                        If EditArray.Contains(CompareString) Then
+                            EditArray.Remove(CompareString)
+                        End If
                     End If
-                End If
-                If Not element.Attributes("fallback") Is Nothing Then
-                    If ShortenedTexturePaths.Contains(element.Attributes("fallback").InnerText.ToString.ToLower) Then
-                        ShortenedTexturePaths.Remove(element.Attributes("fallback").InnerText.ToString.ToLower)
+                Next Attribute
+            Next
+        Catch
+        End Try
+    End Sub
+    Sub RemoveNodesFromArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, Optional ByVal Lowercase As Boolean = False)
+        Try
+            elementlist = doc.GetElementsByTagName(NodeSelection)
+            For Each element In elementlist
+                If Not element.InnerXML Is Nothing Then
+                    Dim CompareString
+                    If Lowercase = True Then
+                        CompareString = element.InnerXML.ToString.ToLower
+                    Else
+                        CompareString = element.InnerXML.ToString
+                    End If
+                    If EditArray.Contains(CompareString) Then
+                        EditArray.Remove(CompareString)
                     End If
                 End If
             Next
-            For j = 0 To xmlelementsTexture.Length
-                elementlist = doc.GetElementsByTagName(xmlelementsTexture(j))
-                For Each element In elementlist
-                    If ShortenedTexturePaths.Contains(element.InnerXml.ToLower) Then
-                        ShortenedTexturePaths.Remove(element.InnerXml.ToLower)
+        Catch
+        End Try
+    End Sub
+    Sub AddNodesToArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, Optional ByVal Lowercase As Boolean = False)
+        Try
+            elementlist = doc.GetElementsByTagName(NodeSelection)
+            For Each element In elementlist
+                If Not element.InnerXML Is Nothing Then
+                    Dim CompareString
+                    If Lowercase = True Then
+                        CompareString = element.InnerXML.ToString.ToLower
+                    Else
+                        CompareString = element.InnerXML.ToString
                     End If
-                Next element
-            Next j
+                    If Not EditArray.Contains(CompareString) Then
+                        EditArray.Add(CompareString)
+                    End If
+                End If
+            Next
+        Catch
+        End Try
+    End Sub
+
+    Sub AddAttributesToArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, ByVal AttributeList As String(), Optional ByVal Lowercase As Boolean = False)
+        Try
+            elementlist = doc.SelectNodes(NodeSelection)
+            For Each element In elementlist
+                For Each Attribute In AttributeList
+                    If Not element.Attributes(Attribute) Is Nothing Then
+                        Dim CompareString
+                        If Lowercase = True Then
+                            CompareString = element.Attributes(Attribute).InnerText.ToString.ToLower
+                        Else
+                            CompareString = element.Attributes(Attribute).InnerText.ToString
+                        End If
+                        If Not EditArray.Contains(CompareString) Then
+                            EditArray.Add(CompareString)
+                        End If
+
+                    End If
+                Next Attribute
+            Next
         Catch
         End Try
     End Sub
@@ -412,19 +463,8 @@ Public Class Filechooser
         Dim FontList2 As New ArrayList()
         Try
             doc.Load(XMLFolder + "\font.xml")
-            elementlist = doc.GetElementsByTagName("name")
-            For Each element In elementlist
-                If Not FontList.Contains(element.InnerXml) Then
-                    FontList.Add(element.InnerXml)
-                End If
-            Next element
-            elementlist = doc.GetElementsByTagName("filename")
-            For Each element In elementlist
-                If Not FontList2.Contains(element.InnerXml) Then
-                    FontList2.Add(element.InnerXml)
-                    OutputLog.AppendText("Added" + element.InnerXml & vbCrLf)
-                End If
-            Next element
+            AddNodesToArray(FontList, "name")
+            AddNodesToArray(FontList2, "filename")
         Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
             OutputLog.AppendText(xmlex.Message)
         Catch ex As Exception                        ' Handle the generic Exceptions here.
@@ -435,12 +475,7 @@ Public Class Filechooser
             Try
                 doc.Load(Filepaths(j))
                 If Not Filepaths(j).ToString.ToLower.Contains("font.xml") Then
-                    elementlist = doc.GetElementsByTagName("font")
-                    For Each element In elementlist
-                        If FontList.Contains(element.InnerXml) Then
-                            FontList.Remove(element.InnerXml)
-                        End If
-                    Next element
+                    RemoveNodesFromArray(FontList, "font")
                 End If
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
@@ -467,12 +502,7 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
-                elementlist = doc.SelectNodes("//include[(@name)]")
-                For Each element In elementlist
-                    If Not IncludeList.Contains(element.Attributes("name").InnerText) Then
-                        IncludeList.Add(element.Attributes("name").InnerText)
-                    End If
-                Next
+                AddAttributesToArray(IncludeList, "//include[(@name)]", {"name"})
                 elementlist = doc.SelectNodes("//include[not(@name)]")
                 For Each element In elementlist
                     If Not IncludeList2.Contains(element.InnerXml) Then
@@ -630,13 +660,8 @@ Public Class Filechooser
                         End While
                     End If
                 Next element
-                elementlist = doc.SelectNodes("//control[(@id)] | //window[(@id)]")
-                For Each element In elementlist
-                    If Not IDList2.Contains(element.Attributes("id").InnerText) Then
-                        IDList2.Add(element.Attributes("id").InnerText)
-                        IDListBackup.Add(element.Attributes("id").InnerText)
-                    End If
-                Next
+                AddAttributesToArray(IDList2, "//control[(@id)] | //window[(@id)]", {"id"})
+                IDListBackup = IDList2
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
