@@ -47,14 +47,14 @@ Public Class Filechooser
         IndentingDropDown.SelectedIndex = 1
         HeaderOption.Checked = Not HeaderOption.Checked
         EOLComboBox.SelectedIndex = 0
+        RoundFactor = 1
         TexturePackerPath = My.Settings.TexturePackerPath
         XMLFolder = My.Settings.XMLFolder
         SkinFolder = My.Settings.SkinFolder
-        RoundFactor = 1
         OutputLog.AppendText("Program started" & vbCrLf)
-        OutputLog.AppendText(TexturePackerPath & vbCrLf)
-        OutputLog.AppendText(XMLFolder & vbCrLf)
-        OutputLog.AppendText(SkinFolder & vbCrLf)
+        OutputLog.AppendText("TexturePacker Path:" & TexturePackerPath & vbCrLf)
+        OutputLog.AppendText("XML Folder Path:" & XMLFolder & vbCrLf)
+        OutputLog.AppendText("Skin Path:" & SkinFolder & vbCrLf)
     End Sub
 
 
@@ -348,7 +348,6 @@ Public Class Filechooser
             OutputLog.AppendText(str & vbCrLf)
         Next
     End Sub
-
     Sub RemoveTexturesFromArray()
         Try
             elementlist = doc.SelectNodes("//texture")
@@ -397,30 +396,36 @@ Public Class Filechooser
         If Not CheckPath(SkinFolder + "\addon.xml") Then
             MsgBox("Please choose a skin folder.")
         Else
-            If SkinFolder <> "" Then
-                doc.Load(SkinFolder + "\addon.xml")
-                elementlist = doc.SelectNodes("//res")
-                If Not elementlist(0).Attributes("folder") Is Nothing Then
-                    XMLFolder = SkinFolder + "\" + elementlist(0).Attributes("folder").InnerText
-                    OutputLog.AppendText("XML Folder:" & XMLFolder & vbCrLf)
-                    Const ATTR_DIRECTORY = 16
-                    If Dir$(XMLFolder, ATTR_DIRECTORY) <> "" Then
-                        Dim DirInfo As New DirectoryInfo(XMLFolder)
-                        Dim FileObj As IO.FileSystemInfo
-                        For Each FileObj In DirInfo.GetFileSystemInfos
-                            Filepaths.Add(FileObj.FullName)
-                            SafeFilepaths.Add(FileObj.Name)
-                        Next
-                        OutputButton.Visible = True
-                        OutputLabel.Visible = True
-                        If strOutputFolder <> "" Then
-                            ConvertButton.Enabled = True
+            Try
+                If SkinFolder <> "" Then
+                    doc.Load(SkinFolder + "\addon.xml")
+                    elementlist = doc.SelectNodes("//res")
+                    If Not elementlist(0).Attributes("folder") Is Nothing Then
+                        XMLFolder = SkinFolder + "\" + elementlist(0).Attributes("folder").InnerText
+                        OutputLog.AppendText("XML Folder:" & XMLFolder & vbCrLf)
+                        Const ATTR_DIRECTORY = 16
+                        If Dir$(XMLFolder, ATTR_DIRECTORY) <> "" Then
+                            Dim DirInfo As New DirectoryInfo(XMLFolder)
+                            Dim FileObj As IO.FileSystemInfo
+                            For Each FileObj In DirInfo.GetFileSystemInfos
+                                Filepaths.Add(FileObj.FullName)
+                                SafeFilepaths.Add(FileObj.Name)
+                            Next
+                            OutputButton.Visible = True
+                            OutputLabel.Visible = True
+                            If strOutputFolder <> "" Then
+                                ConvertButton.Enabled = True
+                            End If
+                        Else
+                            MsgBox("Path from addon.xml does not exist.")
                         End If
-                    Else
-                        MsgBox("Path from addon.xml does not exist.")
                     End If
                 End If
-            End If
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(xmlex.Message & vbCrLf)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(ex.Message & vbCrLf)
+            End Try
         End If
     End Sub
 
