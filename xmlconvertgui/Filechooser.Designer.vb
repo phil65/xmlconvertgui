@@ -51,6 +51,7 @@ Partial Class Filechooser
         Me.CheckBracketsButton = New System.Windows.Forms.Button()
         Me.CheckIDsButton = New System.Windows.Forms.Button()
         Me.SaveButton = New System.Windows.Forms.Button()
+        Me.CheckValuesButton = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'OpenFileDialog
@@ -289,11 +290,21 @@ Partial Class Filechooser
         Me.SaveButton.Text = "Save Settings"
         Me.SaveButton.UseVisualStyleBackColor = True
         '
+        'CheckValuesButton
+        '
+        Me.CheckValuesButton.Location = New System.Drawing.Point(166, 59)
+        Me.CheckValuesButton.Name = "CheckValuesButton"
+        Me.CheckValuesButton.Size = New System.Drawing.Size(95, 23)
+        Me.CheckValuesButton.TabIndex = 30
+        Me.CheckValuesButton.Text = "Check Values"
+        Me.CheckValuesButton.UseVisualStyleBackColor = True
+        '
         'Filechooser
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(913, 619)
+        Me.Controls.Add(Me.CheckValuesButton)
         Me.Controls.Add(Me.SaveButton)
         Me.Controls.Add(Me.CheckIDsButton)
         Me.Controls.Add(Me.CheckBracketsButton)
@@ -354,5 +365,6 @@ Partial Class Filechooser
     Friend WithEvents CheckBracketsButton As System.Windows.Forms.Button
     Friend WithEvents CheckIDsButton As System.Windows.Forms.Button
     Friend WithEvents SaveButton As System.Windows.Forms.Button
+    Friend WithEvents CheckValuesButton As System.Windows.Forms.Button
 
 End Class

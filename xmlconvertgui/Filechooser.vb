@@ -366,6 +366,14 @@ Public Class Filechooser
             CheckPath = False
         End If
     End Function
+    Private Sub CheckNodeValue(ByVal XMLTag As String, ByVal ValidValues As String())
+        elementlist = doc.GetElementsByTagName(XMLTag)
+        For Each element In elementlist
+            If Not ValidValues.Contains(element.InnerXml) Then
+                OutputLog.AppendText("Invalid Value for " & XMLTag & ": " & element.InnerXml & vbCrLf)
+            End If
+        Next
+    End Sub
     Private Sub SkinFolderButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SkinFolderButton.Click
         SafeFilepaths.Clear()
         Filepaths.Clear()
@@ -498,25 +506,25 @@ Public Class Filechooser
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
             End Try
         Next
-        For i = 0 To IncludeList.Count - 1
-            If IncludeList2.Contains(IncludeList(i)) Then
-                IncludeList2.Remove(IncludeList(i))
+        Dim Include As String
+        For Each Include In IncludeList
+            If IncludeList2.Contains(Include) Then
+                IncludeList2.Remove(Include)
             End If
         Next
-        For i = 0 To IncludeListBackup.Count - 1
-            If IncludeList.Contains(IncludeListBackup(i)) Then
-                IncludeList.Remove(IncludeListBackup(i))
+        For Each Include In IncludeListBackup
+            If IncludeList.Contains(Include) Then
+                IncludeList.Remove(Include)
             End If
         Next
         OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the upcoming List of Includes." & vbCrLf)
         OutputLog.AppendText("Unused Includes:" & vbCrLf)
-        Dim str As String
-        For Each str In IncludeList
-            OutputLog.AppendText(str & vbCrLf)
+        For Each Include In IncludeList
+            OutputLog.AppendText(Include & vbCrLf)
         Next
         OutputLog.AppendText("Undefined Includes:" & vbCrLf)
-        For Each str In IncludeList2
-            OutputLog.AppendText(str & vbCrLf)
+        For Each Include In IncludeList2
+            OutputLog.AppendText(Include & vbCrLf)
         Next
     End Sub
 
@@ -563,7 +571,6 @@ Public Class Filechooser
                 For k = 0 To xmlelementsBrackets.Length - 1
                     elementlist = doc.GetElementsByTagName(xmlelementsBrackets(k))
                     For Each element In elementlist
-
                         If Not (CountCharacter(element.InnerXml, "[") = CountCharacter(element.InnerXml, "]")) Then
                             OutputLog.AppendText("Unmatched parenthesis: " + element.InnerXml.ToString & vbCrLf)
                         End If
@@ -574,7 +581,6 @@ Public Class Filechooser
                 Next k
                 elementlist = doc.SelectNodes("//include | //onup | //ondown | //onleft | //onright | //animation | //onload | //onunload | //onclick | //onback | //focusedlayout | //itemlayout | //onfocus | //value")
                 For Each element In elementlist
-
                     If Not element.Attributes("condition") Is Nothing Then
                         If Not (CountCharacter(element.Attributes("condition").InnerText, "[") = CountCharacter(element.Attributes("condition").InnerText, "]")) Then
                             OutputLog.AppendText("Unmatched parenthesis: " + element.Attributes("condition").InnerText & vbCrLf)
@@ -687,6 +693,24 @@ Public Class Filechooser
         My.Settings.EndOfLine = EOLComboBox.SelectedIndex
         My.Settings.Indenting = IndentingDropDown.SelectedIndex
         MsgBox("Settings saved")
+    End Sub
+
+    Private Sub CheckValuesButton_Click(sender As System.Object, e As System.EventArgs) Handles CheckValuesButton.Click
+        OutputLog.AppendText("Scanning XMLs..." & vbCrLf)
+        For j = 0 To Filepaths.Count - 1
+            Try
+                doc.Load(Filepaths(j))
+                CheckNodeValue("align", {"left", "center", "right", "justify"})
+                CheckNodeValue("aligny", {"top", "center", "bottom"})
+                CheckNodeValue("orientation", {"horizontal", "vertical"})
+                CheckNodeValue("scroll", {"false", "true"})
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
+            End Try
+        Next j
+        OutputLog.AppendText("Scan complete" & vbCrLf)
     End Sub
 End Class
 
