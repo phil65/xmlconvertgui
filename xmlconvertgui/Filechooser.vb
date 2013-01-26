@@ -230,24 +230,11 @@ Public Class Filechooser
             End If
         End If
     End Function
-    Sub convertString(ByRef CompleteString As String)
-        Dim NewString As String = ""
-        Dim TempString As String = CompleteString
-        Dim IndexStart = 0
-        For i = 0 To CompleteString.Length - 1
-            If CompleteString(i) = "," Then
-                NewString = NewString + ConvertValue(CompleteString.Substring(IndexStart, i - IndexStart)) + ","
-                IndexStart = i + 1
-            End If
-        Next
-        CompleteString = NewString + ConvertValue((CompleteString.Substring(IndexStart, CompleteString.Length - IndexStart)))
-    End Sub
-
-    Sub convertStringifseveral(ByRef CompleteString As String)
+    Sub convertString(ByRef CompleteString As String, Optional ByVal ConvertAll As Boolean = True)
         Dim NewString As String = ""
         Dim IndexStart = 0
         Dim TempString As String = CompleteString
-        If CompleteString.Contains(",") Then
+        If CompleteString.Contains(",") Or (ConvertAll = True) Then
             For i = 0 To CompleteString.Length - 1
                 If CompleteString(i) = "," Then
                     NewString = NewString + ConvertValue(CompleteString.Substring(IndexStart, i - IndexStart)) + ","
@@ -261,10 +248,10 @@ Public Class Filechooser
         elementlist = doc.SelectNodes("//animation[@effect='zoom'] | //effect[@type='zoom']")
         For i = 0 To elementlist.Count - 1
             If Not elementlist(i).Attributes("start") Is Nothing Then
-                convertStringifseveral(elementlist(i).Attributes("start").InnerText)
+                convertString(elementlist(i).Attributes("start").InnerText, False)
             End If
             If Not elementlist(i).Attributes("end") Is Nothing Then
-                convertStringifseveral(elementlist(i).Attributes("end").InnerText)
+                convertString(elementlist(i).Attributes("end").InnerText, False)
             End If
         Next
         elementlist = doc.SelectNodes("//animation[@effect='slide'] | //effect[@type='slide']")
