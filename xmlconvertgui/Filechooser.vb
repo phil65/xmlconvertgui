@@ -166,7 +166,7 @@ Public Class Filechooser
     Sub ScaleXMLNode(ByRef Element As XmlNode, ByVal tag As String, ByVal ScaleFactor As String)
         Dim Number As Double
         If (Not Element.Attributes(tag) Is Nothing) Then
-            If (Double.TryParse(Element.Attributes(tag).InnerText, Number)) Then
+            If (Double.TryParse(Element.Attributes(tag).InnerText.ToString, Number)) Then
                 Element.Attributes(tag).InnerText = Math.Round(XmlConvert.ToDouble(Number) / RoundFactor * XmlConvert.ToDouble(ScaleFactor)) * RoundFactor
             End If
         End If
@@ -205,7 +205,7 @@ Public Class Filechooser
         Dim Tag As String
         For Each Tag In Tags
             Dim IndexStart = 0
-            Dim CompleteString As String = Node.Attributes(Tag).InnerText
+            Dim CompleteString As String = Node.Attributes(Tag).InnerText.ToString
             Dim NewString As String = ""
             If Not Node.Attributes(Tag) Is Nothing Then
                 If CompleteString.Contains(",") Or (ConvertAll = True) Then
@@ -308,14 +308,14 @@ Public Class Filechooser
     Sub RemoveAttributesFromArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, ByVal Attributes As String(), Optional ByVal Lowercase As Boolean = False)
         Try
             elementlist = doc.SelectNodes(NodeSelection)
+            Dim element As XmlNode
             For Each element In elementlist
                 For Each Attribute In Attributes
                     If Not element.Attributes(Attribute) Is Nothing Then
-                        Dim CompareString
+                        Dim CompareString As String
+                        CompareString = element.Attributes(Attribute).InnerText.ToString
                         If Lowercase = True Then
-                            CompareString = element.Attributes(Attribute).InnerText.ToString.ToLower
-                        Else
-                            CompareString = element.Attributes(Attribute).InnerText.ToString
+                            CompareString = CompareString.ToLower
                         End If
                         If EditArray.Contains(CompareString) Then
                             EditArray.Remove(CompareString)
@@ -328,14 +328,14 @@ Public Class Filechooser
     End Sub
     Sub RemoveNodesFromArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, Optional ByVal Lowercase As Boolean = False)
         Try
+            Dim element As XmlNode
             elementlist = doc.GetElementsByTagName(NodeSelection)
             For Each element In elementlist
                 If Not element.InnerXML Is Nothing Then
-                    Dim CompareString
+                    Dim CompareString As String
+                    CompareString = element.InnerXml
                     If Lowercase = True Then
-                        CompareString = element.InnerXML.ToString.ToLower
-                    Else
-                        CompareString = element.InnerXML.ToString
+                        CompareString = CompareString.ToLower
                     End If
                     If EditArray.Contains(CompareString) Then
                         EditArray.Remove(CompareString)
@@ -347,14 +347,14 @@ Public Class Filechooser
     End Sub
     Sub AddNodesToArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, Optional ByVal Lowercase As Boolean = False)
         Try
+            Dim element As XmlNode
             elementlist = doc.GetElementsByTagName(NodeSelection)
             For Each element In elementlist
                 If Not element.InnerXML Is Nothing Then
-                    Dim CompareString
+                    Dim CompareString As String
+                    CompareString = element.InnerXml
                     If Lowercase = True Then
-                        CompareString = element.InnerXML.ToString.ToLower
-                    Else
-                        CompareString = element.InnerXML.ToString
+                        CompareString = CompareString.ToLower
                     End If
                     If Not EditArray.Contains(CompareString) Then
                         EditArray.Add(CompareString)
@@ -367,15 +367,15 @@ Public Class Filechooser
 
     Sub AddAttributesToArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, ByVal AttributeList As String(), Optional ByVal Lowercase As Boolean = False)
         Try
+            Dim element As XmlNode
             elementlist = doc.SelectNodes(NodeSelection)
             For Each element In elementlist
                 For Each Attribute In AttributeList
                     If Not element.Attributes(Attribute) Is Nothing Then
-                        Dim CompareString
+                        Dim CompareString As String
+                        CompareString = element.Attributes(Attribute).InnerText.ToString
                         If Lowercase = True Then
-                            CompareString = element.Attributes(Attribute).InnerText.ToString.ToLower
-                        Else
-                            CompareString = element.Attributes(Attribute).InnerText.ToString
+                            CompareString = CompareString.ToLower
                         End If
                         If Not EditArray.Contains(CompareString) Then
                             EditArray.Add(CompareString)
@@ -424,7 +424,7 @@ Public Class Filechooser
                     doc.Load(SkinFolder + "\addon.xml")
                     elementlist = doc.SelectNodes("//res")
                     If Not elementlist(0).Attributes("folder") Is Nothing Then
-                        XMLFolder = SkinFolder + "\" + elementlist(0).Attributes("folder").InnerText
+                        XMLFolder = SkinFolder + "\" + elementlist(0).Attributes("folder").InnerText.ToString
                         OutputLog.AppendText("XML Folder:" & XMLFolder & vbCrLf)
                         Const ATTR_DIRECTORY = 16
                         If Dir$(XMLFolder, ATTR_DIRECTORY) <> "" Then
@@ -566,14 +566,6 @@ Public Class Filechooser
         End If
     End Sub
 
-    Public Function CountCharacter(ByVal value As String, ByVal ch As Char) As Integer
-        Dim cnt As Integer = 0
-        For Each c As Char In value
-            If c = ch Then cnt += 1
-        Next
-        Return cnt
-    End Function
-
     Private Sub CheckBracketsButton_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBracketsButton.Click
         OutputLog.AppendText("Checking the brackets..." & vbCrLf)
         For j = 0 To Filepaths.Count - 1
@@ -582,23 +574,16 @@ Public Class Filechooser
                 For k = 0 To xmlelementsBrackets.Length - 1
                     elementlist = doc.GetElementsByTagName(xmlelementsBrackets(k))
                     For Each element In elementlist
-                        If Not (CountCharacter(element.InnerXml, "[") = CountCharacter(element.InnerXml, "]")) Then
-                            OutputLog.AppendText("Unmatched parenthesis: " + element.InnerXml.ToString & vbCrLf)
-                        End If
-                        If Not (CountCharacter(element.InnerXml, "(") = CountCharacter(element.InnerXml, ")")) Then
-                            OutputLog.AppendText("Unmatched parenthesis: " + element.InnerXml.ToString & vbCrLf)
-                        End If
+                        SameCharNumber(element.InnerXML, "[", "]")
+                        SameCharNumber(element.InnerXML, "(", ")")
                     Next element
                 Next k
                 elementlist = doc.SelectNodes("//include | //onup | //ondown | //onleft | //onright | //animation | //onload | //onunload | //onclick | //onback | //focusedlayout | //itemlayout | //onfocus | //value")
                 For Each element In elementlist
                     If Not element.Attributes("condition") Is Nothing Then
-                        If Not (CountCharacter(element.Attributes("condition").InnerText, "[") = CountCharacter(element.Attributes("condition").InnerText, "]")) Then
-                            OutputLog.AppendText("Unmatched parenthesis: " + element.Attributes("condition").InnerText & vbCrLf)
-                        End If
-                        If Not (CountCharacter(element.Attributes("condition").InnerText, "(") = CountCharacter(element.Attributes("condition").InnerText, ")")) Then
-                            OutputLog.AppendText("Unmatched parenthesis: " + element.Attributes("condition").InnerText & vbCrLf)
-                        End If
+                        Dim CompareString As String = element.Attributes("condition").InnerText.ToString
+                        SameCharNumber(CompareString, "[", "]")
+                        SameCharNumber(CompareString, "(", ")")
                     End If
                 Next element
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
@@ -609,6 +594,20 @@ Public Class Filechooser
         Next
     End Sub
 
+    Public Sub SameCharNumber(ByVal value As String, ByVal CompareChar1 As Char, ByVal CompareChar2 As Char)
+        Dim cnt As Integer = 0
+        For Each c As Char In value
+            If c = CompareChar1 Then cnt += 1
+            If c = CompareChar2 Then cnt -= 1
+            If cnt < 0 Then
+                OutputLog.AppendText("Unmatched parenthesis: " + value & vbCrLf)
+            End If
+        Next
+        If cnt = 0 Then
+        Else
+            OutputLog.AppendText("Unmatched parenthesis: " + value & vbCrLf)
+        End If
+    End Sub
     Private Sub CheckIDsButton_Click(sender As System.Object, e As System.EventArgs) Handles CheckIDsButton.Click
         Dim charsToTrim() As Char = {"("c, ")"c}
         Dim pattern As String = "\([0-9]+\)"
@@ -647,7 +646,7 @@ Public Class Filechooser
                 For Each element In elementlist
                     If Not element.Attributes("condition") Is Nothing Then
                         Dim r As Regex = New Regex(pattern, RegexOptions.IgnoreCase)
-                        Dim m As Match = r.Match(element.Attributes("condition").InnerText)
+                        Dim m As Match = r.Match(element.Attributes("condition").InnerText.ToString)
                         While (m.Success)
                             Dim tempText As String = m.Value.ToString()
                             tempText = Replace(tempText, "(", "")
