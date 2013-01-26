@@ -84,28 +84,17 @@ Public Class Filechooser
                     changeAttributes()
                 End If
                 Dim Number As Double
-                Dim AnimationScale As Double
-                AnimationScale = XmlConvert.ToDouble(AnimationMultiplier.Text)
                 If (AnimationMultiplier.Text <> 1) And (Double.TryParse(AnimationMultiplier.Text, Number)) Then
                     elementlist = doc.SelectNodes("//animation | //effect")
                     For Each element In elementlist
-                        If (Not element.Attributes("time") Is Nothing) Then
-                            If (Double.TryParse(element.Attributes("time").InnerText, Number)) Then
-                                element.Attributes("time").InnerText = Math.Round(XmlConvert.ToDouble(Number) / RoundFactor * AnimationScale) * RoundFactor
-                            End If
-                        End If
-                        If (Not element.Attributes("delay") Is Nothing) Then
-                            If (Double.TryParse(element.Attributes("delay").InnerText, Number)) Then
-                                element.Attributes("delay").InnerText = Math.Round(XmlConvert.ToDouble(Number) / RoundFactor * AnimationScale) * RoundFactor
-                            End If
-                        End If
+                        ScaleXMLNode(element, "time", AnimationMultiplier.Text)
+                        ScaleXMLNode(element, "delay", AnimationMultiplier.Text)
                     Next
                 End If
                 Dim myXmlSettings As New XmlWriterSettings
                 If Not HeaderOption.Checked Then
                     myXmlSettings.OmitXmlDeclaration = True
                 End If
-                myXmlSettings.Indent = True
                 Dim UTF8NoBom As Encoding = New UTF8Encoding(False)
                 myXmlSettings.Encoding = UTF8NoBom
                 Select Case EOLComboBox.SelectedIndex
@@ -180,6 +169,14 @@ Public Class Filechooser
         For Each element In elementlist
             element.InnerXml = ConvertValue(element.InnerXml)
         Next element
+    End Sub
+    Sub ScaleXMLNode(ByRef Element As XmlNode, ByVal tag As String, ByVal ScaleFactor As String)
+        Dim Number As Double
+        If (Not Element.Attributes(tag) Is Nothing) Then
+            If (Double.TryParse(Element.Attributes(tag).InnerText, Number)) Then
+                Element.Attributes(tag).InnerText = Math.Round(XmlConvert.ToDouble(Number) / RoundFactor * XmlConvert.ToDouble(ScaleFactor)) * RoundFactor
+            End If
+        End If
     End Sub
 
     Function ConvertValue(ByVal InputString As String) As String
