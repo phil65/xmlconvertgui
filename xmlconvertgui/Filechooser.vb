@@ -19,12 +19,6 @@ Public Class Filechooser
     Public doc As New XmlDocument()
     Public multiplyFactor As Double = 1.5
     Public ShortenedTexturePaths As New ArrayList()
-    Public IDList As New ArrayList()
-    Public IDList2 As New ArrayList()
-    Public IDListBackup As New ArrayList()
-    Public IncludeList As New ArrayList()
-    Public IncludeListBackup As New ArrayList()
-    Public IncludeList2 As New ArrayList()
     Public Filepaths As New ArrayList()
     Public SafeFilepaths As New ArrayList()
     Public elementlist As XmlNodeList
@@ -48,6 +42,10 @@ Public Class Filechooser
         TexturePackerPath = My.Settings.TexturePackerPath
         XMLFolder = My.Settings.XMLFolder
         SkinFolder = My.Settings.SkinFolder
+        IndentingDropDown.SelectedIndex = My.Settings.Indenting
+        EOLComboBox.SelectedIndex = My.Settings.EndOfLine
+        HeaderOption.Checked = My.Settings.XMLHeader
+        ConvertBorders.Checked = My.Settings.ConvertBorders
         OutputLog.AppendText("Program started" & vbCrLf)
         OutputLog.AppendText("TexturePacker Path:" & TexturePackerPath & vbCrLf)
         OutputLog.AppendText("XML Folder Path:" & XMLFolder & vbCrLf)
@@ -474,6 +472,9 @@ Public Class Filechooser
     End Sub
     Private Sub CheckIncludesButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckIncludesButton.Click
         OutputLog.AppendText("Building Include List" & vbCrLf)
+        Dim IncludeList As New ArrayList()
+        Dim IncludeListBackup As New ArrayList()
+        Dim IncludeList2 As New ArrayList()
         Dim ShortPath As String = ""
         IncludeList2.Clear()
         IncludeListBackup.Clear()
@@ -510,9 +511,7 @@ Public Class Filechooser
                 IncludeList.Remove(IncludeListBackup(i))
             End If
         Next
-
         OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the upcoming List of Includes." & vbCrLf)
-
         OutputLog.AppendText("Unused Includes:" & vbCrLf)
         Dim str As String
         For Each str In IncludeList
@@ -611,6 +610,9 @@ Public Class Filechooser
     Private Sub CheckIDsButton_Click(sender As System.Object, e As System.EventArgs) Handles CheckIDsButton.Click
         Dim charsToTrim() As Char = {"("c, ")"c}
         Dim pattern As String = "\([0-9]+\)"
+        Dim IDList As New ArrayList()
+        Dim IDList2 As New ArrayList()
+        Dim IDListBackup As New ArrayList()
         IDList.Clear()
         IDList2.Clear()
         IDListBackup.Clear()
