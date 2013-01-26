@@ -624,6 +624,7 @@ Public Class Filechooser
                                 tempText = Replace(tempText, ")", "")
                                 If Not IDList.Contains(tempText) Then
                                     IDList.Add(tempText)
+                                    IDListBackup.Add(tempText)
                                     '      OutputLog.AppendText(tempText & vbCrLf)
                                 End If
                                 m = m.NextMatch()
