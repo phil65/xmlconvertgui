@@ -440,7 +440,7 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
-                If Not Filepaths(j).ToString.Contains("ont.xml") Then
+                If Not Filepaths(j).ToString.ToLower.Contains("font.xml") Then
                     elementlist = doc.GetElementsByTagName("font")
                     For i = 0 To elementlist.Count - 1
                         If FontList.Contains(elementlist(i).InnerXml) Then
