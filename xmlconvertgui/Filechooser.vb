@@ -183,7 +183,6 @@ Public Class Filechooser
                 InputString = InputString.Substring(0, InputString.Length - 1)
                 If Int32.TryParse(InputString, number) Then
                     ConvertValue = Math.Round(number * multiplyFactor).ToString + TempLetter
-                    OutputLog.AppendText(InputString & vbCrLf)
                 Else
                     If InputString.Length > 1 Then
                         TempLetter = InputString.Substring(InputString.Length - 1, 1)
