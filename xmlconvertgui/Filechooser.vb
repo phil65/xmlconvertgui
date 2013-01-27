@@ -256,8 +256,8 @@ Public Class Filechooser
                 elementlist = doc.SelectNodes("//include[not(@name)]")
                 For i = 0 To elementlist.Count - 1
                     AddStringToArray(IncludeList2, elementlist(i).InnerXml)
+                    AddStringToArray(IncludeListBackup, elementlist(i).InnerXml)
                 Next
-                IncludeListBackup = IncludeList2
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
@@ -366,7 +366,7 @@ Public Class Filechooser
         Dim IDListRefs As New ArrayList()
         Dim IDListDefines As New ArrayList()
         Dim IDListDefinesBackup As New ArrayList()
-        Dim r As Regex = New Regex("(?<=\()[0-9]+)", RegexOptions.IgnoreCase)
+        Dim r As Regex = New Regex("(?<=\()[0-9]+", RegexOptions.IgnoreCase)
         IDListRefs.Clear()
         IDListDefines.Clear()
         IDListDefinesBackup.Clear()
@@ -388,7 +388,7 @@ Public Class Filechooser
                 Next k
                 elementlist = doc.SelectNodes("//include | //onup | //ondown | //onleft | //onright | //animation | //onload | //onunload | //onclick | //onback | //focusedlayout | //itemlayout | //onfocus | //value")
                 For i = 0 To elementlist.Count - 1
-                    If Not elementlist(i).Attributes("condition").InnerText Is Nothing Then
+                    If Not elementlist(i).Attributes("condition") Is Nothing Then
                         Dim m As Match = r.Match(elementlist(i).Attributes("condition").InnerText.ToString)
                         While (m.Success)
                             AddStringToArray(IDListRefs, m.Value.ToString())
@@ -397,13 +397,13 @@ Public Class Filechooser
                     End If
                 Next i
                 AddAttributesToArray(IDListDefines, "//control[(@id)] | //window[(@id)]", {"id"})
+                AddAttributesToArray(IDListDefinesBackup, "//control[(@id)] | //window[(@id)]", {"id"})
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
             End Try
         Next
-        IDListDefinesBackup = IDListDefines
         For i = 0 To IDListRefs.Count - 1
             RemoveStringFromArray(IDListDefines, IDListRefs(i))
         Next
