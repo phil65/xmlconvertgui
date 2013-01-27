@@ -309,13 +309,7 @@ Public Class Filechooser
             For i = 0 To elementlist.Count - 1
                 For Each Attribute In Attributes
                     If Not elementlist(i).Attributes(Attribute).InnerText Is Nothing Then
-                        Dim CompareString As String = elementlist(i).Attributes(Attribute).InnerText.ToString
-                        If Lowercase = True Then
-                            CompareString = CompareString.ToLower
-                        End If
-                        If EditArray.Contains(CompareString) Then
-                            EditArray.Remove(CompareString)
-                        End If
+                        RemoveStringFromArray(EditArray, elementlist(i).Attributes(Attribute).InnerText.ToString, Lowercase)
                     End If
                 Next Attribute
             Next
@@ -328,16 +322,22 @@ Public Class Filechooser
             elementlist = doc.GetElementsByTagName(NodeSelection)
             For i = 0 To elementlist.Count - 1
                 If Not elementlist(i).InnerXml Is Nothing Then
-                    Dim CompareString As String = elementlist(i).InnerXml
-                    If Lowercase = True Then
-                        CompareString = CompareString.ToLower
-                    End If
-                    If EditArray.Contains(CompareString) Then
-                        EditArray.Remove(CompareString)
-                    End If
+                    RemoveStringFromArray(EditArray, elementlist(i).InnerXml, Lowercase)
                 End If
             Next
         Catch
+        End Try
+    End Sub
+    Sub RemoveStringFromArray(ByRef EditArray As ArrayList, ByVal StringToRemove As String, Optional ByVal Lowercase As Boolean = False)
+        Try
+            If Lowercase = True Then
+                StringToRemove = StringToRemove.ToLower
+            End If
+            If EditArray.Contains(StringToRemove) Then
+                EditArray.Remove(StringToRemove)
+            End If
+        Catch ex As Exception                        ' Handle the generic Exceptions here.
+            OutputLog.AppendText(": " + ex.Message & vbCrLf)
         End Try
     End Sub
     Sub AddNodesToArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, Optional ByVal Lowercase As Boolean = False)
@@ -345,13 +345,7 @@ Public Class Filechooser
             elementlist = doc.GetElementsByTagName(NodeSelection)
             For i = 0 To elementlist.Count - 1
                 If Not elementlist(i).InnerXml Is Nothing Then
-                    Dim CompareString As String = elementlist(i).InnerXml
-                    If Lowercase = True Then
-                        CompareString = CompareString.ToLower
-                    End If
-                    If Not EditArray.Contains(CompareString) Then
-                        EditArray.Add(CompareString)
-                    End If
+                    AddStringToArray(EditArray, elementlist(i).InnerXml, Lowercase)
                 End If
             Next
         Catch ex As Exception                        ' Handle the generic Exceptions here.
@@ -365,14 +359,7 @@ Public Class Filechooser
             For i = 0 To elementlist.Count - 1
                 For Each Attribute In AttributeList
                     If Not elementlist(i).Attributes(Attribute).InnerText Is Nothing Then
-                        Dim CompareString As String = elementlist(i).Attributes(Attribute).InnerText.ToString
-                        If Lowercase = True Then
-                            CompareString = CompareString.ToLower
-                        End If
-                        If Not EditArray.Contains(CompareString) Then
-                            EditArray.Add(CompareString)
-                        End If
-
+                        AddStringToArray(EditArray, elementlist(i).Attributes(Attribute).InnerText.ToString, Lowercase)
                     End If
                 Next Attribute
             Next
@@ -383,13 +370,20 @@ Public Class Filechooser
     Sub AddArrayListToArray(ByRef EditArray As ArrayList, ByVal ArrayToAdd As ArrayList, Optional ByVal Lowercase As Boolean = False)
         Try
             For Each StringToAdd In ArrayToAdd
+                AddStringToArray(EditArray, StringToAdd, Lowercase)
+            Next StringToAdd
+        Catch ex As Exception                        ' Handle the generic Exceptions here.
+            OutputLog.AppendText(": " + ex.Message & vbCrLf)
+        End Try
+    End Sub
+    Sub AddStringToArray(ByRef EditArray As ArrayList, ByVal StringToAdd As String, Optional ByVal Lowercase As Boolean = False)
+        Try
                 If Lowercase = True Then
                     StringToAdd = StringToAdd.ToLower
                 End If
                 If Not EditArray.Contains(StringToAdd) Then
                     EditArray.Add(StringToAdd)
                 End If
-            Next StringToAdd
         Catch ex As Exception                        ' Handle the generic Exceptions here.
             OutputLog.AppendText(": " + ex.Message & vbCrLf)
         End Try
@@ -513,13 +507,12 @@ Public Class Filechooser
             Try
                 doc.Load(Filepaths(j))
                 AddAttributesToArray(IncludeList, "//include[(@name)]", {"name"})
+
                 elementlist = doc.SelectNodes("//include[not(@name)]")
                 For i = 0 To elementlist.Count - 1
-                    If Not IncludeList2.Contains(elementlist(i).InnerXml) Then
-                        IncludeList2.Add(elementlist(i).InnerXml)
-                        IncludeListBackup.Add(elementlist(i).InnerXml)
-                    End If
+                    AddStringToArray(IncludeList2, elementlist(i).InnerXml)
                 Next
+                IncludeListBackup = IncludeList2
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
@@ -528,14 +521,10 @@ Public Class Filechooser
         Next
         Dim Include As String
         For Each Include In IncludeList
-            If IncludeList2.Contains(Include) Then
-                IncludeList2.Remove(Include)
-            End If
+            RemoveStringFromArray(IncludeList2, Include)
         Next
         For Each Include In IncludeListBackup
-            If IncludeList.Contains(Include) Then
-                IncludeList.Remove(Include)
-            End If
+            RemoveStringFromArray(IncludeList, Include)
         Next
         OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the upcoming List of Includes." & vbCrLf)
         OutputLog.AppendText("Unused Includes:" & vbCrLf)
@@ -640,9 +629,7 @@ Public Class Filechooser
                                 Dim tempText As String = m.Value.ToString()
                                 tempText = Replace(tempText, "(", "")
                                 tempText = Replace(tempText, ")", "")
-                                If Not IDList.Contains(tempText) Then
-                                    IDList.Add(tempText)
-                                End If
+                                AddStringToArray(IDList, tempText)
                                 m = m.NextMatch()
                             End While
                         End If
@@ -657,10 +644,7 @@ Public Class Filechooser
                             Dim tempText As String = m.Value.ToString()
                             tempText = Replace(tempText, "(", "")
                             tempText = Replace(tempText, ")", "")
-                            If Not IDList.Contains(tempText) Then
-                                IDList.Add(tempText)
-                                ' OutputLog.AppendText(tempText & vbCrLf)
-                            End If
+                            AddStringToArray(IDList, tempText)
                             m = m.NextMatch()
                         End While
                     End If
@@ -674,16 +658,11 @@ Public Class Filechooser
         Next
         IDListBackup = IDList2
         For i = 0 To IDList.Count - 1
-            If IDList2.Contains(IDList(i)) Then
-                IDList2.Remove(IDList(i))
-            End If
+            RemoveStringFromArray(IDList2, IDList(i))
         Next
         For i = 0 To IDListBackup.Count - 1
-            If IDList.Contains(IDListBackup(i)) Then
-                IDList.Remove(IDListBackup(i))
-            End If
+            RemoveStringFromArray(IDList, IDListBackup(i))
         Next
-
         OutputLog.AppendText("Undefined IDs:" & vbCrLf)
         Dim str As String
         For Each str In IDList
