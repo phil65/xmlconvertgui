@@ -141,19 +141,17 @@ Public Class Filechooser
     End Sub
 
     Private Sub OutputButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OutputButton.Click
-        Do
-            OutputFolderDialog.Description = "Choose Output Folder"
-            Dim DidWork As Integer = OutputFolderDialog.ShowDialog()
-            If DidWork = DialogResult.Cancel Then
-            Else
-                strOutputFolder = OutputFolderDialog.SelectedPath
-                If Filepaths(0) <> "" Then
-                    ConvertButton.Enabled = True
-                End If
-                OutputLabel.Text = strOutputFolder + "\"
-                OutputLog.AppendText("Output Folder chosen:" & vbCrLf & strOutputFolder & vbCrLf)
+        OutputFolderDialog.Description = "Choose Output Folder"
+        Dim DidWork As Integer = OutputFolderDialog.ShowDialog()
+        If DidWork = DialogResult.Cancel Then
+        Else
+            strOutputFolder = OutputFolderDialog.SelectedPath
+            If Filepaths(0) <> "" Then
+                ConvertButton.Enabled = True
             End If
-        Loop While (strOutputFolder + "\" + SafeFilepaths(0) = Filepaths(0))
+            OutputLabel.Text = strOutputFolder + "\"
+            OutputLog.AppendText("Output Folder chosen:" & vbCrLf & strOutputFolder & vbCrLf)
+        End If
     End Sub
 
     Sub changeElements(ByVal tag As String)
