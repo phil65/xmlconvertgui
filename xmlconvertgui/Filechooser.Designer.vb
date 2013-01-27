@@ -52,6 +52,7 @@ Partial Class Filechooser
         Me.CheckIDsButton = New System.Windows.Forms.Button()
         Me.SaveButton = New System.Windows.Forms.Button()
         Me.CheckValuesButton = New System.Windows.Forms.Button()
+        Me.CheckVarsButton = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'OpenFileDialog
@@ -61,7 +62,7 @@ Partial Class Filechooser
         'ConvertButton
         '
         Me.ConvertButton.Enabled = False
-        Me.ConvertButton.Location = New System.Drawing.Point(202, 322)
+        Me.ConvertButton.Location = New System.Drawing.Point(203, 368)
         Me.ConvertButton.Name = "ConvertButton"
         Me.ConvertButton.Size = New System.Drawing.Size(75, 23)
         Me.ConvertButton.TabIndex = 3
@@ -79,7 +80,7 @@ Partial Class Filechooser
         '
         'OutputButton
         '
-        Me.OutputButton.Location = New System.Drawing.Point(202, 277)
+        Me.OutputButton.Location = New System.Drawing.Point(203, 323)
         Me.OutputButton.Name = "OutputButton"
         Me.OutputButton.Size = New System.Drawing.Size(75, 24)
         Me.OutputButton.TabIndex = 5
@@ -89,7 +90,7 @@ Partial Class Filechooser
         '
         'OutputLabel
         '
-        Me.OutputLabel.Location = New System.Drawing.Point(184, 250)
+        Me.OutputLabel.Location = New System.Drawing.Point(185, 296)
         Me.OutputLabel.Name = "OutputLabel"
         Me.OutputLabel.Size = New System.Drawing.Size(152, 24)
         Me.OutputLabel.TabIndex = 6
@@ -110,7 +111,7 @@ Partial Class Filechooser
         Me.ConversionDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ConversionDropDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ConversionDropDown.ImeMode = System.Windows.Forms.ImeMode.Off
-        Me.ConversionDropDown.Location = New System.Drawing.Point(9, 194)
+        Me.ConversionDropDown.Location = New System.Drawing.Point(10, 240)
         Me.ConversionDropDown.Name = "ConversionDropDown"
         Me.ConversionDropDown.Size = New System.Drawing.Size(121, 21)
         Me.ConversionDropDown.TabIndex = 8
@@ -118,7 +119,7 @@ Partial Class Filechooser
         'HeaderOption
         '
         Me.HeaderOption.AutoSize = True
-        Me.HeaderOption.Location = New System.Drawing.Point(9, 345)
+        Me.HeaderOption.Location = New System.Drawing.Point(10, 391)
         Me.HeaderOption.Name = "HeaderOption"
         Me.HeaderOption.Size = New System.Drawing.Size(108, 17)
         Me.HeaderOption.TabIndex = 9
@@ -128,7 +129,7 @@ Partial Class Filechooser
         'ConvertBorders
         '
         Me.ConvertBorders.AutoSize = True
-        Me.ConvertBorders.Location = New System.Drawing.Point(9, 368)
+        Me.ConvertBorders.Location = New System.Drawing.Point(10, 414)
         Me.ConvertBorders.Name = "ConvertBorders"
         Me.ConvertBorders.Size = New System.Drawing.Size(102, 17)
         Me.ConvertBorders.TabIndex = 12
@@ -176,7 +177,7 @@ Partial Class Filechooser
         '
         Me.Label1.AutoSize = True
         Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(75, 155)
+        Me.Label1.Location = New System.Drawing.Point(76, 201)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(143, 16)
         Me.Label1.TabIndex = 17
@@ -204,14 +205,14 @@ Partial Class Filechooser
         Me.IndentingDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.IndentingDropDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.IndentingDropDown.ImeMode = System.Windows.Forms.ImeMode.Off
-        Me.IndentingDropDown.Location = New System.Drawing.Point(9, 238)
+        Me.IndentingDropDown.Location = New System.Drawing.Point(10, 284)
         Me.IndentingDropDown.Name = "IndentingDropDown"
         Me.IndentingDropDown.Size = New System.Drawing.Size(121, 21)
         Me.IndentingDropDown.TabIndex = 20
         '
         'Button2
         '
-        Me.Button2.Location = New System.Drawing.Point(78, 419)
+        Me.Button2.Location = New System.Drawing.Point(79, 465)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(154, 23)
         Me.Button2.TabIndex = 21
@@ -220,7 +221,7 @@ Partial Class Filechooser
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(78, 465)
+        Me.Button3.Location = New System.Drawing.Point(79, 511)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(154, 23)
         Me.Button3.TabIndex = 22
@@ -229,7 +230,7 @@ Partial Class Filechooser
         '
         'Button4
         '
-        Me.Button4.Location = New System.Drawing.Point(78, 508)
+        Me.Button4.Location = New System.Drawing.Point(79, 554)
         Me.Button4.Name = "Button4"
         Me.Button4.Size = New System.Drawing.Size(154, 23)
         Me.Button4.TabIndex = 23
@@ -241,14 +242,14 @@ Partial Class Filechooser
         Me.EOLComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.EOLComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.EOLComboBox.ImeMode = System.Windows.Forms.ImeMode.Off
-        Me.EOLComboBox.Location = New System.Drawing.Point(9, 277)
+        Me.EOLComboBox.Location = New System.Drawing.Point(10, 323)
         Me.EOLComboBox.Name = "EOLComboBox"
         Me.EOLComboBox.Size = New System.Drawing.Size(121, 21)
         Me.EOLComboBox.TabIndex = 24
         '
         'AnimationMultiplier
         '
-        Me.AnimationMultiplier.Location = New System.Drawing.Point(289, 203)
+        Me.AnimationMultiplier.Location = New System.Drawing.Point(290, 249)
         Me.AnimationMultiplier.Name = "AnimationMultiplier"
         Me.AnimationMultiplier.Size = New System.Drawing.Size(37, 20)
         Me.AnimationMultiplier.TabIndex = 25
@@ -257,7 +258,7 @@ Partial Class Filechooser
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(153, 197)
+        Me.Label2.Location = New System.Drawing.Point(154, 243)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(111, 26)
         Me.Label2.TabIndex = 26
@@ -299,11 +300,21 @@ Partial Class Filechooser
         Me.CheckValuesButton.Text = "Check Values"
         Me.CheckValuesButton.UseVisualStyleBackColor = True
         '
+        'CheckVarsButton
+        '
+        Me.CheckVarsButton.Location = New System.Drawing.Point(49, 146)
+        Me.CheckVarsButton.Name = "CheckVarsButton"
+        Me.CheckVarsButton.Size = New System.Drawing.Size(95, 23)
+        Me.CheckVarsButton.TabIndex = 31
+        Me.CheckVarsButton.Text = "Check Vars"
+        Me.CheckVarsButton.UseVisualStyleBackColor = True
+        '
         'Filechooser
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(913, 619)
+        Me.Controls.Add(Me.CheckVarsButton)
         Me.Controls.Add(Me.CheckValuesButton)
         Me.Controls.Add(Me.SaveButton)
         Me.Controls.Add(Me.CheckIDsButton)
@@ -366,5 +377,6 @@ Partial Class Filechooser
     Friend WithEvents CheckIDsButton As System.Windows.Forms.Button
     Friend WithEvents SaveButton As System.Windows.Forms.Button
     Friend WithEvents CheckValuesButton As System.Windows.Forms.Button
+    Friend WithEvents CheckVarsButton As System.Windows.Forms.Button
 
 End Class

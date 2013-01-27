@@ -644,6 +644,49 @@ Public Class Filechooser
         If (cnt <> 0) Or (Unmatched = True) Then OutputLog.AppendText("Unmatched parenthesis: " + value & vbCrLf)
     End Sub
 
+    Private Sub CheckVarsButton_Click(sender As System.Object, e As System.EventArgs) Handles CheckVarsButton.Click
+        Dim VarsListRefs As New ArrayList()
+        Dim VarsListDefines As New ArrayList()
+        Dim VarsListDefinesBackup As New ArrayList()
+        '   Dim t As Regex = New Regex("(?<=\#)[0-9]+", RegexOptions.IgnoreCase)
+        '  Dim r As Regex = New Regex("(?<=\$LOCALIZE\[)[0-9]+", RegexOptions.IgnoreCase)
+        Dim r As Regex = New Regex("(?<=\$VAR\[)[0-9A-Za-z-]+", RegexOptions.IgnoreCase)
+        VarsListRefs.Clear()
+        VarsListDefines.Clear()
+        VarsListDefinesBackup.Clear()
+        OutputLog.AppendText("Checking the Vars..." & vbCrLf)
+        For j = 0 To Filepaths.Count - 1
+            Try
+                doc.Load(Filepaths(j))
+                elementlist = doc.SelectNodes("*")
+                For i = 0 To elementlist.Count - 1
+                    If Not elementlist(i).InnerXml Is Nothing Then
+                        Dim m As Match = r.Match(elementlist(i).InnerXml.ToString)
+                        While (m.Success)
+                            AddStringToArray(VarsListRefs, m.Value.ToString())
+                            m = m.NextMatch()
+                        End While
+                    End If
+                Next i
+                AddAttributesToArray(VarsListDefines, "//variable", {"name"})
+                AddAttributesToArray(VarsListDefinesBackup, "//variable", {"name"})
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
+            End Try
+        Next
+        For i = 0 To VarsListRefs.Count - 1
+            RemoveStringFromArray(VarsListDefines, VarsListRefs(i))
+        Next
+        For i = 0 To VarsListDefinesBackup.Count - 1
+            RemoveStringFromArray(VarsListRefs, VarsListDefinesBackup(i))
+        Next
+        OutputLog.AppendText("Undefined Vars:" & vbCrLf)
+        PrintArray(VarsListRefs)
+        OutputLog.AppendText("Unused Vars:" & vbCrLf)
+        PrintArray(VarsListDefines)
+    End Sub
 End Class
 
 
