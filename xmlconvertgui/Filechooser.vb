@@ -594,15 +594,13 @@ Public Class Filechooser
 
     Public Sub SameCharNumber(ByVal value As String, ByVal CompareChar1 As Char, ByVal CompareChar2 As Char)
         Dim cnt As Integer = 0
+        Dim Unmatched As Boolean = False
         For Each c As Char In value
             If c = CompareChar1 Then cnt += 1
             If c = CompareChar2 Then cnt -= 1
-            If cnt < 0 Then
-                OutputLog.AppendText("Unmatched parenthesis: " + value & vbCrLf)
-            End If
+            If cnt < 0 Then Unmatched = True
         Next
-        If cnt = 0 Then
-        Else
+        If (cnt <> 0) Or (Unmatched = True) Then
             OutputLog.AppendText("Unmatched parenthesis: " + value & vbCrLf)
         End If
     End Sub
