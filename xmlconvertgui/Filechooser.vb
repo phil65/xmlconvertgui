@@ -205,9 +205,10 @@ Public Class Filechooser
         Dim Tag As String
         For Each Tag In Tags
             Dim IndexStart = 0
-            Dim CompleteString As String = Node.Attributes(Tag).InnerText.ToString
+            Dim CompleteString As String
             Dim NewString As String = ""
             If Not Node.Attributes(Tag) Is Nothing Then
+                CompleteString = Node.Attributes(Tag).InnerText.ToString
                 If CompleteString.Contains(",") Or (ConvertAll = True) Then
                     For i = 0 To CompleteString.Length - 1
                         If CompleteString(i) = "," Then
@@ -217,8 +218,8 @@ Public Class Filechooser
                     Next
                     CompleteString = NewString + ConvertValue((CompleteString.Substring(IndexStart, CompleteString.Length - IndexStart)), multiplyFactor)
                 End If
+                Node.Attributes(Tag).InnerText = CompleteString
             End If
-            Node.Attributes(Tag).InnerText = CompleteString
         Next
     End Sub
 
@@ -310,7 +311,7 @@ Public Class Filechooser
             elementlist = doc.SelectNodes(NodeSelection)
             For i = 0 To elementlist.Count - 1
                 For Each Attribute In Attributes
-                    If Not elementlist(i).Attributes(Attribute) Is Nothing Then
+                    If Not elementlist(i).Attributes(Attribute).InnerText Is Nothing Then
                         Dim CompareString As String
                         CompareString = elementlist(i).Attributes(Attribute).InnerText.ToString
                         If Lowercase = True Then
@@ -367,7 +368,7 @@ Public Class Filechooser
             elementlist = doc.SelectNodes(NodeSelection)
             For i = 0 To elementlist.Count - 1
                 For Each Attribute In AttributeList
-                    If Not elementlist(i).Attributes(Attribute) Is Nothing Then
+                    If Not elementlist(i).Attributes(Attribute).InnerText Is Nothing Then
                         Dim CompareString As String
                         CompareString = elementlist(i).Attributes(Attribute).InnerText.ToString
                         If Lowercase = True Then
@@ -427,8 +428,11 @@ Public Class Filechooser
                             Dim DirInfo As New DirectoryInfo(XMLFolder)
                             Dim FileObj As IO.FileSystemInfo
                             For Each FileObj In DirInfo.GetFileSystemInfos
-                                Filepaths.Add(FileObj.FullName)
-                                SafeFilepaths.Add(FileObj.Name)
+                                If FileObj.Name.Contains(".xml") Then
+
+                                    Filepaths.Add(FileObj.FullName)
+                                    SafeFilepaths.Add(FileObj.Name)
+                                End If
                             Next
                             OutputButton.Visible = True
                             OutputLabel.Visible = True
@@ -630,8 +634,6 @@ Public Class Filechooser
                                 tempText = Replace(tempText, ")", "")
                                 If Not IDList.Contains(tempText) Then
                                     IDList.Add(tempText)
-                                    IDListBackup.Add(tempText)
-                                    '      OutputLog.AppendText(tempText & vbCrLf)
                                 End If
                                 m = m.NextMatch()
                             End While
