@@ -195,6 +195,8 @@ Public Class Filechooser
                     Else
                         MsgBox("no res tag in addon.xml")
                     End If
+                Else
+                    MsgBox("no skin folder chosen")
                 End If
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(xmlex.Message & vbCrLf)
@@ -626,6 +628,8 @@ Public Class Filechooser
 
     Sub AddStringToArray(ByRef EditArray As ArrayList, ByVal StringToAdd As String, Optional ByVal Lowercase As Boolean = False)
         If Lowercase = True Then StringToAdd = StringToAdd.ToLower
+        '      StringToAdd.Replace("$LOCALIZE[", "")
+        '       StringToAdd.Replace("]", "")
         If Not EditArray.Contains(StringToAdd) Then EditArray.Add(StringToAdd)
     End Sub
 
@@ -700,25 +704,36 @@ Public Class Filechooser
         Dim LabelsListDefines As New ArrayList()
         Dim LabelsListDefinesBackup As New ArrayList()
         '   Dim t As Regex = New Regex("(?<=\#)[0-9]+", RegexOptions.IgnoreCase)
-        Dim r As Regex = New Regex("(?<=\$LOCALIZE\[)[0-9]+", RegexOptions.IgnoreCase)
+        Dim r As Regex = New Regex("((?<=\$LOCALIZE\[)[0-9]+)|([0-9]+)", RegexOptions.IgnoreCase)
+        Dim RegExNumber As Regex = New Regex("\d+")
         LabelsListRefs.Clear()
         LabelsListDefines.Clear()
         LabelsListDefinesBackup.Clear()
+        Dim text = File.ReadAllLines(SkinFolder + "\language\english\strings.po")
+        For Each TextLine In text
+            If TextLine.StartsWith("msgctxt") Then
+                Dim match As Match = RegExNumber.Match(TextLine)
+                AddStringToArray(LabelsListDefines, match.Value.ToString)
+                AddStringToArray(LabelsListDefinesBackup, match.Value.ToString)
+            End If
+        Next
         OutputLog.AppendText("Checking the Labels..." & vbCrLf)
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
-                elementlist = doc.SelectNodes("//label | //value | //onclick")
+                elementlist = doc.SelectNodes("//label | //altlabel | //label2 | //value | //onclick")
                 For i = 0 To elementlist.Count - 1
                     If Not elementlist(i).InnerXml Is Nothing Then
                         Dim m As Match = r.Match(elementlist(i).InnerXml.ToString)
                         While (m.Success)
-                            AddStringToArray(LabelsListRefs, m.Value.ToString())
+                            Dim Result As String = m.Value.ToString()
+                            AddStringToArray(LabelsListRefs, Result)
                             m = m.NextMatch()
                         End While
                     End If
                 Next i
                 AddAttributesToArray(LabelsListRefs, "//viewtype", {"label"})
+                AddAttributesToArray(LabelsListRefs, "//fontset", {"idloc"})
                 AddAttributesToArray(LabelsListRefs, "*[(@fallback)]", {"fallback"})
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
@@ -727,14 +742,14 @@ Public Class Filechooser
             End Try
         Next
         For i = 0 To LabelsListRefs.Count - 1
-            RemoveStringFromArray(LabelsListDefines, LabelsListRefs(i))
+            Dim match As Match = RegExNumber.Match(LabelsListRefs(i))
+            RemoveStringFromArray(LabelsListDefines, match.Value.ToString)
         Next
-        For i = 0 To LabelsListDefinesBackup.Count - 1
-            RemoveStringFromArray(LabelsListRefs, LabelsListDefinesBackup(i))
-        Next
-        OutputLog.AppendText("Undefined Labels:" & vbCrLf)
-        PrintArray(LabelsListRefs)
-        OutputLog.AppendText("Unused Labels:" & vbCrLf)
+        '  OutputLog.AppendText(vbCrLf & "LabelsListRefs:" & vbCrLf & vbCrLf)
+        '   PrintArray(LabelsListRefs)
+        '    OutputLog.AppendText(vbCrLf & "LabelsListDefinesBackup:" & vbCrLf & vbCrLf)
+        '     PrintArray(LabelsListDefinesBackup)
+        OutputLog.AppendText(vbCrLf & "Unused Strings:" & vbCrLf & vbCrLf)
         PrintArray(LabelsListDefines)
     End Sub
 End Class
