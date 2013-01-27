@@ -309,8 +309,7 @@ Public Class Filechooser
             For i = 0 To elementlist.Count - 1
                 For Each Attribute In Attributes
                     If Not elementlist(i).Attributes(Attribute).InnerText Is Nothing Then
-                        Dim CompareString As String
-                        CompareString = elementlist(i).Attributes(Attribute).InnerText.ToString
+                        Dim CompareString As String = elementlist(i).Attributes(Attribute).InnerText.ToString
                         If Lowercase = True Then
                             CompareString = CompareString.ToLower
                         End If
@@ -320,7 +319,8 @@ Public Class Filechooser
                     End If
                 Next Attribute
             Next
-        Catch
+        Catch ex As Exception                        ' Handle the generic Exceptions here.
+            OutputLog.AppendText(": " + ex.Message & vbCrLf)
         End Try
     End Sub
     Sub RemoveNodesFromArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, Optional ByVal Lowercase As Boolean = False)
@@ -328,8 +328,7 @@ Public Class Filechooser
             elementlist = doc.GetElementsByTagName(NodeSelection)
             For i = 0 To elementlist.Count - 1
                 If Not elementlist(i).InnerXml Is Nothing Then
-                    Dim CompareString As String
-                    CompareString = elementlist(i).InnerXml
+                    Dim CompareString As String = elementlist(i).InnerXml
                     If Lowercase = True Then
                         CompareString = CompareString.ToLower
                     End If
@@ -346,8 +345,7 @@ Public Class Filechooser
             elementlist = doc.GetElementsByTagName(NodeSelection)
             For i = 0 To elementlist.Count - 1
                 If Not elementlist(i).InnerXml Is Nothing Then
-                    Dim CompareString As String
-                    CompareString = elementlist(i).InnerXml
+                    Dim CompareString As String = elementlist(i).InnerXml
                     If Lowercase = True Then
                         CompareString = CompareString.ToLower
                     End If
@@ -356,7 +354,8 @@ Public Class Filechooser
                     End If
                 End If
             Next
-        Catch
+        Catch ex As Exception                        ' Handle the generic Exceptions here.
+            OutputLog.AppendText(": " + ex.Message & vbCrLf)
         End Try
     End Sub
 
@@ -366,8 +365,7 @@ Public Class Filechooser
             For i = 0 To elementlist.Count - 1
                 For Each Attribute In AttributeList
                     If Not elementlist(i).Attributes(Attribute).InnerText Is Nothing Then
-                        Dim CompareString As String
-                        CompareString = elementlist(i).Attributes(Attribute).InnerText.ToString
+                        Dim CompareString As String = elementlist(i).Attributes(Attribute).InnerText.ToString
                         If Lowercase = True Then
                             CompareString = CompareString.ToLower
                         End If
@@ -378,7 +376,22 @@ Public Class Filechooser
                     End If
                 Next Attribute
             Next
-        Catch
+        Catch ex As Exception                        ' Handle the generic Exceptions here.
+            OutputLog.AppendText(": " + ex.Message & vbCrLf)
+        End Try
+    End Sub
+    Sub AddArrayListToArray(ByRef EditArray As ArrayList, ByVal ArrayToAdd As ArrayList, Optional ByVal Lowercase As Boolean = False)
+        Try
+            For Each StringToAdd In ArrayToAdd
+                If Lowercase = True Then
+                    StringToAdd = StringToAdd.ToLower
+                End If
+                If Not EditArray.Contains(StringToAdd) Then
+                    EditArray.Add(StringToAdd)
+                End If
+            Next StringToAdd
+        Catch ex As Exception                        ' Handle the generic Exceptions here.
+            OutputLog.AppendText(": " + ex.Message & vbCrLf)
         End Try
     End Sub
 
