@@ -279,7 +279,7 @@ Public Class Filechooser
     End Sub
 
     Private Sub StartSkinBuildButton(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button4.Click
-        Process.Start("build.bat", SkinFolder + " " + TexturePackerPath + " " + BuildFolder)
+        Process.Start("build.bat", SkinFolder)
     End Sub
 
     Private Sub ChooseTexturePackerButton(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
