@@ -721,7 +721,7 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
-                elementlist = doc.SelectNodes("//label | //altlabel | //label2 | //value | //onclick")
+                elementlist = doc.SelectNodes("//label | //altlabel | //label2 | //value | //onclick | //property")
                 For i = 0 To elementlist.Count - 1
                     If Not elementlist(i).InnerXml Is Nothing Then
                         Dim m As Match = r.Match(elementlist(i).InnerXml.ToString)
@@ -732,8 +732,8 @@ Public Class Filechooser
                         End While
                     End If
                 Next i
-                AddAttributesToArray(LabelsListRefs, "//viewtype", {"label"})
-                AddAttributesToArray(LabelsListRefs, "//fontset", {"idloc"})
+                AddAttributesToArray(LabelsListRefs, "//viewtype[(@label)]", {"label"})
+                AddAttributesToArray(LabelsListRefs, "//fontset[(@idloc)]", {"idloc"})
                 AddAttributesToArray(LabelsListRefs, "*[(@fallback)]", {"fallback"})
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
