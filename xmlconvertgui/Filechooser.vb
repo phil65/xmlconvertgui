@@ -92,9 +92,7 @@ Public Class Filechooser
                     Next
                 End If
                 Dim myXmlSettings As New XmlWriterSettings
-                If Not HeaderOption.Checked Then
-                    myXmlSettings.OmitXmlDeclaration = True
-                End If
+                If Not HeaderOption.Checked Then myXmlSettings.OmitXmlDeclaration = True
                 Dim UTF8NoBom As Encoding = New UTF8Encoding(False)
                 myXmlSettings.Encoding = UTF8NoBom
                 Select Case EOLComboBox.SelectedIndex
@@ -154,11 +152,316 @@ Public Class Filechooser
         End If
     End Sub
 
+    Private Sub SkinFolderButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SkinFolderButton.Click
+        SafeFilepaths.Clear()
+        Filepaths.Clear()
+        xmlname.Text = ""
+        SkinFolderDialog.Description = "Choose Skin Folder"
+        Dim DidWork As Integer = SkinFolderDialog.ShowDialog()
+        If DidWork = DialogResult.Cancel Then
+        Else
+            SkinFolder = SkinFolderDialog.SelectedPath
+            OutputLog.AppendText("Skin Folder chosen:" & vbCrLf & SkinFolder & vbCrLf)
+        End If
+        If Not CheckPath(SkinFolder + "\addon.xml") Then
+            MsgBox("Please choose a skin folder.")
+        Else
+            Try
+                If SkinFolder <> "" Then
+                    doc.Load(SkinFolder + "\addon.xml")
+                    elementlist = doc.SelectNodes("//res")
+                    If Not elementlist(0).Attributes("folder") Is Nothing Then
+                        XMLFolder = SkinFolder + "\" + elementlist(0).Attributes("folder").InnerText.ToString
+                        OutputLog.AppendText("XML Folder:" & XMLFolder & vbCrLf)
+                        Const ATTR_DIRECTORY = 16
+                        If Dir$(XMLFolder, ATTR_DIRECTORY) <> "" Then
+                            Dim DirInfo As New DirectoryInfo(XMLFolder)
+                            Dim FileObj As IO.FileSystemInfo
+                            For Each FileObj In DirInfo.GetFileSystemInfos
+                                If FileObj.Name.Contains(".xml") Then
+
+                                    Filepaths.Add(FileObj.FullName)
+                                    SafeFilepaths.Add(FileObj.Name)
+                                End If
+                            Next
+                            OutputButton.Visible = True
+                            OutputLabel.Visible = True
+                            If strOutputFolder <> "" Then
+                                ConvertButton.Enabled = True
+                            End If
+                        Else
+                            MsgBox("Path from addon.xml does not exist.")
+                        End If
+                    End If
+                End If
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(xmlex.Message & vbCrLf)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(ex.Message & vbCrLf)
+            End Try
+        End If
+    End Sub
+
+    Private Sub ClearLogButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ClearLogButton.Click
+        OutputLog.Clear()
+    End Sub
+
+    Private Sub CheckFontsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckFontsButton.Click
+        OutputLog.AppendText("Building Font List" & vbCrLf)
+        Dim ShortPath As String = ""
+        Dim FontList As New ArrayList()
+        Dim FontList2 As New ArrayList()
+        Try
+            doc.Load(XMLFolder + "\font.xml")
+            AddNodesToArray(FontList, "name")
+            AddNodesToArray(FontList2, "filename")
+        Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+            OutputLog.AppendText(xmlex.Message)
+        Catch ex As Exception                        ' Handle the generic Exceptions here.
+            OutputLog.AppendText(ex.Message)
+        End Try
+        OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the fonts of the upcoming list for usage." & vbCrLf)
+        For j = 0 To Filepaths.Count - 1
+            Try
+                doc.Load(Filepaths(j))
+                If Not Filepaths(j).ToString.ToLower.Contains("font.xml") Then
+                    RemoveNodesFromArray(FontList, "font")
+                End If
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
+            End Try
+        Next j
+        OutputLog.AppendText("Unused Fonts:" & vbCrLf)
+        Dim str As String
+        For Each str In FontList
+            OutputLog.AppendText(str & vbCrLf)
+        Next
+    End Sub
+
+    Private Sub CheckIncludesButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckIncludesButton.Click
+        OutputLog.AppendText("Building Include List" & vbCrLf)
+        Dim IncludeList As New ArrayList()
+        Dim IncludeListBackup As New ArrayList()
+        Dim IncludeList2 As New ArrayList()
+        Dim ShortPath As String = ""
+        IncludeList2.Clear()
+        IncludeListBackup.Clear()
+        IncludeList.Clear()
+        For j = 0 To Filepaths.Count - 1
+            Try
+                doc.Load(Filepaths(j))
+                AddAttributesToArray(IncludeList, "//include[(@name)]", {"name"})
+                elementlist = doc.SelectNodes("//include[not(@name)]")
+                For i = 0 To elementlist.Count - 1
+                    AddStringToArray(IncludeList2, elementlist(i).InnerXml)
+                Next
+                IncludeListBackup = IncludeList2
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
+            End Try
+        Next
+        Dim Include As String
+        For Each Include In IncludeList
+            RemoveStringFromArray(IncludeList2, Include)
+        Next
+        For Each Include In IncludeListBackup
+            RemoveStringFromArray(IncludeList, Include)
+        Next
+        OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the upcoming List of Includes." & vbCrLf)
+        OutputLog.AppendText("Unused Includes:" & vbCrLf)
+        PrintArray(IncludeList)
+        OutputLog.AppendText("Undefined Includes:" & vbCrLf)
+        PrintArray(IncludeList2)
+    End Sub
+
+    Private Sub StartSkinBuildButton(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button4.Click
+        Process.Start("build.bat", SkinFolder + " " + TexturePackerPath + " " + BuildFolder)
+    End Sub
+
+    Private Sub ChooseTexturePackerButton(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
+        OpenFileDialog.Title = "Choose EXE file"
+        OpenFileDialog.Filter = "EXE Files|*.exe"
+        Dim DidWork As Integer = OpenFileDialog.ShowDialog()
+        If DidWork = DialogResult.Cancel Then
+        Else
+            OutputButton.Visible = True
+            OutputLabel.Visible = True
+            TexturePackerPath = OpenFileDialog.FileName
+            OutputLog.AppendText("TexturePacker Path: " + TexturePackerPath & vbCrLf)
+        End If
+    End Sub
+
+    Private Sub BuildFolderButton(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button3.Click
+        BuildFolderDialog.Description = "Choose Build Folder"
+        Dim DidWork As Integer = BuildFolderDialog.ShowDialog()
+        If DidWork = DialogResult.Cancel Then
+        Else
+            BuildFolder = BuildFolderDialog.SelectedPath
+            OutputLog.AppendText("Build Folder chosen:" & vbCrLf)
+            OutputLog.AppendText(BuildFolder & vbCrLf)
+        End If
+    End Sub
+
+    Private Sub CheckBracketsButton_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBracketsButton.Click
+        OutputLog.AppendText("Checking the brackets..." & vbCrLf)
+        For j = 0 To Filepaths.Count - 1
+            Try
+                doc.Load(Filepaths(j))
+                For k = 0 To xmlelementsBrackets.Length - 1
+                    elementlist = doc.GetElementsByTagName(xmlelementsBrackets(k))
+                    For i = 0 To elementlist.Count - 1
+                        SameCharNumber(elementlist(i).InnerXml, "[", "]")
+                        SameCharNumber(elementlist(i).InnerXml, "(", ")")
+                    Next i
+                Next k
+                elementlist = doc.SelectNodes("//include | //onup | //ondown | //onleft | //onright | //animation | //onload | //onunload | //onclick | //onback | //focusedlayout | //itemlayout | //onfocus | //value")
+                For i = 0 To elementlist.Count - 1
+                    If Not elementlist(i).Attributes("condition") Is Nothing Then
+                        Dim CompareString As String = elementlist(i).Attributes("condition").InnerText.ToString
+                        SameCharNumber(CompareString, "[", "]")
+                        SameCharNumber(CompareString, "(", ")")
+                    End If
+                Next i
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
+            End Try
+        Next
+    End Sub
+
+    Private Sub TextureCheckButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TextureCheckButton.Click
+        OutputLog.AppendText("Building Texture List" & vbCrLf)
+        TextureFinder(SkinFolder + "\media")
+        OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the textures of the upcoming list for usage." & vbCrLf)
+        For j = 0 To Filepaths.Count - 1
+            Try
+                doc.Load(Filepaths(j))
+                RemoveAttributesFromArray(ShortenedTexturePaths, "//texture", {"diffuse", "fallback"}, True)
+                For k = 0 To xmlelementsTexture.Length
+                    RemoveNodesFromArray(ShortenedTexturePaths, xmlelementsTexture(k), True)
+                Next k
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
+            End Try
+        Next j
+        OutputLog.AppendText("Unused Textures:" & vbCrLf)
+        PrintArray(ShortenedTexturePaths)
+    End Sub
+
     Sub changeElements(ByVal tag As String)
         elementlist = doc.GetElementsByTagName(tag)
         For i = 0 To elementlist.Count - 1
             elementlist(i).InnerXml = ConvertValue(elementlist(i).InnerXml, multiplyFactor)
         Next i
+    End Sub
+
+    Private Sub CheckIDsButton_Click(sender As System.Object, e As System.EventArgs) Handles CheckIDsButton.Click
+        Dim charsToTrim() As Char = {"("c, ")"c}
+        Dim pattern As String = "(?<=\()[0-9]+)"
+        Dim IDListRefs As New ArrayList()
+        Dim IDListDefines As New ArrayList()
+        Dim IDListDefinesBackup As New ArrayList()
+        IDListRefs.Clear()
+        IDListDefines.Clear()
+        IDListDefinesBackup.Clear()
+        '   Dim pattern as String = "\([0-9]+\)"
+        OutputLog.AppendText("Checking the IDs..." & vbCrLf)
+        For j = 0 To Filepaths.Count - 1
+            Try
+                doc.Load(Filepaths(j))
+                For k = 0 To xmlelementsBrackets.Length - 1
+                    elementlist = doc.GetElementsByTagName(xmlelementsBrackets(k))
+                    For i = 0 To elementlist.Count - 1
+                        If Not elementlist(i).InnerXml Is Nothing Then
+                            Dim r As Regex = New Regex(pattern, RegexOptions.IgnoreCase)
+                            Dim m As Match = r.Match(elementlist(i).InnerXml.ToString)
+                            While (m.Success)
+                                Dim tempText As String = m.Value.ToString()
+                                AddStringToArray(IDListRefs, tempText)
+                                m = m.NextMatch()
+                            End While
+                        End If
+                    Next i
+                Next k
+                elementlist = doc.SelectNodes("//include | //onup | //ondown | //onleft | //onright | //animation | //onload | //onunload | //onclick | //onback | //focusedlayout | //itemlayout | //onfocus | //value")
+                For i = 0 To elementlist.Count - 1
+                    If Not elementlist(i).Attributes("condition").InnerText Is Nothing Then
+                        Dim r As Regex = New Regex(pattern, RegexOptions.IgnoreCase)
+                        Dim m As Match = r.Match(elementlist(i).Attributes("condition").InnerText.ToString)
+                        While (m.Success)
+                            Dim tempText As String = m.Value.ToString()
+                            AddStringToArray(IDListRefs, tempText)
+                            m = m.NextMatch()
+                        End While
+                    End If
+                Next i
+                AddAttributesToArray(IDListDefines, "//control[(@id)] | //window[(@id)]", {"id"})
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
+            End Try
+        Next
+        IDListDefinesBackup = IDListDefines
+        For i = 0 To IDListRefs.Count - 1
+            RemoveStringFromArray(IDListDefines, IDListRefs(i))
+        Next
+        For i = 0 To IDListDefinesBackup.Count - 1
+            RemoveStringFromArray(IDListRefs, IDListDefinesBackup(i))
+        Next
+        OutputLog.AppendText("Undefined IDs:" & vbCrLf)
+        Dim str As String
+        For Each str In IDListRefs
+            OutputLog.AppendText(str & vbCrLf)
+        Next
+        '       OutputLog.AppendText("Undefined IDs:" & vbCrLf)
+        '      For Each str In IDListDefines
+        ' OutputLog.AppendText(str & vbCrLf)
+        '  Next
+    End Sub
+
+    Private Sub SaveButton_Click(sender As System.Object, e As System.EventArgs) Handles SaveButton.Click
+        My.Settings.TexturePackerPath = TexturePackerPath
+        My.Settings.XMLFolder = XMLFolder
+        My.Settings.SkinFolder = SkinFolder
+        My.Settings.XMLHeader = HeaderOption.Checked
+        My.Settings.ConvertBorders = ConvertBorders.Checked
+        My.Settings.EndOfLine = EOLComboBox.SelectedIndex
+        My.Settings.Indenting = IndentingDropDown.SelectedIndex
+        MsgBox("Settings saved")
+    End Sub
+
+    Private Sub CheckValuesButton_Click(sender As System.Object, e As System.EventArgs) Handles CheckValuesButton.Click
+        OutputLog.AppendText("Scanning XMLs..." & vbCrLf)
+        For j = 0 To Filepaths.Count - 1
+            Try
+                doc.Load(Filepaths(j))
+                CheckNodeValue("align", {"left", "center", "right", "justify"}, SafeFilepaths(j))
+                CheckNodeValue("aspectratio", {"keep", "scale", "stretch", "center"}, SafeFilepaths(j))
+                CheckNodeValue("aligny", {"top", "center", "bottom"}, SafeFilepaths(j))
+                CheckNodeValue("orientation", {"horizontal", "vertical"}, SafeFilepaths(j))
+                CheckNodeValue("subtype", {"page", "int", "float", "text"}, SafeFilepaths(j))
+                CheckNodeValue("action", {"volume", "seek"}, SafeFilepaths(j))
+                CheckNodeValue("scroll", {"false", "true", "yes", "no"}, SafeFilepaths(j))
+                CheckNodeValue("randomize", {"false", "true", "yes", "no"}, SafeFilepaths(j))
+                CheckNodeValue("scrollout", {"false", "true", "yes", "no"}, SafeFilepaths(j))
+                CheckNodeValue("pulseonselect", {"false", "true", "yes", "no"}, SafeFilepaths(j))
+                CheckNodeValue("reverse", {"false", "true", "yes", "no"}, SafeFilepaths(j))
+                CheckNodeValue("usecontrolcoords", {"false", "true", "yes", "no"}, SafeFilepaths(j))
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
+            End Try
+        Next j
+        OutputLog.AppendText("Scan complete" & vbCrLf)
     End Sub
 
     Sub ScaleXMLNode(ByRef Element As XmlNode, ByVal tag As String, ByVal ScaleFactor As String)
@@ -265,7 +568,7 @@ Public Class Filechooser
                     (Not ShortPath.ToLower.Contains("\480p.png")) And (Not ShortPath.ToLower.Contains("\540p.png")) And (Not ShortPath.ToLower.Contains("\720p.png")) And
                     (Not ShortPath.ToLower.Contains("\576p.png")) And (Not ShortPath.ToLower.Contains("\1080p.png")) And (Not ShortPath.ToLower.Contains("overlaywatched.png"))) Then
                     ShortPath = ShortPath.Replace("\", "/")
-                    '   ShortPath = ShortPath.ToLower
+                    ShortPath = ShortPath.ToLower
                     ShortenedTexturePaths.Add(ShortPath)
                 End If
             Next
@@ -279,27 +582,10 @@ Public Class Filechooser
         End Try
     End Sub
 
-    Private Sub TextureCheckButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TextureCheckButton.Click
-        OutputLog.AppendText("Building Texture List" & vbCrLf)
-        TextureFinder(SkinFolder + "\media")
-        OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the textures of the upcoming list for usage." & vbCrLf)
-        For j = 0 To Filepaths.Count - 1
-            Try
-                doc.Load(Filepaths(j))
-                RemoveAttributesFromArray(ShortenedTexturePaths, "//texture", {"diffuse", "fallback"})
-                For k = 0 To xmlelementsTexture.Length
-                    RemoveNodesFromArray(ShortenedTexturePaths, xmlelementsTexture(k))
-                Next k
-            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
-            Catch ex As Exception                        ' Handle the generic Exceptions here.
-                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
-            End Try
-        Next j
-        OutputLog.AppendText("Unused Textures:" & vbCrLf)
-        Dim str As String
-        For Each str In ShortenedTexturePaths
-            OutputLog.AppendText(str & vbCrLf)
+    Sub PrintArray(ByVal PrintArray As ArrayList)
+        Dim Line As String
+        For Each Line In PrintArray
+            OutputLog.AppendText(Line & vbCrLf)
         Next
     End Sub
 
@@ -317,6 +603,7 @@ Public Class Filechooser
             OutputLog.AppendText(": " + ex.Message & vbCrLf)
         End Try
     End Sub
+
     Sub RemoveNodesFromArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, Optional ByVal Lowercase As Boolean = False)
         Try
             elementlist = doc.GetElementsByTagName(NodeSelection)
@@ -328,6 +615,7 @@ Public Class Filechooser
         Catch
         End Try
     End Sub
+
     Sub RemoveStringFromArray(ByRef EditArray As ArrayList, ByVal StringToRemove As String, Optional ByVal Lowercase As Boolean = False)
         Try
             If Lowercase = True Then
@@ -340,6 +628,7 @@ Public Class Filechooser
             OutputLog.AppendText(": " + ex.Message & vbCrLf)
         End Try
     End Sub
+
     Sub AddNodesToArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, Optional ByVal Lowercase As Boolean = False)
         Try
             elementlist = doc.GetElementsByTagName(NodeSelection)
@@ -367,6 +656,7 @@ Public Class Filechooser
             OutputLog.AppendText(": " + ex.Message & vbCrLf)
         End Try
     End Sub
+
     Sub AddArrayListToArray(ByRef EditArray As ArrayList, ByVal ArrayToAdd As ArrayList, Optional ByVal Lowercase As Boolean = False)
         Try
             For Each StringToAdd In ArrayToAdd
@@ -376,14 +666,15 @@ Public Class Filechooser
             OutputLog.AppendText(": " + ex.Message & vbCrLf)
         End Try
     End Sub
+
     Sub AddStringToArray(ByRef EditArray As ArrayList, ByVal StringToAdd As String, Optional ByVal Lowercase As Boolean = False)
         Try
-                If Lowercase = True Then
-                    StringToAdd = StringToAdd.ToLower
-                End If
-                If Not EditArray.Contains(StringToAdd) Then
-                    EditArray.Add(StringToAdd)
-                End If
+            If Lowercase = True Then
+                StringToAdd = StringToAdd.ToLower
+            End If
+            If Not EditArray.Contains(StringToAdd) Then
+                EditArray.Add(StringToAdd)
+            End If
         Catch ex As Exception                        ' Handle the generic Exceptions here.
             OutputLog.AppendText(": " + ex.Message & vbCrLf)
         End Try
@@ -406,193 +697,6 @@ Public Class Filechooser
         Next
     End Sub
 
-    Private Sub SkinFolderButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SkinFolderButton.Click
-        SafeFilepaths.Clear()
-        Filepaths.Clear()
-        xmlname.Text = ""
-        SkinFolderDialog.Description = "Choose Skin Folder"
-        Dim DidWork As Integer = SkinFolderDialog.ShowDialog()
-        If DidWork = DialogResult.Cancel Then
-        Else
-            SkinFolder = SkinFolderDialog.SelectedPath
-            OutputLog.AppendText("Skin Folder chosen:" & vbCrLf & SkinFolder & vbCrLf)
-        End If
-        If Not CheckPath(SkinFolder + "\addon.xml") Then
-            MsgBox("Please choose a skin folder.")
-        Else
-            Try
-                If SkinFolder <> "" Then
-                    doc.Load(SkinFolder + "\addon.xml")
-                    elementlist = doc.SelectNodes("//res")
-                    If Not elementlist(0).Attributes("folder") Is Nothing Then
-                        XMLFolder = SkinFolder + "\" + elementlist(0).Attributes("folder").InnerText.ToString
-                        OutputLog.AppendText("XML Folder:" & XMLFolder & vbCrLf)
-                        Const ATTR_DIRECTORY = 16
-                        If Dir$(XMLFolder, ATTR_DIRECTORY) <> "" Then
-                            Dim DirInfo As New DirectoryInfo(XMLFolder)
-                            Dim FileObj As IO.FileSystemInfo
-                            For Each FileObj In DirInfo.GetFileSystemInfos
-                                If FileObj.Name.Contains(".xml") Then
-
-                                    Filepaths.Add(FileObj.FullName)
-                                    SafeFilepaths.Add(FileObj.Name)
-                                End If
-                            Next
-                            OutputButton.Visible = True
-                            OutputLabel.Visible = True
-                            If strOutputFolder <> "" Then
-                                ConvertButton.Enabled = True
-                            End If
-                        Else
-                            MsgBox("Path from addon.xml does not exist.")
-                        End If
-                    End If
-                End If
-            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-                OutputLog.AppendText(xmlex.Message & vbCrLf)
-            Catch ex As Exception                        ' Handle the generic Exceptions here.
-                OutputLog.AppendText(ex.Message & vbCrLf)
-            End Try
-        End If
-    End Sub
-
-    Private Sub ClearLogButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ClearLogButton.Click
-        OutputLog.Clear()
-    End Sub
-
-    Private Sub CheckFontsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckFontsButton.Click
-        OutputLog.AppendText("Building Font List" & vbCrLf)
-        Dim ShortPath As String = ""
-        Dim FontList As New ArrayList()
-        Dim FontList2 As New ArrayList()
-        Try
-            doc.Load(XMLFolder + "\font.xml")
-            AddNodesToArray(FontList, "name")
-            AddNodesToArray(FontList2, "filename")
-        Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-            OutputLog.AppendText(xmlex.Message)
-        Catch ex As Exception                        ' Handle the generic Exceptions here.
-            OutputLog.AppendText(ex.Message)
-        End Try
-        OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the fonts of the upcoming list for usage." & vbCrLf)
-        For j = 0 To Filepaths.Count - 1
-            Try
-                doc.Load(Filepaths(j))
-                If Not Filepaths(j).ToString.ToLower.Contains("font.xml") Then
-                    RemoveNodesFromArray(FontList, "font")
-                End If
-            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
-            Catch ex As Exception                        ' Handle the generic Exceptions here.
-                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
-            End Try
-        Next j
-        OutputLog.AppendText("Unused Fonts:" & vbCrLf)
-        Dim str As String
-        For Each str In FontList
-            OutputLog.AppendText(str & vbCrLf)
-        Next
-    End Sub
-
-    Private Sub CheckIncludesButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckIncludesButton.Click
-        OutputLog.AppendText("Building Include List" & vbCrLf)
-        Dim IncludeList As New ArrayList()
-        Dim IncludeListBackup As New ArrayList()
-        Dim IncludeList2 As New ArrayList()
-        Dim ShortPath As String = ""
-        IncludeList2.Clear()
-        IncludeListBackup.Clear()
-        IncludeList.Clear()
-        For j = 0 To Filepaths.Count - 1
-            Try
-                doc.Load(Filepaths(j))
-                AddAttributesToArray(IncludeList, "//include[(@name)]", {"name"})
-
-                elementlist = doc.SelectNodes("//include[not(@name)]")
-                For i = 0 To elementlist.Count - 1
-                    AddStringToArray(IncludeList2, elementlist(i).InnerXml)
-                Next
-                IncludeListBackup = IncludeList2
-            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
-            Catch ex As Exception                        ' Handle the generic Exceptions here.
-                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
-            End Try
-        Next
-        Dim Include As String
-        For Each Include In IncludeList
-            RemoveStringFromArray(IncludeList2, Include)
-        Next
-        For Each Include In IncludeListBackup
-            RemoveStringFromArray(IncludeList, Include)
-        Next
-        OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the upcoming List of Includes." & vbCrLf)
-        OutputLog.AppendText("Unused Includes:" & vbCrLf)
-        For Each Include In IncludeList
-            OutputLog.AppendText(Include & vbCrLf)
-        Next
-        OutputLog.AppendText("Undefined Includes:" & vbCrLf)
-        For Each Include In IncludeList2
-            OutputLog.AppendText(Include & vbCrLf)
-        Next
-    End Sub
-
-    Private Sub StartSkinBuildButton(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button4.Click
-        Process.Start("build.bat", SkinFolder + " " + TexturePackerPath + " " + BuildFolder)
-    End Sub
-
-    Private Sub ChooseTexturePackerButton(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
-        OpenFileDialog.Title = "Choose EXE file"
-        OpenFileDialog.Filter = "EXE Files|*.exe"
-        Dim DidWork As Integer = OpenFileDialog.ShowDialog()
-        If DidWork = DialogResult.Cancel Then
-        Else
-            OutputButton.Visible = True
-            OutputLabel.Visible = True
-            TexturePackerPath = OpenFileDialog.FileName
-            OutputLog.AppendText("TexturePacker Path: " + TexturePackerPath & vbCrLf)
-        End If
-    End Sub
-
-    Private Sub BuildFolderButton(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button3.Click
-        BuildFolderDialog.Description = "Choose Build Folder"
-        Dim DidWork As Integer = BuildFolderDialog.ShowDialog()
-        If DidWork = DialogResult.Cancel Then
-        Else
-            BuildFolder = BuildFolderDialog.SelectedPath
-            OutputLog.AppendText("Build Folder chosen:" & vbCrLf)
-            OutputLog.AppendText(BuildFolder & vbCrLf)
-        End If
-    End Sub
-
-    Private Sub CheckBracketsButton_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBracketsButton.Click
-        OutputLog.AppendText("Checking the brackets..." & vbCrLf)
-        For j = 0 To Filepaths.Count - 1
-            Try
-                doc.Load(Filepaths(j))
-                For k = 0 To xmlelementsBrackets.Length - 1
-                    elementlist = doc.GetElementsByTagName(xmlelementsBrackets(k))
-                    For i = 0 To elementlist.Count - 1
-                        SameCharNumber(elementlist(i).InnerXml, "[", "]")
-                        SameCharNumber(elementlist(i).InnerXml, "(", ")")
-                    Next i
-                Next k
-                elementlist = doc.SelectNodes("//include | //onup | //ondown | //onleft | //onright | //animation | //onload | //onunload | //onclick | //onback | //focusedlayout | //itemlayout | //onfocus | //value")
-                For i = 0 To elementlist.Count - 1
-                    If Not elementlist(i).Attributes("condition") Is Nothing Then
-                        Dim CompareString As String = elementlist(i).Attributes("condition").InnerText.ToString
-                        SameCharNumber(CompareString, "[", "]")
-                        SameCharNumber(CompareString, "(", ")")
-                    End If
-                Next i
-            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
-            Catch ex As Exception                        ' Handle the generic Exceptions here.
-                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
-            End Try
-        Next
-    End Sub
-
     Public Sub SameCharNumber(ByVal value As String, ByVal CompareChar1 As Char, ByVal CompareChar2 As Char)
         Dim cnt As Integer = 0
         Dim Unmatched As Boolean = False
@@ -605,111 +709,7 @@ Public Class Filechooser
             OutputLog.AppendText("Unmatched parenthesis: " + value & vbCrLf)
         End If
     End Sub
-    Private Sub CheckIDsButton_Click(sender As System.Object, e As System.EventArgs) Handles CheckIDsButton.Click
-        Dim charsToTrim() As Char = {"("c, ")"c}
-        Dim pattern As String = "\([0-9]+\)"
-        Dim IDList As New ArrayList()
-        Dim IDList2 As New ArrayList()
-        Dim IDListBackup As New ArrayList()
-        IDList.Clear()
-        IDList2.Clear()
-        IDListBackup.Clear()
-        '   Dim pattern as String = "\([a-zA-Z0-9]*\)"
-        OutputLog.AppendText("Checking the IDs..." & vbCrLf)
-        For j = 0 To Filepaths.Count - 1
-            Try
-                doc.Load(Filepaths(j))
-                For k = 0 To xmlelementsBrackets.Length - 1
-                    elementlist = doc.GetElementsByTagName(xmlelementsBrackets(k))
-                    For i = 0 To elementlist.Count - 1
-                        If Not elementlist(i).InnerXml Is Nothing Then
-                            Dim r As Regex = New Regex(pattern, RegexOptions.IgnoreCase)
-                            Dim m As Match = r.Match(elementlist(i).InnerXml.ToString)
-                            While (m.Success)
-                                Dim tempText As String = m.Value.ToString()
-                                tempText = Replace(tempText, "(", "")
-                                tempText = Replace(tempText, ")", "")
-                                AddStringToArray(IDList, tempText)
-                                m = m.NextMatch()
-                            End While
-                        End If
-                    Next i
-                Next k
-                elementlist = doc.SelectNodes("//include | //onup | //ondown | //onleft | //onright | //animation | //onload | //onunload | //onclick | //onback | //focusedlayout | //itemlayout | //onfocus | //value")
-                For i = 0 To elementlist.Count - 1
-                    If Not elementlist(i).Attributes("condition") Is Nothing Then
-                        Dim r As Regex = New Regex(pattern, RegexOptions.IgnoreCase)
-                        Dim m As Match = r.Match(elementlist(i).Attributes("condition").InnerText.ToString)
-                        While (m.Success)
-                            Dim tempText As String = m.Value.ToString()
-                            tempText = Replace(tempText, "(", "")
-                            tempText = Replace(tempText, ")", "")
-                            AddStringToArray(IDList, tempText)
-                            m = m.NextMatch()
-                        End While
-                    End If
-                Next i
-                AddAttributesToArray(IDList2, "//control[(@id)] | //window[(@id)]", {"id"})
-            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
-            Catch ex As Exception                        ' Handle the generic Exceptions here.
-                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
-            End Try
-        Next
-        IDListBackup = IDList2
-        For i = 0 To IDList.Count - 1
-            RemoveStringFromArray(IDList2, IDList(i))
-        Next
-        For i = 0 To IDListBackup.Count - 1
-            RemoveStringFromArray(IDList, IDListBackup(i))
-        Next
-        OutputLog.AppendText("Undefined IDs:" & vbCrLf)
-        Dim str As String
-        For Each str In IDList
-            OutputLog.AppendText(str & vbCrLf)
-        Next
-        '       OutputLog.AppendText("Undefined IDs:" & vbCrLf)
-        '      For Each str In IDList2
-        ' OutputLog.AppendText(str & vbCrLf)
-        '  Next
-    End Sub
 
-    Private Sub SaveButton_Click(sender As System.Object, e As System.EventArgs) Handles SaveButton.Click
-        My.Settings.TexturePackerPath = TexturePackerPath
-        My.Settings.XMLFolder = XMLFolder
-        My.Settings.SkinFolder = SkinFolder
-        My.Settings.XMLHeader = HeaderOption.Checked
-        My.Settings.ConvertBorders = ConvertBorders.Checked
-        My.Settings.EndOfLine = EOLComboBox.SelectedIndex
-        My.Settings.Indenting = IndentingDropDown.SelectedIndex
-        MsgBox("Settings saved")
-    End Sub
-
-    Private Sub CheckValuesButton_Click(sender As System.Object, e As System.EventArgs) Handles CheckValuesButton.Click
-        OutputLog.AppendText("Scanning XMLs..." & vbCrLf)
-        For j = 0 To Filepaths.Count - 1
-            Try
-                doc.Load(Filepaths(j))
-                CheckNodeValue("align", {"left", "center", "right", "justify"}, SafeFilepaths(j))
-                CheckNodeValue("aspectratio", {"keep", "scale", "stretch", "center"}, SafeFilepaths(j))
-                CheckNodeValue("aligny", {"top", "center", "bottom"}, SafeFilepaths(j))
-                CheckNodeValue("orientation", {"horizontal", "vertical"}, SafeFilepaths(j))
-                CheckNodeValue("subtype", {"page", "int", "float", "text"}, SafeFilepaths(j))
-                CheckNodeValue("action", {"volume", "seek"}, SafeFilepaths(j))
-                CheckNodeValue("scroll", {"false", "true", "yes", "no"}, SafeFilepaths(j))
-                CheckNodeValue("randomize", {"false", "true", "yes", "no"}, SafeFilepaths(j))
-                CheckNodeValue("scrollout", {"false", "true", "yes", "no"}, SafeFilepaths(j))
-                CheckNodeValue("pulseonselect", {"false", "true", "yes", "no"}, SafeFilepaths(j))
-                CheckNodeValue("reverse", {"false", "true", "yes", "no"}, SafeFilepaths(j))
-                CheckNodeValue("usecontrolcoords", {"false", "true", "yes", "no"}, SafeFilepaths(j))
-            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
-            Catch ex As Exception                        ' Handle the generic Exceptions here.
-                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
-            End Try
-        Next j
-        OutputLog.AppendText("Scan complete" & vbCrLf)
-    End Sub
 End Class
 
 
