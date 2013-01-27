@@ -144,9 +144,7 @@ Public Class Filechooser
         If DidWork = DialogResult.Cancel Then
         Else
             strOutputFolder = OutputFolderDialog.SelectedPath
-            If Filepaths(0) <> "" Then
-                ConvertButton.Enabled = True
-            End If
+            If Filepaths(0) <> "" Then ConvertButton.Enabled = True
             OutputLabel.Text = strOutputFolder + "\"
             OutputLog.AppendText("Output Folder chosen:" & vbCrLf & strOutputFolder & vbCrLf)
         End If
@@ -186,19 +184,17 @@ Public Class Filechooser
                             Next
                             OutputButton.Visible = True
                             OutputLabel.Visible = True
-                            If strOutputFolder <> "" Then
-                                ConvertButton.Enabled = True
-                            End If
+                            If strOutputFolder <> "" Then ConvertButton.Enabled = True
                         Else
                             MsgBox("Path from addon.xml does not exist.")
                         End If
                     End If
                 End If
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-                OutputLog.AppendText(xmlex.Message & vbCrLf)
-            Catch ex As Exception                        ' Handle the generic Exceptions here.
-                OutputLog.AppendText(ex.Message & vbCrLf)
-            End Try
+            OutputLog.AppendText(xmlex.Message & vbCrLf)
+        Catch ex As Exception                        ' Handle the generic Exceptions here.
+            OutputLog.AppendText(ex.Message & vbCrLf)
+        End Try
         End If
     End Sub
 
@@ -224,9 +220,7 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
-                If Not Filepaths(j).ToString.ToLower.Contains("font.xml") Then
-                    RemoveNodesFromArray(FontList, "font")
-                End If
+                If Not Filepaths(j).ToString.ToLower.Contains("font.xml") Then RemoveNodesFromArray(FontList, "font")
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
@@ -481,11 +475,7 @@ Public Class Filechooser
                     If InputString.Length > 1 Then
                         TempLetter = InputString.Substring(InputString.Length - 1, 1)
                         InputString = InputString.Substring(0, InputString.Length - 1)
-                        If Int32.TryParse(InputString, number) Then
-                            ConvertValue = Math.Round(number * multiplyFactor).ToString
-                        Else
-                        End If
-                    Else
+                        If Int32.TryParse(InputString, number) Then ConvertValue = Math.Round(number * multiplyFactor).ToString
                     End If
                 End If
             End If
@@ -581,7 +571,6 @@ Public Class Filechooser
     End Sub
 
     Sub RemoveAttributesFromArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, ByVal Attributes As String(), Optional ByVal Lowercase As Boolean = False)
-        Try
             elementlist = doc.SelectNodes(NodeSelection)
             For i = 0 To elementlist.Count - 1
                 For Each Attribute In Attributes
@@ -590,93 +579,49 @@ Public Class Filechooser
                     End If
                 Next Attribute
             Next
-        Catch ex As Exception                        ' Handle the generic Exceptions here.
-            OutputLog.AppendText(": " + ex.Message & vbCrLf)
-        End Try
     End Sub
 
     Sub RemoveNodesFromArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, Optional ByVal Lowercase As Boolean = False)
-        Try
-            elementlist = doc.GetElementsByTagName(NodeSelection)
-            For i = 0 To elementlist.Count - 1
-                If Not elementlist(i).InnerXml Is Nothing Then
-                    RemoveStringFromArray(EditArray, elementlist(i).InnerXml, Lowercase)
-                End If
-            Next
-        Catch
-        End Try
+        elementlist = doc.GetElementsByTagName(NodeSelection)
+        For i = 0 To elementlist.Count - 1
+            If Not elementlist(i).InnerXml Is Nothing Then RemoveStringFromArray(EditArray, elementlist(i).InnerXml, Lowercase)
+        Next
     End Sub
 
     Sub RemoveStringFromArray(ByRef EditArray As ArrayList, ByVal StringToRemove As String, Optional ByVal Lowercase As Boolean = False)
-        Try
-            If Lowercase = True Then
-                StringToRemove = StringToRemove.ToLower
-            End If
-            If EditArray.Contains(StringToRemove) Then
-                EditArray.Remove(StringToRemove)
-            End If
-        Catch ex As Exception                        ' Handle the generic Exceptions here.
-            OutputLog.AppendText(": " + ex.Message & vbCrLf)
-        End Try
+        If Lowercase = True Then StringToRemove = StringToRemove.ToLower
+        If EditArray.Contains(StringToRemove) Then EditArray.Remove(StringToRemove)
     End Sub
 
     Sub AddNodesToArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, Optional ByVal Lowercase As Boolean = False)
-        Try
-            elementlist = doc.GetElementsByTagName(NodeSelection)
-            For i = 0 To elementlist.Count - 1
-                If Not elementlist(i).InnerXml Is Nothing Then
-                    AddStringToArray(EditArray, elementlist(i).InnerXml, Lowercase)
-                End If
-            Next
-        Catch ex As Exception                        ' Handle the generic Exceptions here.
-            OutputLog.AppendText(": " + ex.Message & vbCrLf)
-        End Try
+        elementlist = doc.GetElementsByTagName(NodeSelection)
+        For i = 0 To elementlist.Count - 1
+            If Not elementlist(i).InnerXml Is Nothing Then AddStringToArray(EditArray, elementlist(i).InnerXml, Lowercase)
+        Next
     End Sub
 
     Sub AddAttributesToArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, ByVal AttributeList As String(), Optional ByVal Lowercase As Boolean = False)
-        Try
-            elementlist = doc.SelectNodes(NodeSelection)
-            For i = 0 To elementlist.Count - 1
-                For Each Attribute In AttributeList
-                    If Not elementlist(i).Attributes(Attribute).InnerText Is Nothing Then
-                        AddStringToArray(EditArray, elementlist(i).Attributes(Attribute).InnerText.ToString, Lowercase)
-                    End If
-                Next Attribute
-            Next
-        Catch ex As Exception                        ' Handle the generic Exceptions here.
-            OutputLog.AppendText(": " + ex.Message & vbCrLf)
-        End Try
+        elementlist = doc.SelectNodes(NodeSelection)
+        For i = 0 To elementlist.Count - 1
+            For Each Attribute In AttributeList
+                If Not elementlist(i).Attributes(Attribute).InnerText Is Nothing Then AddStringToArray(EditArray, elementlist(i).Attributes(Attribute).InnerText.ToString, Lowercase)
+            Next Attribute
+        Next
     End Sub
 
     Sub AddArrayListToArray(ByRef EditArray As ArrayList, ByVal ArrayToAdd As ArrayList, Optional ByVal Lowercase As Boolean = False)
-        Try
-            For Each StringToAdd In ArrayToAdd
-                AddStringToArray(EditArray, StringToAdd, Lowercase)
-            Next StringToAdd
-        Catch ex As Exception                        ' Handle the generic Exceptions here.
-            OutputLog.AppendText(": " + ex.Message & vbCrLf)
-        End Try
+        For Each StringToAdd In ArrayToAdd
+            AddStringToArray(EditArray, StringToAdd, Lowercase)
+        Next StringToAdd
     End Sub
 
     Sub AddStringToArray(ByRef EditArray As ArrayList, ByVal StringToAdd As String, Optional ByVal Lowercase As Boolean = False)
-        Try
-            If Lowercase = True Then
-                StringToAdd = StringToAdd.ToLower
-            End If
-            If Not EditArray.Contains(StringToAdd) Then
-                EditArray.Add(StringToAdd)
-            End If
-        Catch ex As Exception                        ' Handle the generic Exceptions here.
-            OutputLog.AppendText(": " + ex.Message & vbCrLf)
-        End Try
+        If Lowercase = True Then StringToAdd = StringToAdd.ToLower
+        If Not EditArray.Contains(StringToAdd) Then EditArray.Add(StringToAdd)
     End Sub
 
     Private Function CheckPath(ByVal strPath As String) As Boolean
-        If Dir$(strPath) <> "" Then
-            CheckPath = True
-        Else
-            CheckPath = False
-        End If
+        If Dir$(strPath) <> "" Then CheckPath = True Else CheckPath = False
     End Function
 
     Private Sub CheckNodeValue(ByVal XMLTag As String, ByVal ValidValues As String(), Optional ByRef FileName As String = "")
@@ -696,9 +641,7 @@ Public Class Filechooser
             If c = CompareChar2 Then cnt -= 1
             If cnt < 0 Then Unmatched = True
         Next
-        If (cnt <> 0) Or (Unmatched = True) Then
-            OutputLog.AppendText("Unmatched parenthesis: " + value & vbCrLf)
-        End If
+        If (cnt <> 0) Or (Unmatched = True) Then OutputLog.AppendText("Unmatched parenthesis: " + value & vbCrLf)
     End Sub
 
 End Class
