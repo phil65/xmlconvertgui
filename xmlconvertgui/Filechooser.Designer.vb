@@ -53,6 +53,7 @@ Partial Class Filechooser
         Me.SaveButton = New System.Windows.Forms.Button()
         Me.CheckValuesButton = New System.Windows.Forms.Button()
         Me.CheckVarsButton = New System.Windows.Forms.Button()
+        Me.CheckLabelsButton = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'OpenFileDialog
@@ -309,11 +310,21 @@ Partial Class Filechooser
         Me.CheckVarsButton.Text = "Check Vars"
         Me.CheckVarsButton.UseVisualStyleBackColor = True
         '
+        'CheckLabelsButton
+        '
+        Me.CheckLabelsButton.Location = New System.Drawing.Point(166, 146)
+        Me.CheckLabelsButton.Name = "CheckLabelsButton"
+        Me.CheckLabelsButton.Size = New System.Drawing.Size(95, 23)
+        Me.CheckLabelsButton.TabIndex = 32
+        Me.CheckLabelsButton.Text = "Check Labels"
+        Me.CheckLabelsButton.UseVisualStyleBackColor = True
+        '
         'Filechooser
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(913, 619)
+        Me.Controls.Add(Me.CheckLabelsButton)
         Me.Controls.Add(Me.CheckVarsButton)
         Me.Controls.Add(Me.CheckValuesButton)
         Me.Controls.Add(Me.SaveButton)
@@ -378,5 +389,6 @@ Partial Class Filechooser
     Friend WithEvents SaveButton As System.Windows.Forms.Button
     Friend WithEvents CheckValuesButton As System.Windows.Forms.Button
     Friend WithEvents CheckVarsButton As System.Windows.Forms.Button
+    Friend WithEvents CheckLabelsButton As System.Windows.Forms.Button
 
 End Class

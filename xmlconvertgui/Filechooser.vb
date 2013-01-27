@@ -168,33 +168,39 @@ Public Class Filechooser
                 If SkinFolder <> "" Then
                     doc.Load(SkinFolder + "\addon.xml")
                     elementlist = doc.SelectNodes("//res")
-                    If Not elementlist(0).Attributes("folder") Is Nothing Then
-                        XMLFolder = SkinFolder + "\" + elementlist(0).Attributes("folder").InnerText.ToString
-                        OutputLog.AppendText("XML Folder:" & XMLFolder & vbCrLf)
-                        Const ATTR_DIRECTORY = 16
-                        If Dir$(XMLFolder, ATTR_DIRECTORY) <> "" Then
-                            Dim DirInfo As New DirectoryInfo(XMLFolder)
-                            Dim FileObj As IO.FileSystemInfo
-                            For Each FileObj In DirInfo.GetFileSystemInfos
-                                If FileObj.Name.Contains(".xml") Then
+                    If elementlist.Count > 0 Then
+                        If Not elementlist(0).Attributes("folder") Is Nothing Then
+                            XMLFolder = SkinFolder + "\" + elementlist(0).Attributes("folder").InnerText.ToString
+                            OutputLog.AppendText("XML Folder:" & XMLFolder & vbCrLf)
+                            Const ATTR_DIRECTORY = 16
+                            If Dir$(XMLFolder, ATTR_DIRECTORY) <> "" Then
+                                Dim DirInfo As New DirectoryInfo(XMLFolder)
+                                Dim FileObj As IO.FileSystemInfo
+                                For Each FileObj In DirInfo.GetFileSystemInfos
+                                    If FileObj.Name.Contains(".xml") Then
 
-                                    Filepaths.Add(FileObj.FullName)
-                                    SafeFilepaths.Add(FileObj.Name)
-                                End If
-                            Next
-                            OutputButton.Visible = True
-                            OutputLabel.Visible = True
-                            If strOutputFolder <> "" Then ConvertButton.Enabled = True
+                                        Filepaths.Add(FileObj.FullName)
+                                        SafeFilepaths.Add(FileObj.Name)
+                                    End If
+                                Next
+                                OutputButton.Visible = True
+                                OutputLabel.Visible = True
+                                If strOutputFolder <> "" Then ConvertButton.Enabled = True
+                            Else
+                                MsgBox("Path from addon.xml does not exist.")
+                            End If
                         Else
-                            MsgBox("Path from addon.xml does not exist.")
+                            MsgBox("Folder Tag in Addon.xml empty")
                         End If
+                    Else
+                        MsgBox("no res tag in addon.xml")
                     End If
                 End If
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
-            OutputLog.AppendText(xmlex.Message & vbCrLf)
-        Catch ex As Exception                        ' Handle the generic Exceptions here.
-            OutputLog.AppendText(ex.Message & vbCrLf)
-        End Try
+                OutputLog.AppendText(xmlex.Message & vbCrLf)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(ex.Message & vbCrLf)
+            End Try
         End If
     End Sub
 
@@ -537,19 +543,22 @@ Public Class Filechooser
         End If
     End Sub
 
-    Sub TextureFinder(ByVal dir As String)
+    Sub TextureFinder(ByVal dir As String, Optional ByVal Lowercase As Boolean = True)
         Dim ShortPath As String = ""
         Try
             For Each fname As String In Directory.GetFiles(dir)
                 Dim number As Integer = 0
                 ShortPath = fname.Substring(SkinFolder.Length + 7, fname.Length - (SkinFolder.Length + 7))
+                Dim blacklist As String() = {"flags\", "cerberus", "default", "stars", "rating", "\480p.png", "\540p.png", "\720p.png", "\576p.png", "\1080p.png", "overlay"}
                 If ((Not ShortPath.Contains("flags\")) And (Not ShortPath.Contains("cerberus")) And (Not ShortPath.ToLower.Contains("default")) And
                     (Not ShortPath.ToLower.Contains("stars\")) And (Not ShortPath.ToLower.Contains("rating1.png")) And (Not ShortPath.ToLower.Contains("rating2.png")) And
                     (Not ShortPath.ToLower.Contains("rating3.png")) And (Not ShortPath.ToLower.Contains("rating4.png")) And (Not ShortPath.ToLower.Contains("rating5.png")) And
                     (Not ShortPath.ToLower.Contains("\480p.png")) And (Not ShortPath.ToLower.Contains("\540p.png")) And (Not ShortPath.ToLower.Contains("\720p.png")) And
                     (Not ShortPath.ToLower.Contains("\576p.png")) And (Not ShortPath.ToLower.Contains("\1080p.png")) And (Not ShortPath.ToLower.Contains("overlaywatched.png"))) Then
                     ShortPath = ShortPath.Replace("\", "/")
-                    ShortPath = ShortPath.ToLower
+                    If Lowercase = True Then
+                        ShortPath = ShortPath.ToLower
+                    End If
                     ShortenedTexturePaths.Add(ShortPath)
                 End If
             Next
@@ -648,8 +657,6 @@ Public Class Filechooser
         Dim VarsListRefs As New ArrayList()
         Dim VarsListDefines As New ArrayList()
         Dim VarsListDefinesBackup As New ArrayList()
-        '   Dim t As Regex = New Regex("(?<=\#)[0-9]+", RegexOptions.IgnoreCase)
-        '  Dim r As Regex = New Regex("(?<=\$LOCALIZE\[)[0-9]+", RegexOptions.IgnoreCase)
         Dim r As Regex = New Regex("(?<=\$VAR\[)[0-9A-Za-z-]+", RegexOptions.IgnoreCase)
         VarsListRefs.Clear()
         VarsListDefines.Clear()
@@ -686,6 +693,49 @@ Public Class Filechooser
         PrintArray(VarsListRefs)
         OutputLog.AppendText("Unused Vars:" & vbCrLf)
         PrintArray(VarsListDefines)
+    End Sub
+
+    Private Sub CheckLabelsButton_Click(sender As System.Object, e As System.EventArgs) Handles CheckLabelsButton.Click
+        Dim LabelsListRefs As New ArrayList()
+        Dim LabelsListDefines As New ArrayList()
+        Dim LabelsListDefinesBackup As New ArrayList()
+        '   Dim t As Regex = New Regex("(?<=\#)[0-9]+", RegexOptions.IgnoreCase)
+        Dim r As Regex = New Regex("(?<=\$LOCALIZE\[)[0-9]+", RegexOptions.IgnoreCase)
+        LabelsListRefs.Clear()
+        LabelsListDefines.Clear()
+        LabelsListDefinesBackup.Clear()
+        OutputLog.AppendText("Checking the Labels..." & vbCrLf)
+        For j = 0 To Filepaths.Count - 1
+            Try
+                doc.Load(Filepaths(j))
+                elementlist = doc.SelectNodes("//label | //value | //onclick")
+                For i = 0 To elementlist.Count - 1
+                    If Not elementlist(i).InnerXml Is Nothing Then
+                        Dim m As Match = r.Match(elementlist(i).InnerXml.ToString)
+                        While (m.Success)
+                            AddStringToArray(LabelsListRefs, m.Value.ToString())
+                            m = m.NextMatch()
+                        End While
+                    End If
+                Next i
+                AddAttributesToArray(LabelsListRefs, "//viewtype", {"label"})
+                AddAttributesToArray(LabelsListRefs, "*[(@fallback)]", {"fallback"})
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
+            End Try
+        Next
+        For i = 0 To LabelsListRefs.Count - 1
+            RemoveStringFromArray(LabelsListDefines, LabelsListRefs(i))
+        Next
+        For i = 0 To LabelsListDefinesBackup.Count - 1
+            RemoveStringFromArray(LabelsListRefs, LabelsListDefinesBackup(i))
+        Next
+        OutputLog.AppendText("Undefined Labels:" & vbCrLf)
+        PrintArray(LabelsListRefs)
+        OutputLog.AppendText("Unused Labels:" & vbCrLf)
+        PrintArray(LabelsListDefines)
     End Sub
 End Class
 
