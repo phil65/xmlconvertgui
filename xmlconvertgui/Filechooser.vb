@@ -363,15 +363,13 @@ Public Class Filechooser
     End Sub
 
     Private Sub CheckIDsButton_Click(sender As System.Object, e As System.EventArgs) Handles CheckIDsButton.Click
-        Dim charsToTrim() As Char = {"("c, ")"c}
-        Dim pattern As String = "(?<=\()[0-9]+)"
         Dim IDListRefs As New ArrayList()
         Dim IDListDefines As New ArrayList()
         Dim IDListDefinesBackup As New ArrayList()
+        Dim r As Regex = New Regex("(?<=\()[0-9]+)", RegexOptions.IgnoreCase)
         IDListRefs.Clear()
         IDListDefines.Clear()
         IDListDefinesBackup.Clear()
-        '   Dim pattern as String = "\([0-9]+\)"
         OutputLog.AppendText("Checking the IDs..." & vbCrLf)
         For j = 0 To Filepaths.Count - 1
             Try
@@ -380,11 +378,9 @@ Public Class Filechooser
                     elementlist = doc.GetElementsByTagName(xmlelementsBrackets(k))
                     For i = 0 To elementlist.Count - 1
                         If Not elementlist(i).InnerXml Is Nothing Then
-                            Dim r As Regex = New Regex(pattern, RegexOptions.IgnoreCase)
                             Dim m As Match = r.Match(elementlist(i).InnerXml.ToString)
                             While (m.Success)
-                                Dim tempText As String = m.Value.ToString()
-                                AddStringToArray(IDListRefs, tempText)
+                                AddStringToArray(IDListRefs, m.Value.ToString())
                                 m = m.NextMatch()
                             End While
                         End If
@@ -393,11 +389,9 @@ Public Class Filechooser
                 elementlist = doc.SelectNodes("//include | //onup | //ondown | //onleft | //onright | //animation | //onload | //onunload | //onclick | //onback | //focusedlayout | //itemlayout | //onfocus | //value")
                 For i = 0 To elementlist.Count - 1
                     If Not elementlist(i).Attributes("condition").InnerText Is Nothing Then
-                        Dim r As Regex = New Regex(pattern, RegexOptions.IgnoreCase)
                         Dim m As Match = r.Match(elementlist(i).Attributes("condition").InnerText.ToString)
                         While (m.Success)
-                            Dim tempText As String = m.Value.ToString()
-                            AddStringToArray(IDListRefs, tempText)
+                            AddStringToArray(IDListRefs, m.Value.ToString())
                             m = m.NextMatch()
                         End While
                     End If
@@ -417,10 +411,7 @@ Public Class Filechooser
             RemoveStringFromArray(IDListRefs, IDListDefinesBackup(i))
         Next
         OutputLog.AppendText("Undefined IDs:" & vbCrLf)
-        Dim str As String
-        For Each str In IDListRefs
-            OutputLog.AppendText(str & vbCrLf)
-        Next
+        PrintArray(IDListRefs)
         '       OutputLog.AppendText("Undefined IDs:" & vbCrLf)
         '      For Each str In IDListDefines
         ' OutputLog.AppendText(str & vbCrLf)
