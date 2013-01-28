@@ -3,6 +3,7 @@ Imports System.Text
 Imports System
 Imports System.Text.RegularExpressions
 Imports System.IO
+Imports System.Xml.Schema
 Imports System.Security
 Imports System.Security.Principal.WindowsIdentity
 Public Class Filechooser
@@ -732,6 +733,15 @@ Public Class Filechooser
                         End While
                     End If
                 Next i
+                elementlist = doc.SelectNodes("//label | //altlabel | //label2")
+                For i = 0 To elementlist.Count - 1
+                    If Not elementlist(i).InnerXml Is Nothing Then
+                        Dim m As Match = r.Match(elementlist(i).InnerXml.ToString)
+                        If (m.Success = False) And (Not elementlist(i).InnerXml.ToString.Contains("$INFO")) And (Not elementlist(i).InnerXml.ToString = "-") Then
+                            OutputLog.AppendText(SafeFilepaths(j) + ": Untranslated Label:" + elementlist(i).InnerXml.ToString & vbCrLf)
+                        End If
+                    End If
+                Next i
                 AddAttributesToArray(LabelsListRefs, "//viewtype[(@label)]", {"label"})
                 AddAttributesToArray(LabelsListRefs, "//fontset[(@idloc)]", {"idloc"})
                 AddAttributesToArray(LabelsListRefs, "*[(@fallback)]", {"fallback"})
@@ -751,6 +761,18 @@ Public Class Filechooser
         '     PrintArray(LabelsListDefinesBackup)
         OutputLog.AppendText(vbCrLf & "Unused Strings:" & vbCrLf & vbCrLf)
         PrintArray(LabelsListDefines)
+    End Sub
+
+    Private Sub Button1_Click(sender As System.Object, e As System.EventArgs)
+        Dim reader As XmlReader = XmlReader.Create(XMLFolder + "\MyVideoNav.xml")
+        Dim schemaSet As XmlSchemaSet = New XmlSchemaSet()
+        Dim schema As XmlSchemaInference = New XmlSchemaInference()
+
+        schemaSet = schema.InferSchema(reader)
+
+        For Each s As XmlSchema In schemaSet.Schemas()
+            s.Write(Console.Out)
+        Next
     End Sub
 End Class
 
