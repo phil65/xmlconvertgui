@@ -122,6 +122,7 @@ Public Class Filechooser
                 End Select
                 Dim wrtr As XmlWriter = XmlWriter.Create(strOutputFolder + "\" + SafeFilepaths(j).ToString, myXmlSettings)
                 doc.WriteTo(wrtr)
+                wrtr.WriteEndDocument()
                 wrtr.Close()
                 OutputLog.AppendText(SafeFilepaths(j) + " created successfully" & vbCrLf)
                 XMLCounter = XMLCounter + 1
@@ -646,6 +647,14 @@ Public Class Filechooser
             End If
         Next
     End Sub
+    Private Sub CheckAttributesValue(ByVal XMLTag As String, ByVal Attribute As String, ByVal ValidValues As String(), Optional ByRef FileName As String = "")
+        elementlist = doc.GetElementsByTagName(XMLTag)
+        For i = 0 To elementlist.Count - 1
+            If Not ValidValues.Contains(elementlist(i).InnerXml.ToString.ToLower) Then
+                OutputLog.AppendText(FileName + ": Invalid Value for " & XMLTag & ": " & elementlist(i).InnerXml & vbCrLf)
+            End If
+        Next
+    End Sub
 
     Public Sub SameCharNumber(ByVal value As String, ByVal CompareChar1 As Char, ByVal CompareChar2 As Char)
         Dim cnt As Integer = 0
@@ -737,7 +746,7 @@ Public Class Filechooser
                 For i = 0 To elementlist.Count - 1
                     If Not elementlist(i).InnerXml Is Nothing Then
                         Dim m As Match = r.Match(elementlist(i).InnerXml.ToString)
-                        If (m.Success = False) And (Not elementlist(i).InnerXml.ToString.Contains("$INFO")) And (Not elementlist(i).InnerXml.ToString = "-") Then
+                        If (m.Success = False) And (Not elementlist(i).InnerXml.ToString.Contains("$INFO")) And (Not elementlist(i).InnerXml.ToString.Contains("$VAR")) And (Not elementlist(i).InnerXml.ToString = "-") Then
                             OutputLog.AppendText(SafeFilepaths(j) + ": Untranslated Label:" + elementlist(i).InnerXml.ToString & vbCrLf)
                         End If
                     End If
