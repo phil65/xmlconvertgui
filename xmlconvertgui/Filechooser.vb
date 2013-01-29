@@ -548,17 +548,16 @@ Public Class Filechooser
     End Sub
 
     Sub TextureFinder(ByVal dir As String, Optional ByVal Lowercase As Boolean = True)
-        Dim ShortPath As String = ""
         Try
             For Each fname As String In Directory.GetFiles(dir)
                 Dim number As Integer = 0
-                ShortPath = fname.Substring(SkinFolder.Length + 7, fname.Length - (SkinFolder.Length + 7))
+                Dim ShortPath As String = fname.Substring(SkinFolder.Length + 7, fname.Length - (SkinFolder.Length + 7))
                 Dim blacklist As String() = {"flags\", "cerberus", "default", "stars", "rating", "\480p.png", "\540p.png", "\720p.png", "\576p.png", "\1080p.png", "overlay"}
-                If ((Not ShortPath.Contains("flags\")) And (Not ShortPath.Contains("cerberus")) And (Not ShortPath.ToLower.Contains("default")) And
-                    (Not ShortPath.ToLower.Contains("stars\")) And (Not ShortPath.ToLower.Contains("rating1.png")) And (Not ShortPath.ToLower.Contains("rating2.png")) And
-                    (Not ShortPath.ToLower.Contains("rating3.png")) And (Not ShortPath.ToLower.Contains("rating4.png")) And (Not ShortPath.ToLower.Contains("rating5.png")) And
-                    (Not ShortPath.ToLower.Contains("\480p.png")) And (Not ShortPath.ToLower.Contains("\540p.png")) And (Not ShortPath.ToLower.Contains("\720p.png")) And
-                    (Not ShortPath.ToLower.Contains("\576p.png")) And (Not ShortPath.ToLower.Contains("\1080p.png")) And (Not ShortPath.ToLower.Contains("overlaywatched.png"))) Then
+                Dim blacklisted As Boolean = False
+                For Each Item In blacklist
+                    If ShortPath.Contains(Item) Then blacklisted = True
+                Next
+                If blacklisted = False Then
                     ShortPath = ShortPath.Replace("\", "/")
                     If Lowercase = True Then
                         ShortPath = ShortPath.ToLower
