@@ -400,8 +400,8 @@ Public Class Filechooser
                         End While
                     End If
                 Next i
-                AddAttributesToArray(IDListDefines, "//control[(@id)] | //window[(@id)]", {"id"})
-                AddAttributesToArray(IDListDefinesBackup, "//control[(@id)] | //window[(@id)]", {"id"})
+                AddAttributesToArray(IDListDefines, "//control[(@id)] | //window[(@id)] | //item[(@id)]", {"id"})
+                AddAttributesToArray(IDListDefinesBackup, "//control[(@id)] | //window[(@id)] | //item[(@id)]", {"id"})
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
@@ -776,9 +776,7 @@ Public Class Filechooser
         Dim reader As XmlReader = XmlReader.Create(XMLFolder + "\MyVideoNav.xml")
         Dim schemaSet As XmlSchemaSet = New XmlSchemaSet()
         Dim schema As XmlSchemaInference = New XmlSchemaInference()
-
         schemaSet = schema.InferSchema(reader)
-
         For Each s As XmlSchema In schemaSet.Schemas()
             s.Write(Console.Out)
         Next
