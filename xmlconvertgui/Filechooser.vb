@@ -346,7 +346,7 @@ Public Class Filechooser
             Try
                 doc.Load(Filepaths(j))
                 RemoveAttributesFromArray(ShortenedTexturePaths, "//texture", {"diffuse", "fallback"}, True)
-                For k = 0 To xmlelementsTexture.Length
+                For k = 0 To xmlelementsTexture.Length - 1
                     RemoveNodesFromArray(ShortenedTexturePaths, xmlelementsTexture(k), True)
                 Next k
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
@@ -552,7 +552,7 @@ Public Class Filechooser
             For Each fname As String In Directory.GetFiles(dir)
                 Dim number As Integer = 0
                 Dim ShortPath As String = fname.Substring(SkinFolder.Length + 7, fname.Length - (SkinFolder.Length + 7))
-                Dim blacklist As String() = {"flags\", "cerberus", "default", "stars", "rating", "\480p.png", "\540p.png", "\720p.png", "\576p.png", "\1080p.png", "overlay"}
+                Dim blacklist As String() = {"flags\", "cerberus", "default", "stars", "rating", "\480p.png", "\540p.png", "\720p.png", "\576p.png", "\1080p.png", "overlay", ".xbt"}
                 Dim blacklisted As Boolean = False
                 For Each Item In blacklist
                     If ShortPath.Contains(Item) Then blacklisted = True
@@ -585,11 +585,13 @@ Public Class Filechooser
     Sub RemoveAttributesFromArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, ByVal Attributes As String(), Optional ByVal Lowercase As Boolean = False)
             elementlist = doc.SelectNodes(NodeSelection)
             For i = 0 To elementlist.Count - 1
-                For Each Attribute In Attributes
-                    If Not elementlist(i).Attributes(Attribute).InnerText Is Nothing Then
+            For Each Attribute In Attributes
+                If Not Attribute Is Nothing Then
+                    If Not elementlist(i).Attributes(Attribute) Is Nothing Then
                         RemoveStringFromArray(EditArray, elementlist(i).Attributes(Attribute).InnerText.ToString, Lowercase)
                     End If
-                Next Attribute
+                End If
+            Next Attribute
             Next
     End Sub
 
