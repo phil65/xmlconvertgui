@@ -439,8 +439,10 @@ Public Class Filechooser
             Try
                 doc.Load(Filepaths(j))
                 CheckNodeValue("align", {"left", "center", "right", "justify"}, SafeFilepaths(j))
+                CheckAttributeValue("//*[(@align)]", {"align"}, {"left", "center", "right", "justify"}, SafeFilepaths(j))
                 CheckNodeValue("aspectratio", {"keep", "scale", "stretch", "center"}, SafeFilepaths(j))
                 CheckNodeValue("aligny", {"top", "center", "bottom"}, SafeFilepaths(j))
+                CheckAttributeValue("//*[(@aligny)]", {"aligny"}, {"top", "center", "bottom"}, SafeFilepaths(j))
                 CheckNodeValue("orientation", {"horizontal", "vertical"}, SafeFilepaths(j))
                 CheckNodeValue("subtype", {"page", "int", "float", "text"}, SafeFilepaths(j))
                 CheckNodeValue("action", {"volume", "seek"}, SafeFilepaths(j))
@@ -648,6 +650,20 @@ Public Class Filechooser
             End If
         Next
     End Sub
+    Private Sub CheckAttributeValue(ByVal XMLTag As String, ByVal Attributes As String(), ByVal ValidValues As String(), Optional ByRef FileName As String = "")
+        elementlist = doc.SelectNodes(XMLTag)
+        For i = 0 To elementlist.Count - 1
+            For Each Attribute In Attributes
+                If Not Attribute Is Nothing Then
+                    If Not elementlist(i).Attributes(Attribute) Is Nothing Then
+                        If Not ValidValues.Contains(elementlist(i).Attributes(Attribute).InnerText.ToString) Then
+                            OutputLog.AppendText(FileName + ": Invalid Value for " & XMLTag & ": " & elementlist(i).Attributes(Attribute).InnerText.ToString & vbCrLf)
+                        End If
+                    End If
+                End If
+            Next Attribute
+        Next
+    End Sub
     Private Sub CheckAttributesValue(ByVal XMLTag As String, ByVal Attribute As String, ByVal ValidValues As String(), Optional ByRef FileName As String = "")
         elementlist = doc.GetElementsByTagName(XMLTag)
         For i = 0 To elementlist.Count - 1
@@ -680,7 +696,7 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
-                elementlist = doc.SelectNodes("*")
+                elementlist = doc.SelectNodes("//*")
                 For i = 0 To elementlist.Count - 1
                     If Not elementlist(i).InnerXml Is Nothing Then
                         Dim m As Match = r.Match(elementlist(i).InnerXml.ToString)
@@ -754,7 +770,7 @@ Public Class Filechooser
                 Next i
                 AddAttributesToArray(LabelsListRefs, "//viewtype[(@label)]", {"label"})
                 AddAttributesToArray(LabelsListRefs, "//fontset[(@idloc)]", {"idloc"})
-                AddAttributesToArray(LabelsListRefs, "*[(@fallback)]", {"fallback"})
+                AddAttributesToArray(LabelsListRefs, "//*[(@fallback)]", {"fallback"})
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
