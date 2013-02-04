@@ -25,6 +25,7 @@ Public Class Filechooser
     Public elementlist As XmlNodeList
     Public XMLCounter As String
     Public RoundFactor As Integer
+    Public actualFile As String
     Private Sub Filechooser_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         ConversionDropDown.Items.Add("720p --> 1080p")
         ConversionDropDown.Items.Add("1080p --> 720p")
@@ -73,6 +74,7 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
+                actualFile = SafeFilepaths(j)
                 If multiplyFactor <> 1 Then
                     For i = 0 To xmlelements.Length - 1
                         changeElements(xmlelements(i))
@@ -231,6 +233,7 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
+                actualFile = SafeFilepaths(j)
                 If Not Filepaths(j).ToString.ToLower.Contains("font.xml") Then RemoveNodesFromArray(FontList, "font")
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
@@ -257,6 +260,7 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
+                actualFile = SafeFilepaths(j)
                 AddAttributesToArray(IncludeList, "//include[(@name)]", {"name"})
                 elementlist = doc.SelectNodes("//include[not(@name)]")
                 For i = 0 To elementlist.Count - 1
@@ -316,6 +320,7 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
+                actualFile = SafeFilepaths(j)
                 For k = 0 To xmlelementsBrackets.Length - 1
                     elementlist = doc.GetElementsByTagName(xmlelementsBrackets(k))
                     For i = 0 To elementlist.Count - 1
@@ -346,6 +351,7 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
+                actualFile = SafeFilepaths(j)
                 RemoveAttributesFromArray(ShortenedTexturePaths, "//texture", {"diffuse", "fallback"}, True)
                 For k = 0 To xmlelementsTexture.Length - 1
                     RemoveNodesFromArray(ShortenedTexturePaths, xmlelementsTexture(k), True)
@@ -379,6 +385,7 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
+                actualFile = SafeFilepaths(j)
                 For k = 0 To xmlelementsBrackets.Length - 1
                     elementlist = doc.GetElementsByTagName(xmlelementsBrackets(k))
                     For i = 0 To elementlist.Count - 1
@@ -439,6 +446,7 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
+                actualFile = SafeFilepaths(j)
                 CheckValues()
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
@@ -450,10 +458,11 @@ Public Class Filechooser
     End Sub
 
     Sub CheckValues()
-        CheckChildren("//control[@type='button']/*", {"description", "posx", "posy", "width", "height", "visible", "colordiffuse", "texturefocus", "include", "animation", "texturenofocus", "label", "label2", "font", "textcolor", "disabledcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "ondown", "ondown", "ondown", "textwidth", "focusedcolor", "angle", "hitrect", "enable"})
+        CheckChildren("//control[@type='button']/*", {"description", "posx", "posy", "width", "height", "visible", "colordiffuse", "texturefocus", "include", "animation", "texturenofocus", "label", "label2", "font", "textcolor", "disabledcolor", "selectedcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "textwidth", "focusedcolor", "angle", "hitrect", "enable"})
         CheckChildren("//control[@type='togglebutton']/*", {"description", "posx", "posy", "width", "height", "visible", "colordiffuse", "texturefocus", "alttexturefocus", "alttexturenofocus", "altclick", "include", "animation", "texturenofocus", "label", "altlabel", "usealttexture", "font", "textcolor", "disabledcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "ondown", "ondown", "ondown", "textwidth", "focusedcolor", "subtype", "hitrect", "enable"})
-        CheckChildren("//control[@type='label']/*", {"description", "posx", "posy", "width", "height", "visible", "align", "aligny", "include", "animation", "scroll", "info", "number", "angle", "haspath", "label", "textcolor", "font", "shadowcolor", "wrapmultiline", "scrollspeed", "scrollsuffix", "textoffsetx", "textoffsety"})
+        CheckChildren("//control[@type='label']/*", {"description", "posx", "posy", "width", "height", "visible", "align", "aligny", "include", "animation", "scroll", "info", "number", "angle", "haspath", "label", "textcolor", "selectedcolor", "font", "shadowcolor", "wrapmultiline", "scrollspeed", "scrollsuffix", "textoffsetx", "textoffsety"})
         CheckChildren("//control[@type='textbox']/*", {"description", "posx", "posy", "width", "height", "visible", "align", "aligny", "include", "animation", "autoscroll", "label", "info", "font", "textcolor", "shadowcolor", "pagecontrol"})
+        CheckChildren("//control[@type='scrollbar']/*", {"description", "posx", "posy", "width", "height", "visible", "texturesliderbackground", "texturesliderbar", "include", "animation", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "pulseonselect", "orientation", "showonepage", "pagecontrol", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback"})
         CheckNodeValue("align", {"left", "center", "right", "justify"})
         CheckAttributeValue("//*[(@align)]", {"align"}, {"left", "center", "right", "justify"})
         CheckNodeValue("aspectratio", {"keep", "scale", "stretch", "center"})
@@ -655,7 +664,7 @@ Public Class Filechooser
         For i = 0 To elementlist.Count - 1
             If Not elementlist(i) Is Nothing Then
                 If Not ValidValues.Contains(elementlist(i).InnerXml.ToString.ToLower) Then
-                    OutputLog.AppendText(elementlist(i).OwnerDocument.ToString + ": Invalid Value for " & XMLTag & ": " & elementlist(i).InnerXml & vbCrLf)
+                    OutputLog.AppendText(actualFile + ": Invalid Value for " & XMLTag & ": " & elementlist(i).InnerXml & vbCrLf)
                     elementlist(i).ParentNode.RemoveChild(elementlist(i))
                 End If
             End If
@@ -666,7 +675,7 @@ Public Class Filechooser
         For i = 0 To elementlist.Count - 1
             If Not elementlist(i) Is Nothing Then
                 If Not ValidValues.Contains(elementlist(i).Name) Then
-                    OutputLog.AppendText(elementlist(i).OwnerDocument.Name + ": Invalid Value for " & XMLTag & ": " & elementlist(i).Name & vbCrLf)
+                    OutputLog.AppendText(actualFile + ": Invalid Value for " & XMLTag & ": " & elementlist(i).Name & vbCrLf)
                     elementlist(i).ParentNode.RemoveChild(elementlist(i))
                 End If
             End If
@@ -679,7 +688,7 @@ Public Class Filechooser
                 If Not Attribute Is Nothing Then
                     If Not elementlist(i).Attributes(Attribute) Is Nothing Then
                         If Not ValidValues.Contains(elementlist(i).Attributes(Attribute).InnerText.ToString) Then
-                            OutputLog.AppendText(elementlist(i).OwnerDocument.ToString + ": Invalid Value for " & XMLTag & ": " & elementlist(i).Attributes(Attribute).InnerText.ToString & vbCrLf)
+                            OutputLog.AppendText(actualFile + ": Invalid Value for " & XMLTag & ": " & elementlist(i).Attributes(Attribute).InnerText.ToString & vbCrLf)
                         End If
                     End If
                 End If
@@ -690,7 +699,7 @@ Public Class Filechooser
         elementlist = doc.GetElementsByTagName(XMLTag)
         For i = 0 To elementlist.Count - 1
             If Not ValidValues.Contains(elementlist(i).InnerXml.ToString.ToLower) Then
-                OutputLog.AppendText(elementlist(i).OwnerDocument.ToString + ": Invalid Value for " & XMLTag & ": " & elementlist(i).InnerXml & vbCrLf)
+                OutputLog.AppendText(actualFile + ": Invalid Value for " & XMLTag & ": " & elementlist(i).InnerXml & vbCrLf)
             End If
         Next
     End Sub
@@ -718,6 +727,7 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
+                actualFile = SafeFilepaths(j)
                 elementlist = doc.SelectNodes("//*")
                 For i = 0 To elementlist.Count - 1
                     If Not elementlist(i).InnerXml Is Nothing Then
@@ -770,6 +780,7 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
+                actualFile = SafeFilepaths(j)
                 elementlist = doc.SelectNodes("//label | //altlabel | //label2 | //value | //onclick | //property")
                 For i = 0 To elementlist.Count - 1
                     If Not elementlist(i).InnerXml Is Nothing Then
