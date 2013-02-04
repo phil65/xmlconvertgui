@@ -92,6 +92,9 @@ Public Class Filechooser
                         ScaleXMLNode(elementlist(i), "delay", AnimationMultiplier.Text)
                     Next
                 End If
+                CheckChildren("//control[@type='button']/*", {"description", "posx", "posy", "width", "height", "visible", "colordiffuse", "texturefocus", "include", "animation", "texturenofocus", "label", "label2", "font", "textcolor", "disabledcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "ondown", "ondown", "ondown", "textwidth", "focusedcolor", "angle", "hitrect", "enable"}, SafeFilepaths(j))
+                CheckChildren("//control[@type='togglebutton']/*", {"description", "posx", "posy", "width", "height", "visible", "colordiffuse", "texturefocus", "alttexturefocus", "alttexturenofocus", "altclick", "include", "animation", "texturenofocus", "label", "altlabel", "usealttexture", "font", "textcolor", "disabledcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "ondown", "ondown", "ondown", "textwidth", "focusedcolor", "subtype", "hitrect", "enable"}, SafeFilepaths(j))
+                CheckChildren("//control[@type='label']/*", {"description", "posx", "posy", "width", "height", "visible", "align", "aligny", "include", "animation", "scroll", "info", "number", "angle", "haspath", "label", "font", "textcolor", "font", "shadowcolor", "wrapmultiline", "scrollspeed", "scrollsuffix", "textoffsetx", "textoffsety"}, SafeFilepaths(j))
                 Dim myXmlSettings As New XmlWriterSettings
                 If Not HeaderOption.Checked Then myXmlSettings.OmitXmlDeclaration = True
                 Dim UTF8NoBom As Encoding = New UTF8Encoding(False)
@@ -438,6 +441,10 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
+                CheckChildren("//control[@type='button']/*", {"description", "posx", "posy", "width", "height", "visible", "colordiffuse", "texturefocus", "include", "animation", "texturenofocus", "label", "label2", "font", "textcolor", "disabledcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "ondown", "ondown", "ondown", "textwidth", "focusedcolor", "angle", "hitrect", "enable"}, SafeFilepaths(j))
+                CheckChildren("//control[@type='togglebutton']/*", {"description", "posx", "posy", "width", "height", "visible", "colordiffuse", "texturefocus", "alttexturefocus", "alttexturenofocus", "altclick", "include", "animation", "texturenofocus", "label", "altlabel", "usealttexture", "font", "textcolor", "disabledcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "ondown", "ondown", "ondown", "textwidth", "focusedcolor", "subtype", "hitrect", "enable"}, SafeFilepaths(j))
+                CheckChildren("//control[@type='label']/*", {"description", "posx", "posy", "width", "height", "visible", "align", "aligny", "include", "animation", "scroll", "info", "number", "angle", "haspath", "label", "textcolor", "font", "shadowcolor", "wrapmultiline", "scrollspeed", "scrollsuffix", "textoffsetx", "textoffsety"}, SafeFilepaths(j))
+                CheckChildren("//control[@type='textbox']/*", {"description", "posx", "posy", "width", "height", "visible", "align", "aligny", "include", "animation", "autoscroll", "label", "font", "textcolor", "shadowcolor", "pagecontrol"}, SafeFilepaths(j))
                 CheckNodeValue("align", {"left", "center", "right", "justify"}, SafeFilepaths(j))
                 CheckAttributeValue("//*[(@align)]", {"align"}, {"left", "center", "right", "justify"}, SafeFilepaths(j))
                 CheckNodeValue("aspectratio", {"keep", "scale", "stretch", "center"}, SafeFilepaths(j))
@@ -647,6 +654,16 @@ Public Class Filechooser
         For i = 0 To elementlist.Count - 1
             If Not ValidValues.Contains(elementlist(i).InnerXml.ToString.ToLower) Then
                 OutputLog.AppendText(FileName + ": Invalid Value for " & XMLTag & ": " & elementlist(i).InnerXml & vbCrLf)
+                elementlist(i).ParentNode.RemoveChild(elementlist(i))
+            End If
+        Next
+    End Sub
+    Private Sub CheckChildren(ByVal XMLTag As String, ByVal ValidValues As String(), Optional ByRef FileName As String = "")
+        elementlist = doc.SelectNodes(XMLTag)
+        For i = 0 To elementlist.Count - 1
+            If Not ValidValues.Contains(elementlist(i).Name) Then
+                OutputLog.AppendText(FileName + ": Invalid Value for " & XMLTag & ": " & elementlist(i).Name & vbCrLf)
+                elementlist(i).ParentNode.RemoveChild(elementlist(i))
             End If
         Next
     End Sub
