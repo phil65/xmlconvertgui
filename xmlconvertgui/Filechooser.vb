@@ -459,10 +459,14 @@ Public Class Filechooser
 
     Sub CheckValues()
         CheckChildren("//control[@type='button']/*", {"description", "posx", "posy", "width", "height", "visible", "colordiffuse", "texturefocus", "include", "animation", "texturenofocus", "label", "label2", "font", "textcolor", "disabledcolor", "selectedcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "textwidth", "focusedcolor", "angle", "hitrect", "enable"})
+        CheckChildren("//control[@type='radiobutton']/*", {"description", "posx", "posy", "width", "height", "visible", "colordiffuse", "texturefocus", "include", "animation", "texturenofocus", "label", "selected", "font", "textcolor", "disabledcolor", "selectedcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "textwidth", "focusedcolor", "angle", "hitrect", "enable", "textureradioon", "textureradiooff", "radioposx", "radioposy", "radiowidth", "radioheight"})
         CheckChildren("//control[@type='togglebutton']/*", {"description", "posx", "posy", "width", "height", "visible", "colordiffuse", "texturefocus", "alttexturefocus", "alttexturenofocus", "altclick", "include", "animation", "texturenofocus", "label", "altlabel", "usealttexture", "font", "textcolor", "disabledcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "ondown", "ondown", "ondown", "textwidth", "focusedcolor", "subtype", "hitrect", "enable"})
-        CheckChildren("//control[@type='label']/*", {"description", "posx", "posy", "width", "height", "visible", "align", "aligny", "include", "animation", "scroll", "info", "number", "angle", "haspath", "label", "textcolor", "selectedcolor", "font", "shadowcolor", "wrapmultiline", "scrollspeed", "scrollsuffix", "textoffsetx", "textoffsety"})
-        CheckChildren("//control[@type='textbox']/*", {"description", "posx", "posy", "width", "height", "visible", "align", "aligny", "include", "animation", "autoscroll", "label", "info", "font", "textcolor", "shadowcolor", "pagecontrol"})
+        CheckChildren("//control[@type='label']/*", {"description", "posx", "posy", "width", "height", "visible", "align", "aligny", "include", "animation", "scroll", "scrollout", "info", "number", "angle", "haspath", "label", "textcolor", "selectedcolor", "font", "shadowcolor", "disabledcolor", "pauseatend", "wrapmultiline", "scrollspeed", "scrollsuffix", "textoffsetx", "textoffsety"})
+        CheckChildren("//control[@type='textbox']/*", {"description", "posx", "posy", "width", "height", "visible", "align", "aligny", "include", "animation", "autoscroll", "label", "info", "font", "textcolor", "selectedcolor", "shadowcolor", "pagecontrol"})
+        CheckChildren("//control[@type='image']/*", {"description", "posx", "posy", "width", "height", "visible", "align", "aligny", "include", "animation", "aspectratio", "fadetime", "colordiffuse", "texture", "bordertexture", "bordersize", "info"})
+        CheckChildren("//control[@type='multiimage']/*", {"description", "posx", "posy", "width", "height", "visible", "align", "aligny", "include", "animation", "aspectratio", "fadetime", "colordiffuse", "imagepath", "timeperimage", "loop", "info", "randomize", "pauseatend"})
         CheckChildren("//control[@type='scrollbar']/*", {"description", "posx", "posy", "width", "height", "visible", "texturesliderbackground", "texturesliderbar", "include", "animation", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "pulseonselect", "orientation", "showonepage", "pagecontrol", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback"})
+        CheckChildren("//control[@type='progress']/*", {"description", "posx", "posy", "width", "height", "visible", "texturebg", "lefttexture", "include", "animation", "righttexture", "overlaytexture", "midtexture", "info", "reveal"})
         CheckNodeValue("align", {"left", "center", "right", "justify"})
         CheckAttributeValue("//*[(@align)]", {"align"}, {"left", "center", "right", "justify"})
         CheckNodeValue("aspectratio", {"keep", "scale", "stretch", "center"})
@@ -665,7 +669,9 @@ Public Class Filechooser
             If Not elementlist(i) Is Nothing Then
                 If Not ValidValues.Contains(elementlist(i).InnerXml.ToString.ToLower) Then
                     OutputLog.AppendText(actualFile + ": Invalid Value for " & XMLTag & ": " & elementlist(i).InnerXml & vbCrLf)
-                    elementlist(i).ParentNode.RemoveChild(elementlist(i))
+                    If AutoFixCheckBox.Checked Then
+                        elementlist(i).ParentNode.RemoveChild(elementlist(i))
+                    End If
                 End If
             End If
         Next
@@ -676,7 +682,9 @@ Public Class Filechooser
             If Not elementlist(i) Is Nothing Then
                 If Not ValidValues.Contains(elementlist(i).Name) Then
                     OutputLog.AppendText(actualFile + ": Invalid Value for " & XMLTag & ": " & elementlist(i).Name & vbCrLf)
-                    elementlist(i).ParentNode.RemoveChild(elementlist(i))
+                    If AutoFixCheckBox.Checked Then
+                        elementlist(i).ParentNode.RemoveChild(elementlist(i))
+                    End If
                 End If
             End If
         Next

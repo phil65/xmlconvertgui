@@ -54,6 +54,7 @@ Partial Class Filechooser
         Me.CheckValuesButton = New System.Windows.Forms.Button()
         Me.CheckVarsButton = New System.Windows.Forms.Button()
         Me.CheckLabelsButton = New System.Windows.Forms.Button()
+        Me.AutoFixCheckBox = New System.Windows.Forms.CheckBox()
         Me.SuspendLayout()
         '
         'OpenFileDialog
@@ -120,7 +121,7 @@ Partial Class Filechooser
         'HeaderOption
         '
         Me.HeaderOption.AutoSize = True
-        Me.HeaderOption.Location = New System.Drawing.Point(10, 391)
+        Me.HeaderOption.Location = New System.Drawing.Point(9, 382)
         Me.HeaderOption.Name = "HeaderOption"
         Me.HeaderOption.Size = New System.Drawing.Size(108, 17)
         Me.HeaderOption.TabIndex = 9
@@ -130,7 +131,7 @@ Partial Class Filechooser
         'ConvertBorders
         '
         Me.ConvertBorders.AutoSize = True
-        Me.ConvertBorders.Location = New System.Drawing.Point(10, 414)
+        Me.ConvertBorders.Location = New System.Drawing.Point(9, 405)
         Me.ConvertBorders.Name = "ConvertBorders"
         Me.ConvertBorders.Size = New System.Drawing.Size(102, 17)
         Me.ConvertBorders.TabIndex = 12
@@ -319,11 +320,22 @@ Partial Class Filechooser
         Me.CheckLabelsButton.Text = "Check Labels"
         Me.CheckLabelsButton.UseVisualStyleBackColor = True
         '
+        'AutoFixCheckBox
+        '
+        Me.AutoFixCheckBox.AutoSize = True
+        Me.AutoFixCheckBox.Location = New System.Drawing.Point(9, 359)
+        Me.AutoFixCheckBox.Name = "AutoFixCheckBox"
+        Me.AutoFixCheckBox.Size = New System.Drawing.Size(99, 17)
+        Me.AutoFixCheckBox.TabIndex = 33
+        Me.AutoFixCheckBox.Text = "Auto-Fix Values"
+        Me.AutoFixCheckBox.UseVisualStyleBackColor = True
+        '
         'Filechooser
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(913, 619)
+        Me.Controls.Add(Me.AutoFixCheckBox)
         Me.Controls.Add(Me.CheckLabelsButton)
         Me.Controls.Add(Me.CheckVarsButton)
         Me.Controls.Add(Me.CheckValuesButton)
@@ -390,5 +402,6 @@ Partial Class Filechooser
     Friend WithEvents CheckValuesButton As System.Windows.Forms.Button
     Friend WithEvents CheckVarsButton As System.Windows.Forms.Button
     Friend WithEvents CheckLabelsButton As System.Windows.Forms.Button
+    Friend WithEvents AutoFixCheckBox As System.Windows.Forms.CheckBox
 
 End Class
