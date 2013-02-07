@@ -44,6 +44,7 @@ Public Class Filechooser
         TexturePackerPath = My.Settings.TexturePackerPath
         XMLFolder = My.Settings.XMLFolder
         SkinFolder = My.Settings.SkinFolder
+        strOutputFolder = My.Settings.OutPutFolder
         IndentingDropDown.SelectedIndex = My.Settings.Indenting
         EOLComboBox.SelectedIndex = My.Settings.EndOfLine
         ConversionDropDown.SelectedIndex = My.Settings.ConversionType
@@ -438,6 +439,7 @@ Public Class Filechooser
         My.Settings.ConvertBorders = ConvertBorders.Checked
         My.Settings.EndOfLine = EOLComboBox.SelectedIndex
         My.Settings.Indenting = IndentingDropDown.SelectedIndex
+        My.Settings.OutPutFolder = strOutputFolder
         MsgBox("Settings saved")
     End Sub
 
@@ -468,6 +470,34 @@ Public Class Filechooser
         CheckChildren("//control[@type='scrollbar']/*", {"description", "posx", "posy", "width", "height", "visible", "texturesliderbackground", "texturesliderbar", "include", "animation", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "pulseonselect", "orientation", "showonepage", "pagecontrol", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback"})
         CheckChildren("//control[@type='progress']/*", {"description", "posx", "posy", "width", "height", "visible", "texturebg", "lefttexture", "include", "animation", "righttexture", "overlaytexture", "midtexture", "info", "reveal"})
         CheckNodeValue("align", {"left", "center", "right", "justify"})
+        '     MoveNodeToBottom("animation")
+        '    MoveNodeToBottom("visible")
+        '      MoveNodeToBottom("include")
+        MoveNodeToTop("disabledcolor")
+        MoveNodeToTop("selectedcolor")
+        MoveNodeToTop("textcolor")
+        MoveNodeToTop("shadowcolor")
+        MoveNodeToTop("property")
+        MoveNodeToTop("label2")
+        MoveNodeToTop("altlabel")
+        MoveNodeToTop("label")
+        MoveNodeToTop("alttexturenofocus")
+        MoveNodeToTop("alttexturefocus")
+        MoveNodeToTop("texturenofocus")
+        MoveNodeToTop("texturefocus")
+        MoveNodeToTop("fadetime")
+        MoveNodeToTop("texture")
+        MoveNodeToTop("imagepath")
+        MoveNodeToTop("aspectratio")
+        MoveNodeToTop("aligny")
+        MoveNodeToTop("align")
+        MoveNodeToTop("textoffsety")
+        MoveNodeToTop("textoffsetx")
+        MoveNodeToTop("height")
+        MoveNodeToTop("width")
+        MoveNodeToTop("posy")
+        MoveNodeToTop("posx")
+        MoveNodeToTop("description")
         CheckAttributeValue("//*[(@align)]", {"align"}, {"left", "center", "right", "justify"})
         CheckNodeValue("aspectratio", {"keep", "scale", "stretch", "center"})
         CheckNodeValue("aligny", {"top", "center", "bottom"})
@@ -662,7 +692,27 @@ Public Class Filechooser
     Private Function CheckPath(ByVal strPath As String) As Boolean
         If Dir$(strPath) <> "" Then CheckPath = True Else CheckPath = False
     End Function
-
+    Private Sub MoveNodeToTop(ByVal XMLTag As String)
+        elementlist = doc.GetElementsByTagName(XMLTag)
+        For i = 0 To elementlist.Count - 1
+            If Not elementlist(i) Is Nothing Then
+                If Not elementlist(i).ParentNode.FirstChild.Equals(elementlist(i)) Then
+                    elementlist(i).ParentNode.InsertBefore(elementlist(i), elementlist(i).ParentNode.FirstChild)
+                End If
+            End If
+        Next
+    End Sub
+    Private Sub MoveNodeToBottom(ByVal XMLTag As String)
+        elementlist = doc.GetElementsByTagName(XMLTag)
+        For i = 0 To elementlist.Count - 1
+            If Not elementlist(i) Is Nothing Then
+                If Not elementlist(i).ParentNode.LastChild.Equals(elementlist(i)) Then
+                    '              elementlist(i).ParentNode.ChildNodes()
+                    elementlist(i).ParentNode.InsertBefore(elementlist(i), elementlist(i).ParentNode.LastChild)
+                End If
+            End If
+        Next
+    End Sub
     Private Sub CheckNodeValue(ByVal XMLTag As String, ByVal ValidValues As String())
         elementlist = doc.GetElementsByTagName(XMLTag)
         For i = 0 To elementlist.Count - 1
