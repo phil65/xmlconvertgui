@@ -55,6 +55,8 @@ Partial Class Filechooser
         Me.CheckVarsButton = New System.Windows.Forms.Button()
         Me.CheckLabelsButton = New System.Windows.Forms.Button()
         Me.AutoFixCheckBox = New System.Windows.Forms.CheckBox()
+        Me.ReorderButton = New System.Windows.Forms.CheckBox()
+        Me.BackgroundWorker1 = New System.ComponentModel.BackgroundWorker()
         Me.SuspendLayout()
         '
         'OpenFileDialog
@@ -121,7 +123,7 @@ Partial Class Filechooser
         'HeaderOption
         '
         Me.HeaderOption.AutoSize = True
-        Me.HeaderOption.Location = New System.Drawing.Point(9, 382)
+        Me.HeaderOption.Location = New System.Drawing.Point(10, 402)
         Me.HeaderOption.Name = "HeaderOption"
         Me.HeaderOption.Size = New System.Drawing.Size(108, 17)
         Me.HeaderOption.TabIndex = 9
@@ -131,7 +133,7 @@ Partial Class Filechooser
         'ConvertBorders
         '
         Me.ConvertBorders.AutoSize = True
-        Me.ConvertBorders.Location = New System.Drawing.Point(9, 405)
+        Me.ConvertBorders.Location = New System.Drawing.Point(10, 425)
         Me.ConvertBorders.Name = "ConvertBorders"
         Me.ConvertBorders.Size = New System.Drawing.Size(102, 17)
         Me.ConvertBorders.TabIndex = 12
@@ -330,11 +332,25 @@ Partial Class Filechooser
         Me.AutoFixCheckBox.Text = "Auto-Fix Values"
         Me.AutoFixCheckBox.UseVisualStyleBackColor = True
         '
+        'ReorderButton
+        '
+        Me.ReorderButton.AutoSize = True
+        Me.ReorderButton.Location = New System.Drawing.Point(9, 379)
+        Me.ReorderButton.Name = "ReorderButton"
+        Me.ReorderButton.Size = New System.Drawing.Size(121, 17)
+        Me.ReorderButton.TabIndex = 34
+        Me.ReorderButton.Text = "Re-Order XML Tags"
+        Me.ReorderButton.UseVisualStyleBackColor = True
+        '
+        'BackgroundWorker1
+        '
+        '
         'Filechooser
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(913, 619)
+        Me.Controls.Add(Me.ReorderButton)
         Me.Controls.Add(Me.AutoFixCheckBox)
         Me.Controls.Add(Me.CheckLabelsButton)
         Me.Controls.Add(Me.CheckVarsButton)
@@ -403,5 +419,7 @@ Partial Class Filechooser
     Friend WithEvents CheckVarsButton As System.Windows.Forms.Button
     Friend WithEvents CheckLabelsButton As System.Windows.Forms.Button
     Friend WithEvents AutoFixCheckBox As System.Windows.Forms.CheckBox
+    Friend WithEvents ReorderButton As System.Windows.Forms.CheckBox
+    Friend WithEvents BackgroundWorker1 As System.ComponentModel.BackgroundWorker
 
 End Class

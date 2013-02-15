@@ -468,36 +468,40 @@ Public Class Filechooser
         CheckChildren("//control[@type='image']/*", {"description", "posx", "posy", "width", "height", "visible", "align", "aligny", "include", "animation", "aspectratio", "fadetime", "colordiffuse", "texture", "bordertexture", "bordersize", "info"})
         CheckChildren("//control[@type='multiimage']/*", {"description", "posx", "posy", "width", "height", "visible", "align", "aligny", "include", "animation", "aspectratio", "fadetime", "colordiffuse", "imagepath", "timeperimage", "loop", "info", "randomize", "pauseatend"})
         CheckChildren("//control[@type='scrollbar']/*", {"description", "posx", "posy", "width", "height", "visible", "texturesliderbackground", "texturesliderbar", "include", "animation", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "pulseonselect", "orientation", "showonepage", "pagecontrol", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback"})
-        CheckChildren("//control[@type='progress']/*", {"description", "posx", "posy", "width", "height", "visible", "texturebg", "lefttexture", "include", "animation", "righttexture", "overlaytexture", "midtexture", "info", "reveal"})
+        CheckChildren("//control[@type='progress']/*", {"description", "posx", "posy", "width", "height", "visible", "texturebg", "lefttexture", "include", "animation", "colordiffuse", "righttexture", "overlaytexture", "midtexture", "info", "reveal"})
         CheckNodeValue("align", {"left", "center", "right", "justify"})
         '     MoveNodeToBottom("animation")
         '    MoveNodeToBottom("visible")
         '      MoveNodeToBottom("include")
-        MoveNodeToTop("disabledcolor")
-        MoveNodeToTop("selectedcolor")
-        MoveNodeToTop("textcolor")
-        MoveNodeToTop("shadowcolor")
-        MoveNodeToTop("property")
-        MoveNodeToTop("label2")
-        MoveNodeToTop("altlabel")
-        MoveNodeToTop("label")
-        MoveNodeToTop("alttexturenofocus")
-        MoveNodeToTop("alttexturefocus")
-        MoveNodeToTop("texturenofocus")
-        MoveNodeToTop("texturefocus")
-        MoveNodeToTop("fadetime")
-        MoveNodeToTop("texture")
-        MoveNodeToTop("imagepath")
-        MoveNodeToTop("aspectratio")
-        MoveNodeToTop("aligny")
-        MoveNodeToTop("align")
-        MoveNodeToTop("textoffsety")
-        MoveNodeToTop("textoffsetx")
-        MoveNodeToTop("height")
-        MoveNodeToTop("width")
-        MoveNodeToTop("posy")
-        MoveNodeToTop("posx")
-        MoveNodeToTop("description")
+        If ReorderButton.Checked Then
+            MoveNodeToTop("disabledcolor")
+            MoveNodeToTop("selectedcolor")
+            MoveNodeToTop("textcolor")
+            MoveNodeToTop("shadowcolor")
+            MoveNodeToTop("font")
+            MoveNodeToTop("property")
+            MoveNodeToTop("label2")
+            MoveNodeToTop("altlabel")
+            MoveNodeToTop("label")
+            MoveNodeToTop("alttexturenofocus")
+            MoveNodeToTop("alttexturefocus")
+            MoveNodeToTop("texturenofocus")
+            MoveNodeToTop("texturefocus")
+            MoveNodeToTop("fadetime")
+            MoveNodeToTop("texture")
+            MoveNodeToTop("info")
+            MoveNodeToTop("imagepath")
+            MoveNodeToTop("aspectratio")
+            MoveNodeToTop("aligny")
+            MoveNodeToTop("align")
+            MoveNodeToTop("textoffsety")
+            MoveNodeToTop("textoffsetx")
+            MoveNodeToTop("height")
+            MoveNodeToTop("width")
+            MoveNodeToTop("posy")
+            MoveNodeToTop("posx")
+            MoveNodeToTop("description")
+        End If
         CheckAttributeValue("//*[(@align)]", {"align"}, {"left", "center", "right", "justify"})
         CheckNodeValue("aspectratio", {"keep", "scale", "stretch", "center"})
         CheckNodeValue("aligny", {"top", "center", "bottom"})
@@ -511,6 +515,8 @@ Public Class Filechooser
         CheckNodeValue("pulseonselect", {"false", "true", "yes", "no"})
         CheckNodeValue("reverse", {"false", "true", "yes", "no"})
         CheckNodeValue("usecontrolcoords", {"false", "true", "yes", "no"})
+        CheckAttributes("aspectratio", {"align", "aligny"})
+        CheckDoubleValues()
     End Sub
     Sub ScaleXMLNode(ByRef Element As XmlNode, ByVal tag As String, ByVal ScaleFactor As String)
         Dim Number As Double
@@ -696,7 +702,7 @@ Public Class Filechooser
         elementlist = doc.GetElementsByTagName(XMLTag)
         For i = 0 To elementlist.Count - 1
             If Not elementlist(i) Is Nothing Then
-                If Not elementlist(i).ParentNode.FirstChild.Equals(elementlist(i)) Then
+                If Not elementlist(i).ParentNode.FirstChild.Equals(elementlist(i)) And Not elementlist(i).HasChildNodes Then
                     elementlist(i).ParentNode.InsertBefore(elementlist(i), elementlist(i).ParentNode.FirstChild)
                 End If
             End If
@@ -706,7 +712,7 @@ Public Class Filechooser
         elementlist = doc.GetElementsByTagName(XMLTag)
         For i = 0 To elementlist.Count - 1
             If Not elementlist(i) Is Nothing Then
-                If Not elementlist(i).ParentNode.LastChild.Equals(elementlist(i)) Then
+                If Not elementlist(i).ParentNode.LastChild.Equals(elementlist(i)) And Not elementlist(i).HasChildNodes Then
                     '              elementlist(i).ParentNode.ChildNodes()
                     elementlist(i).ParentNode.InsertBefore(elementlist(i), elementlist(i).ParentNode.LastChild)
                 End If
@@ -723,6 +729,48 @@ Public Class Filechooser
                         elementlist(i).ParentNode.RemoveChild(elementlist(i))
                     End If
                 End If
+            End If
+        Next
+    End Sub
+    Private Sub CheckAttributes(ByVal XMLTag As String, ByVal ValidValues As String())
+        elementlist = doc.GetElementsByTagName(XMLTag)
+        For i = 0 To elementlist.Count - 1
+            For Each Attribute As XmlAttribute In elementlist(i).Attributes
+                If Not Attribute Is Nothing Then
+                    Dim Test As String = Attribute.Name
+                    If Not ValidValues.Contains(Test) Then
+                        OutputLog.AppendText(actualFile + ": Invalid Attribute for " & XMLTag & ": " & Test & vbCrLf)
+                        If AutoFixCheckBox.Checked Then
+                            elementlist(i).Attributes.RemoveNamedItem(Test)
+                        End If
+                    End If
+                End If
+            Next
+        Next
+    End Sub
+    Private Sub CheckDoubleValues()
+        elementlist = doc.SelectNodes("//*")
+        Dim IgnoreList As String() = {"control", "item", "onclick", "onleft", "onright", "onup", "ondown", "property", "include", "onback", "group", "animation", "effect", "onload", "onunload", "visible", "enable", "itemlayout", "focusedlayout", "variable", "value", "altclick", "onfocus", "#comment", "default", "font", "constant", "style", "label"}
+        For i = 0 To elementlist.Count - 1
+            If elementlist(i).HasChildNodes Then
+                Dim DoubleValuesList As New ArrayList()
+                DoubleValuesList.Clear()
+                For Each element In elementlist(i).ChildNodes
+                    Dim blacklisted As Boolean = False
+                    For Each Item In IgnoreList
+                        If element.Name.Contains(Item) Then blacklisted = True
+                    Next
+                    If blacklisted = False Then
+                        If Not DoubleValuesList.Contains(element.Name) Then
+                            AddStringToArray(DoubleValuesList, element.Name)
+                        Else
+                            OutputLog.AppendText(element.Name & " in " & actualFile & vbCrLf)
+                            If AutoFixCheckBox.Checked Then
+                                element.ParentNode.RemoveChild(element)
+                            End If
+                        End If
+                    End If
+                Next
             End If
         Next
     End Sub
