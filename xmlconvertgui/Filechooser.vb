@@ -72,6 +72,34 @@ Public Class Filechooser
         End Select
         XMLCounter = 0
         Dim errorcounter = 0
+        Dim myXmlSettings As New XmlWriterSettings
+        If Not HeaderOption.Checked Then myXmlSettings.OmitXmlDeclaration = True
+        Dim UTF8NoBom As Encoding = New UTF8Encoding(False)
+        myXmlSettings.Encoding = UTF8NoBom
+        Select Case EOLComboBox.SelectedIndex
+            Case 0
+                myXmlSettings.NewLineHandling = NewLineHandling.None
+            Case 1
+                myXmlSettings.NewLineHandling = NewLineHandling.Replace
+                myXmlSettings.NewLineChars = ControlChars.CrLf
+                OutputLog.AppendText("Windows Line Endings selected" & vbCrLf)
+            Case 2
+                myXmlSettings.NewLineHandling = NewLineHandling.Replace
+                myXmlSettings.NewLineChars = ControlChars.NewLine
+                OutputLog.AppendText("Linux Line Endings selected" & vbCrLf)
+        End Select
+        myXmlSettings.Indent = True
+        Select Case IndentingDropDown.SelectedIndex
+            Case 0
+                myXmlSettings.IndentChars = "  "
+                OutputLog.AppendText("Indenting: 2" & vbCrLf)
+            Case 1
+                myXmlSettings.IndentChars = "    "
+                OutputLog.AppendText("Indenting: 4" & vbCrLf)
+            Case 2
+                myXmlSettings.IndentChars = (ControlChars.Tab)
+                OutputLog.AppendText("Indenting: Tab" & vbCrLf)
+        End Select
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
@@ -96,34 +124,6 @@ Public Class Filechooser
                     Next
                 End If
                 CheckValues()
-                Dim myXmlSettings As New XmlWriterSettings
-                If Not HeaderOption.Checked Then myXmlSettings.OmitXmlDeclaration = True
-                Dim UTF8NoBom As Encoding = New UTF8Encoding(False)
-                myXmlSettings.Encoding = UTF8NoBom
-                Select Case EOLComboBox.SelectedIndex
-                    Case 0
-                        myXmlSettings.NewLineHandling = NewLineHandling.None
-                    Case 1
-                        myXmlSettings.NewLineHandling = NewLineHandling.Replace
-                        myXmlSettings.NewLineChars = ControlChars.CrLf
-                        OutputLog.AppendText("Windows Line Endings selected" & vbCrLf)
-                    Case 2
-                        myXmlSettings.NewLineHandling = NewLineHandling.Replace
-                        myXmlSettings.NewLineChars = ControlChars.NewLine
-                        OutputLog.AppendText("Linux Line Endings selected" & vbCrLf)
-                End Select
-                myXmlSettings.Indent = True
-                Select Case IndentingDropDown.SelectedIndex
-                    Case 0
-                        myXmlSettings.IndentChars = "  "
-                        OutputLog.AppendText("Indenting: 2" & vbCrLf)
-                    Case 1
-                        myXmlSettings.IndentChars = "    "
-                        OutputLog.AppendText("Indenting: 4" & vbCrLf)
-                    Case 2
-                        myXmlSettings.IndentChars = (ControlChars.Tab)
-                        OutputLog.AppendText("Indenting: Tab" & vbCrLf)
-                End Select
                 Dim wrtr As XmlWriter = XmlWriter.Create(strOutputFolder + "\" + SafeFilepaths(j).ToString, myXmlSettings)
                 doc.WriteTo(wrtr)
                 wrtr.WriteEndDocument()
