@@ -469,7 +469,7 @@ Public Class Filechooser
         CheckChildren("//control[@type='multiimage']/*", {"description", "posx", "posy", "width", "height", "visible", "align", "aligny", "include", "animation", "aspectratio", "fadetime", "colordiffuse", "imagepath", "timeperimage", "loop", "info", "randomize", "pauseatend"})
         CheckChildren("//control[@type='scrollbar']/*", {"description", "posx", "posy", "width", "height", "visible", "texturesliderbackground", "texturesliderbar", "include", "animation", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "pulseonselect", "orientation", "showonepage", "pagecontrol", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback"})
         CheckChildren("//control[@type='progress']/*", {"description", "posx", "posy", "width", "height", "visible", "texturebg", "lefttexture", "include", "animation", "colordiffuse", "righttexture", "overlaytexture", "midtexture", "info", "reveal"})
-        CheckNodeValue("align", {"left", "center", "right", "justify"})
+        CheckChildren("//content/*", {"item", "include"})
         '     MoveNodeToBottom("animation")
         '    MoveNodeToBottom("visible")
         '      MoveNodeToBottom("include")
@@ -502,10 +502,14 @@ Public Class Filechooser
             MoveNodeToTop("posx")
             MoveNodeToTop("description")
         End If
+
         CheckAttributeValue("//*[(@align)]", {"align"}, {"left", "center", "right", "justify"})
+        CheckAttributeValue("//*[(@aligny)]", {"aligny"}, {"top", "center", "bottom"})
+        CheckAttributeValue("//*[(@flipx)]", {"flipx"}, {"true", "false"})
+        CheckAttributeValue("//*[(@flipy)]", {"flipy"}, {"true", "false"})
+        CheckNodeValue("align", {"left", "center", "right", "justify"})
         CheckNodeValue("aspectratio", {"keep", "scale", "stretch", "center"})
         CheckNodeValue("aligny", {"top", "center", "bottom"})
-        CheckAttributeValue("//*[(@aligny)]", {"aligny"}, {"top", "center", "bottom"})
         CheckNodeValue("orientation", {"horizontal", "vertical"})
         CheckNodeValue("subtype", {"page", "int", "float", "text"})
         CheckNodeValue("action", {"volume", "seek"})
@@ -515,9 +519,28 @@ Public Class Filechooser
         CheckNodeValue("pulseonselect", {"false", "true", "yes", "no"})
         CheckNodeValue("reverse", {"false", "true", "yes", "no"})
         CheckNodeValue("usecontrolcoords", {"false", "true", "yes", "no"})
-        CheckAttributes("aspectratio", {"align", "aligny"})
+
+        CheckAttributes("aspectratio", {"align", "aligny", "scalediffuse"})
+        CheckAttributes("texture", {"background", "flipx", "flipy", "fallback", "border", "diffuse"})
+        CheckAttributes("label", {"fallback"})
+        CheckAttributes("align", {})
+        CheckAttributes("aligny", {})
+        CheckAttributes("posx", {})
+        CheckAttributes("posy", {})
+        CheckAttributes("height", {})
+        CheckAttributes("width", {"min", "max"})
+        CheckAttributes("textoffsetx", {})
+        CheckAttributes("textoffsety", {})
+        CheckAttributes("onload", {"condition"})
+        CheckAttributes("onload", {"condition"})
+        CheckAttributes("property", {"name", "fallback"})
+        CheckAttributes("item", {"id"})
+        CheckAttributes("control", {"id", "type"})
+        CheckAttributes("animation", {"start", "end", "effect", "tween", "easing", "time", "condition", "reversible", "type", "center", "delay", "pulse", "loop"})
+        CheckAttributes("effect", {"start", "end", "tween", "easing", "time", "condition", "type", "center", "delay", "pulse", "loop"})
         CheckDoubleValues()
     End Sub
+
     Sub ScaleXMLNode(ByRef Element As XmlNode, ByVal tag As String, ByVal ScaleFactor As String)
         Dim Number As Double
         If (Not Element.Attributes(tag) Is Nothing) Then
@@ -764,7 +787,7 @@ Public Class Filechooser
                         If Not DoubleValuesList.Contains(element.Name) Then
                             AddStringToArray(DoubleValuesList, element.Name)
                         Else
-                            OutputLog.AppendText(element.Name & " in " & actualFile & vbCrLf)
+                            OutputLog.AppendText("Double XML Tag: " & element.Name & " in " & actualFile & vbCrLf)
                             If AutoFixCheckBox.Checked Then
                                 element.ParentNode.RemoveChild(element)
                             End If
