@@ -222,6 +222,7 @@ Public Class Filechooser
 
     Private Sub ClearLogButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ClearLogButton.Click
         OutputLog.Clear()
+        InitializeProgressBar(0)
     End Sub
 
     Private Sub CheckFontsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckFontsButton.Click
@@ -266,6 +267,7 @@ Public Class Filechooser
         IncludeList2.Clear()
         IncludeListBackup.Clear()
         IncludeList.Clear()
+        InitializeProgressBar(Filepaths.Count)
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
@@ -281,7 +283,9 @@ Public Class Filechooser
             Catch ex As Exception                        ' Handle the generic Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
             End Try
+            IncrementProgressBar()
         Next
+        OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the upcoming List of Includes." & vbCrLf)
         Dim Include As String
         For Each Include In IncludeList
             RemoveStringFromArray(IncludeList2, Include)
@@ -289,10 +293,9 @@ Public Class Filechooser
         For Each Include In IncludeListBackup
             RemoveStringFromArray(IncludeList, Include)
         Next
-        OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the upcoming List of Includes." & vbCrLf)
-        OutputLog.AppendText("Unused Includes:" & vbCrLf)
+        OutputLog.AppendText(vbCrLf & "Unused Includes:" & vbCrLf)
         PrintArray(IncludeList)
-        OutputLog.AppendText("Undefined Includes:" & vbCrLf)
+        OutputLog.AppendText(vbCrLf & "Undefined Includes:" & vbCrLf)
         PrintArray(IncludeList2)
     End Sub
 
@@ -326,6 +329,7 @@ Public Class Filechooser
 
     Private Sub CheckBracketsButton_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBracketsButton.Click
         OutputLog.AppendText("Checking the brackets..." & vbCrLf)
+        InitializeProgressBar(Filepaths.Count)
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
@@ -350,13 +354,16 @@ Public Class Filechooser
             Catch ex As Exception                        ' Handle the generic Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
             End Try
+            IncrementProgressBar()
         Next
+        OutputLog.AppendText("Scan complete" & vbCrLf)
     End Sub
 
     Private Sub TextureCheckButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TextureCheckButton.Click
         OutputLog.AppendText("Building Texture List" & vbCrLf)
         TextureFinder(SkinFolder + "\media")
         OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the textures of the upcoming list for usage." & vbCrLf)
+        InitializeProgressBar(Filepaths.Count)
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
@@ -370,6 +377,7 @@ Public Class Filechooser
             Catch ex As Exception                        ' Handle the generic Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
             End Try
+            IncrementProgressBar()
         Next j
         OutputLog.AppendText("Unused Textures:" & vbCrLf)
         PrintArray(ShortenedTexturePaths)
@@ -391,6 +399,7 @@ Public Class Filechooser
         IDListDefines.Clear()
         IDListDefinesBackup.Clear()
         OutputLog.AppendText("Checking the IDs..." & vbCrLf)
+        InitializeProgressBar(Filepaths.Count)
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
@@ -424,6 +433,7 @@ Public Class Filechooser
             Catch ex As Exception                        ' Handle the generic Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
             End Try
+            IncrementProgressBar()
         Next
         For i = 0 To IDListRefs.Count - 1
             RemoveStringFromArray(IDListDefines, IDListRefs(i))
@@ -453,6 +463,7 @@ Public Class Filechooser
 
     Private Sub CheckValuesButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckValuesButton.Click
         OutputLog.AppendText("Scanning XMLs..." & vbCrLf)
+        InitializeProgressBar(Filepaths.Count)
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
@@ -463,8 +474,23 @@ Public Class Filechooser
             Catch ex As Exception                        ' Handle the generic Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
             End Try
+            IncrementProgressBar()
         Next j
         OutputLog.AppendText("Scan complete" & vbCrLf)
+    End Sub
+
+    Private Sub InitializeProgressBar(ByVal maximum As Integer)
+        ProgressBar1.Visible = True
+        ProgressBar1.Minimum = 0
+        ProgressBar1.Value = 0
+        ProgressBar1.Maximum = maximum
+    End Sub
+
+    Private Sub IncrementProgressBar()
+        ProgressBar1.Maximum = ProgressBar1.Maximum + 1
+        ProgressBar1.Value += 2
+        ProgressBar1.Value -= 1
+        ProgressBar1.Maximum = ProgressBar1.Maximum - 1
     End Sub
 
     Sub CheckValues()
@@ -883,6 +909,7 @@ Public Class Filechooser
         VarsListDefines.Clear()
         VarsListDefinesBackup.Clear()
         OutputLog.AppendText("Checking the Vars..." & vbCrLf)
+        InitializeProgressBar(Filepaths.Count)
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
@@ -904,6 +931,7 @@ Public Class Filechooser
             Catch ex As Exception                        ' Handle the generic Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
             End Try
+            IncrementProgressBar()
         Next
         For i = 0 To VarsListRefs.Count - 1
             RemoveStringFromArray(VarsListDefines, VarsListRefs(i))
@@ -936,6 +964,7 @@ Public Class Filechooser
             End If
         Next
         OutputLog.AppendText("Checking the Labels..." & vbCrLf)
+        InitializeProgressBar(Filepaths.Count)
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
@@ -968,6 +997,7 @@ Public Class Filechooser
             Catch ex As Exception                        ' Handle the generic Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
             End Try
+            IncrementProgressBar()
         Next
         For i = 0 To LabelsListRefs.Count - 1
             Dim match As Match = RegExNumber.Match(LabelsListRefs(i))

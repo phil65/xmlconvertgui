@@ -26,7 +26,7 @@ Partial Class Filechooser
         Me.ConvertButton = New System.Windows.Forms.Button()
         Me.xmlname = New System.Windows.Forms.Label()
         Me.OutputButton = New System.Windows.Forms.Button()
-        Me.OutputFolderDialog = New FolderSelect.FolderSelectDialog()
+        Me.OutputFolderDialog = New FolderSelect.FolderSelectDialog
         Me.OutputLabel = New System.Windows.Forms.Label()
         Me.OutputLog = New System.Windows.Forms.TextBox()
         Me.ConversionDropDown = New System.Windows.Forms.ComboBox()
@@ -34,7 +34,7 @@ Partial Class Filechooser
         Me.ConvertBorders = New System.Windows.Forms.CheckBox()
         Me.TextureCheckButton = New System.Windows.Forms.Button()
         Me.SkinFolderButton = New System.Windows.Forms.Button()
-        Me.SkinFolderDialog = New FolderSelect.FolderSelectDialog()
+        Me.SkinFolderDialog = New FolderSelect.FolderSelectDialog
         Me.ClearLogButton = New System.Windows.Forms.Button()
         Me.CheckFontsButton = New System.Windows.Forms.Button()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -44,7 +44,7 @@ Partial Class Filechooser
         Me.Button2 = New System.Windows.Forms.Button()
         Me.Button3 = New System.Windows.Forms.Button()
         Me.Button4 = New System.Windows.Forms.Button()
-        Me.BuildFolderDialog = New FolderSelect.FolderSelectDialog()
+        Me.BuildFolderDialog = New FolderSelect.FolderSelectDialog
         Me.EOLComboBox = New System.Windows.Forms.ComboBox()
         Me.AnimationMultiplier = New System.Windows.Forms.TextBox()
         Me.Label2 = New System.Windows.Forms.Label()
@@ -57,6 +57,7 @@ Partial Class Filechooser
         Me.AutoFixCheckBox = New System.Windows.Forms.CheckBox()
         Me.ReorderButton = New System.Windows.Forms.CheckBox()
         Me.BackgroundWorker1 = New System.ComponentModel.BackgroundWorker()
+        Me.ProgressBar1 = New System.Windows.Forms.ProgressBar()
         Me.SuspendLayout()
         '
         'OpenFileDialog
@@ -342,14 +343,20 @@ Partial Class Filechooser
         Me.ReorderButton.Text = "Re-Order XML Tags"
         Me.ReorderButton.UseVisualStyleBackColor = True
         '
-        'BackgroundWorker1
+        'ProgressBar1
         '
+        Me.ProgressBar1.Location = New System.Drawing.Point(13, 584)
+        Me.ProgressBar1.Name = "ProgressBar1"
+        Me.ProgressBar1.Size = New System.Drawing.Size(678, 23)
+        Me.ProgressBar1.TabIndex = 35
+        Me.ProgressBar1.Visible = False
         '
         'Filechooser
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(913, 619)
+        Me.Controls.Add(Me.ProgressBar1)
         Me.Controls.Add(Me.ReorderButton)
         Me.Controls.Add(Me.AutoFixCheckBox)
         Me.Controls.Add(Me.CheckLabelsButton)
@@ -421,5 +428,6 @@ Partial Class Filechooser
     Friend WithEvents AutoFixCheckBox As System.Windows.Forms.CheckBox
     Friend WithEvents ReorderButton As System.Windows.Forms.CheckBox
     Friend WithEvents BackgroundWorker1 As System.ComponentModel.BackgroundWorker
+    Friend WithEvents ProgressBar1 As System.Windows.Forms.ProgressBar
 
 End Class

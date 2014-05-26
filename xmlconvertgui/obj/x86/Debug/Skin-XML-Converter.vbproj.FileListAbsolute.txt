@@ -9,3 +9,4 @@ C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\bin\Debug\XBMC S
 C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Debug\XBMC Skinning Tool v1.2.exe
 C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Debug\XBMC Skinning Tool v1.2.xml
 C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Debug\XBMC Skinning Tool v1.2.pdb
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Debug\Skin-XML-Converter.vbprojResolveAssemblyReference.cache
