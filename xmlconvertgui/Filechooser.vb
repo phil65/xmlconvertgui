@@ -904,7 +904,7 @@ Public Class Filechooser
         Dim VarsListRefs As New ArrayList()
         Dim VarsListDefines As New ArrayList()
         Dim VarsListDefinesBackup As New ArrayList()
-        Dim r As Regex = New Regex("(?<=\$VAR\[)[0-9A-Za-z-]+", RegexOptions.IgnoreCase)
+        Dim r As Regex = New Regex("(?<=\$VAR\[)[_0-9A-Za-z-]+", RegexOptions.IgnoreCase)
         VarsListRefs.Clear()
         VarsListDefines.Clear()
         VarsListDefinesBackup.Clear()

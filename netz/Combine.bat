@@ -1,1 +1,1 @@
-netz.exe -s -z "XBMC Skinning Tool v1.2.exe" FolderSelect.dll -so
+netz.exe -s -z "..\xmlconvertgui\bin\Release\XBMC Skinning Tool v1.2.exe" "..\xmlconvertgui\bin\Release\FolderSelect.dll" -so -o "..\Release"
