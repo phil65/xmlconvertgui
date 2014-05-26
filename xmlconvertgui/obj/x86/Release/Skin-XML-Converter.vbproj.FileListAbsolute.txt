@@ -1,22 +1,12 @@
-C:\Users\Phil\documents\visual studio 2010\Projects\xmlconvertgui\xmlconvertgui\obj\x86\Release\ResolveAssemblyReference.cache
-C:\Users\Phil\documents\visual studio 2010\Projects\xmlconvertgui\xmlconvertgui\obj\x86\Release\GenerateResource.read.1.tlog
-C:\Users\Phil\documents\visual studio 2010\Projects\xmlconvertgui\xmlconvertgui\obj\x86\Release\GenerateResource.write.1.tlog
-C:\Users\Phil\Documents\Visual Studio 2010\Projects\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v0.9 beta.exe.config
-C:\Users\Phil\Documents\Visual Studio 2010\Projects\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v0.9 beta.exe
-C:\Users\Phil\Documents\Visual Studio 2010\Projects\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v0.9 beta.pdb
-C:\Users\Phil\Documents\Visual Studio 2010\Projects\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v0.9 beta.xml
-C:\Users\Phil\Documents\Visual Studio 2010\Projects\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMCSkinningTool.Filechooser.resources
-C:\Users\Phil\Documents\Visual Studio 2010\Projects\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMCSkinningTool.Resources.resources
-C:\Users\Phil\Documents\Visual Studio 2010\Projects\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v0.9 beta.exe
-C:\Users\Phil\Documents\Visual Studio 2010\Projects\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v0.9 beta.xml
-C:\Users\Phil\Documents\Visual Studio 2010\Projects\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v0.9 beta.pdb
-C:\Dev\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMCSkinningTool.Filechooser.resources
-C:\Dev\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMCSkinningTool.Resources.resources
-C:\Dev\xmlconvertgui\xmlconvertgui\obj\x86\Release\Skin-XML-Converter.vbproj.GenerateResource.Cache
-C:\Dev\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v1.1.exe.config
-C:\Dev\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v1.1.exe
-C:\Dev\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v1.1.pdb
-C:\Dev\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v1.1.xml
-C:\Dev\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v1.1.exe
-C:\Dev\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v1.1.xml
-C:\Dev\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v1.1.pdb
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMCSkinningTool.Filechooser.resources
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMCSkinningTool.Resources.resources
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Release\Skin-XML-Converter.vbproj.GenerateResource.Cache
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v1.2.exe.config
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v1.2.exe
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v1.2.pdb
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v1.2.xml
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v1.2.exe
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v1.2.xml
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v1.2.pdb
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Release\Skin-XML-Converter.vbprojResolveAssemblyReference.cache
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\bin\Release\FolderSelect.dll

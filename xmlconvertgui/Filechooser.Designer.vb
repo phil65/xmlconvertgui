@@ -34,7 +34,7 @@ Partial Class Filechooser
         Me.ConvertBorders = New System.Windows.Forms.CheckBox()
         Me.TextureCheckButton = New System.Windows.Forms.Button()
         Me.SkinFolderButton = New System.Windows.Forms.Button()
-        Me.SkinFolderDialog = New System.Windows.Forms.FolderBrowserDialog()
+        Me.SkinFolderDialog = New FolderSelect.FolderSelectDialog()
         Me.ClearLogButton = New System.Windows.Forms.Button()
         Me.CheckFontsButton = New System.Windows.Forms.Button()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -398,7 +398,7 @@ Partial Class Filechooser
     Friend WithEvents ConvertBorders As System.Windows.Forms.CheckBox
     Friend WithEvents TextureCheckButton As System.Windows.Forms.Button
     Friend WithEvents SkinFolderButton As System.Windows.Forms.Button
-    Friend WithEvents SkinFolderDialog As System.Windows.Forms.FolderBrowserDialog
+    Friend WithEvents SkinFolderDialog As FolderSelect.FolderSelectDialog
     Friend WithEvents ClearLogButton As System.Windows.Forms.Button
     Friend WithEvents CheckFontsButton As System.Windows.Forms.Button
     Friend WithEvents Label1 As System.Windows.Forms.Label

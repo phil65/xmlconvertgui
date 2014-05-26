@@ -6,13 +6,15 @@ Imports System.IO
 Imports System.Xml.Schema
 Imports System.Security
 Imports System.Security.Principal.WindowsIdentity
+Imports FolderSelect
+
 Public Class Filechooser
     Public strOutputFolder As String = ""
     Public TexturePackerPath As String = ""
     Public BuildFolder As String = ""
     Public XMLFolder As String = ""
     Public SkinFolder As String = ""
-    Public xmlelements As String() = {"posx", "posy", "width", "height", "textoffsetx", "textoffsety", "radiowidth", "radioheight", "radioposx", "radioposy", "textwidth", "size", "itemgap", "spinwidth", "spinheight"}
+    Public xmlelements As String() = {"posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "textoffsetx", "textoffsety", "radiowidth", "radioheight", "radioposx", "radioposy", "textwidth", "size", "itemgap", "spinwidth", "spinheight"}
     Public xmlelementsBorder As String() = {"border", "bordersize"}
     Public xmlelementsTexture As String() = {"texture", "texturefocus", "texturenofocus", "texturebg", "bordertexture", "value", "icon", "thumb", "alttexturefocus", "alttexturenofocus", "texturesliderbackground", "texturesliderbar", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "midtexture", "righttexture", "lefttexture"}
     Public xmlelementsBrackets As String() = {"visible", "enable", "usealttexture", "selected"}
@@ -160,11 +162,11 @@ Public Class Filechooser
         SafeFilepaths.Clear()
         Filepaths.Clear()
         xmlname.Text = ""
-        SkinFolderDialog.Description = "Choose Skin Folder"
+        SkinFolderDialog.Title = "Choose Skin Folder"
         Dim DidWork As Integer = SkinFolderDialog.ShowDialog()
         If DidWork = DialogResult.Cancel Then
         Else
-            SkinFolder = SkinFolderDialog.SelectedPath
+            SkinFolder = SkinFolderDialog.FileName
             OutputLog.AppendText("Skin Folder chosen:" & vbCrLf & SkinFolder & vbCrLf)
         End If
         If Not CheckPath(SkinFolder + "\addon.xml") Then
@@ -181,14 +183,7 @@ Public Class Filechooser
                             Const ATTR_DIRECTORY = 16
                             If Dir$(XMLFolder, ATTR_DIRECTORY) <> "" Then
                                 Dim DirInfo As New DirectoryInfo(XMLFolder)
-                                Dim FileObj As IO.FileSystemInfo
-                                For Each FileObj In DirInfo.GetFileSystemInfos
-                                    If FileObj.Name.Contains(".xml") Then
-
-                                        Filepaths.Add(FileObj.FullName)
-                                        SafeFilepaths.Add(FileObj.Name)
-                                    End If
-                                Next
+                                SearchDirectory(DirInfo)
                                 OutputButton.Visible = True
                                 OutputLabel.Visible = True
                                 If strOutputFolder <> "" Then ConvertButton.Enabled = True
@@ -210,6 +205,19 @@ Public Class Filechooser
                 OutputLog.AppendText(ex.Message & vbCrLf)
             End Try
         End If
+    End Sub
+
+    Private Sub SearchDirectory(ByVal DirInfo As DirectoryInfo)
+        Dim FileObj As IO.FileSystemInfo
+        For Each FileObj In DirInfo.GetFileSystemInfos
+            If FileObj.Name.Contains(".xml") Then
+                Filepaths.Add(FileObj.FullName)
+                SafeFilepaths.Add(FileObj.Name)
+            End If
+        Next
+        For Each SubdirInfo As DirectoryInfo In DirInfo.EnumerateDirectories
+            SearchDirectory(SubdirInfo)
+        Next SubdirInfo
     End Sub
 
     Private Sub ClearLogButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ClearLogButton.Click
@@ -374,7 +382,7 @@ Public Class Filechooser
         Next i
     End Sub
 
-    Private Sub CheckIDsButton_Click(sender As System.Object, e As System.EventArgs) Handles CheckIDsButton.Click
+    Private Sub CheckIDsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckIDsButton.Click
         Dim IDListRefs As New ArrayList()
         Dim IDListDefines As New ArrayList()
         Dim IDListDefinesBackup As New ArrayList()
@@ -431,7 +439,7 @@ Public Class Filechooser
         '  Next
     End Sub
 
-    Private Sub SaveButton_Click(sender As System.Object, e As System.EventArgs) Handles SaveButton.Click
+    Private Sub SaveButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveButton.Click
         My.Settings.TexturePackerPath = TexturePackerPath
         My.Settings.XMLFolder = XMLFolder
         My.Settings.SkinFolder = SkinFolder
@@ -443,7 +451,7 @@ Public Class Filechooser
         MsgBox("Settings saved")
     End Sub
 
-    Private Sub CheckValuesButton_Click(sender As System.Object, e As System.EventArgs) Handles CheckValuesButton.Click
+    Private Sub CheckValuesButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckValuesButton.Click
         OutputLog.AppendText("Scanning XMLs..." & vbCrLf)
         For j = 0 To Filepaths.Count - 1
             Try
@@ -460,15 +468,15 @@ Public Class Filechooser
     End Sub
 
     Sub CheckValues()
-        CheckChildren("//control[@type='button']/*", {"description", "posx", "posy", "width", "height", "visible", "colordiffuse", "texturefocus", "include", "animation", "texturenofocus", "label", "label2", "font", "textcolor", "disabledcolor", "selectedcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "textwidth", "focusedcolor", "angle", "hitrect", "enable"})
-        CheckChildren("//control[@type='radiobutton']/*", {"description", "posx", "posy", "width", "height", "visible", "colordiffuse", "texturefocus", "include", "animation", "texturenofocus", "label", "selected", "font", "textcolor", "disabledcolor", "selectedcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "textwidth", "focusedcolor", "angle", "hitrect", "enable", "textureradioon", "textureradiooff", "radioposx", "radioposy", "radiowidth", "radioheight"})
-        CheckChildren("//control[@type='togglebutton']/*", {"description", "posx", "posy", "width", "height", "visible", "colordiffuse", "texturefocus", "alttexturefocus", "alttexturenofocus", "altclick", "include", "animation", "texturenofocus", "label", "altlabel", "usealttexture", "font", "textcolor", "disabledcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "ondown", "ondown", "ondown", "textwidth", "focusedcolor", "subtype", "hitrect", "enable"})
-        CheckChildren("//control[@type='label']/*", {"description", "posx", "posy", "width", "height", "visible", "align", "aligny", "include", "animation", "scroll", "scrollout", "info", "number", "angle", "haspath", "label", "textcolor", "selectedcolor", "font", "shadowcolor", "disabledcolor", "pauseatend", "wrapmultiline", "scrollspeed", "scrollsuffix", "textoffsetx", "textoffsety"})
-        CheckChildren("//control[@type='textbox']/*", {"description", "posx", "posy", "width", "height", "visible", "align", "aligny", "include", "animation", "autoscroll", "label", "info", "font", "textcolor", "selectedcolor", "shadowcolor", "pagecontrol"})
-        CheckChildren("//control[@type='image']/*", {"description", "posx", "posy", "width", "height", "visible", "align", "aligny", "include", "animation", "aspectratio", "fadetime", "colordiffuse", "texture", "bordertexture", "bordersize", "info"})
-        CheckChildren("//control[@type='multiimage']/*", {"description", "posx", "posy", "width", "height", "visible", "align", "aligny", "include", "animation", "aspectratio", "fadetime", "colordiffuse", "imagepath", "timeperimage", "loop", "info", "randomize", "pauseatend"})
-        CheckChildren("//control[@type='scrollbar']/*", {"description", "posx", "posy", "width", "height", "visible", "texturesliderbackground", "texturesliderbar", "include", "animation", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "pulseonselect", "orientation", "showonepage", "pagecontrol", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback"})
-        CheckChildren("//control[@type='progress']/*", {"description", "posx", "posy", "width", "height", "visible", "texturebg", "lefttexture", "include", "animation", "colordiffuse", "righttexture", "overlaytexture", "midtexture", "info", "reveal"})
+        CheckChildren("//control[@type='button']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "colordiffuse", "texturefocus", "include", "animation", "texturenofocus", "label", "label2", "font", "textcolor", "disabledcolor", "selectedcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "textwidth", "focusedcolor", "angle", "hitrect", "enable"})
+        CheckChildren("//control[@type='radiobutton']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "colordiffuse", "texturefocus", "include", "animation", "texturenofocus", "label", "selected", "font", "textcolor", "disabledcolor", "selectedcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "textwidth", "focusedcolor", "angle", "hitrect", "enable", "textureradioonfocus", "textureradioofffocus", "textureradioonnofocus", "textureradiooffnofocus", "radioposx", "radioposy", "radiowidth", "radioheight"})
+        CheckChildren("//control[@type='togglebutton']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "colordiffuse", "texturefocus", "alttexturefocus", "alttexturenofocus", "altclick", "include", "animation", "texturenofocus", "label", "altlabel", "usealttexture", "font", "textcolor", "disabledcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "ondown", "ondown", "ondown", "textwidth", "focusedcolor", "subtype", "hitrect", "enable"})
+        CheckChildren("//control[@type='label']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "align", "aligny", "include", "animation", "scroll", "scrollout", "info", "number", "angle", "haspath", "label", "textcolor", "selectedcolor", "font", "shadowcolor", "disabledcolor", "pauseatend", "wrapmultiline", "scrollspeed", "scrollsuffix", "textoffsetx", "textoffsety"})
+        CheckChildren("//control[@type='textbox']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "align", "aligny", "include", "animation", "autoscroll", "label", "info", "font", "textcolor", "selectedcolor", "shadowcolor", "pagecontrol"})
+        CheckChildren("//control[@type='image']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "align", "aligny", "include", "animation", "aspectratio", "fadetime", "colordiffuse", "texture", "bordertexture", "bordersize", "info"})
+        CheckChildren("//control[@type='multiimage']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "align", "aligny", "include", "animation", "aspectratio", "fadetime", "colordiffuse", "imagepath", "timeperimage", "loop", "info", "randomize", "pauseatend"})
+        CheckChildren("//control[@type='scrollbar']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "texturesliderbackground", "texturesliderbar", "include", "animation", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "pulseonselect", "orientation", "showonepage", "pagecontrol", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback"})
+        CheckChildren("//control[@type='progress']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "texturebg", "lefttexture", "include", "animation", "colordiffuse", "righttexture", "overlaytexture", "midtexture", "info", "reveal"})
         CheckChildren("//content/*", {"item", "include"})
         '     MoveNodeToBottom("animation")
         '    MoveNodeToBottom("visible")
@@ -498,6 +506,14 @@ Public Class Filechooser
             MoveNodeToTop("textoffsetx")
             MoveNodeToTop("height")
             MoveNodeToTop("width")
+            MoveNodeToTop("centerright")
+            MoveNodeToTop("centerleft")
+            MoveNodeToTop("centerbottom")
+            MoveNodeToTop("centertop")
+            MoveNodeToTop("right")
+            MoveNodeToTop("left")
+            MoveNodeToTop("bottom")
+            MoveNodeToTop("top")
             MoveNodeToTop("posy")
             MoveNodeToTop("posx")
             MoveNodeToTop("description")
@@ -522,7 +538,7 @@ Public Class Filechooser
         CheckNodeValue("usecontrolcoords", {"false", "true", "yes", "no"})
 
         CheckAttributes("aspectratio", {"align", "aligny", "scalediffuse"})
-        CheckAttributes("texture", {"background", "flipx", "flipy", "fallback", "border", "diffuse"})
+        CheckAttributes("texture", {"background", "flipx", "flipy", "fallback", "border", "diffuse", "colordiffuse"})
         CheckAttributes("label", {"fallback"})
         CheckAttributes("align", {})
         CheckAttributes("aligny", {})
@@ -858,7 +874,7 @@ Public Class Filechooser
         If (cnt <> 0) Or (Unmatched = True) Then OutputLog.AppendText("Unmatched parenthesis: " + value & vbCrLf)
     End Sub
 
-    Private Sub CheckVarsButton_Click(sender As System.Object, e As System.EventArgs) Handles CheckVarsButton.Click
+    Private Sub CheckVarsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckVarsButton.Click
         Dim VarsListRefs As New ArrayList()
         Dim VarsListDefines As New ArrayList()
         Dim VarsListDefinesBackup As New ArrayList()
@@ -901,7 +917,7 @@ Public Class Filechooser
         PrintArray(VarsListDefines)
     End Sub
 
-    Private Sub CheckLabelsButton_Click(sender As System.Object, e As System.EventArgs) Handles CheckLabelsButton.Click
+    Private Sub CheckLabelsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckLabelsButton.Click
         Dim LabelsListRefs As New ArrayList()
         Dim LabelsListDefines As New ArrayList()
         Dim LabelsListDefinesBackup As New ArrayList()
@@ -965,15 +981,6 @@ Public Class Filechooser
         PrintArray(LabelsListDefines)
     End Sub
 
-    Private Sub Button1_Click(sender As System.Object, e As System.EventArgs)
-        Dim reader As XmlReader = XmlReader.Create(XMLFolder + "\MyVideoNav.xml")
-        Dim schemaSet As XmlSchemaSet = New XmlSchemaSet()
-        Dim schema As XmlSchemaInference = New XmlSchemaInference()
-        schemaSet = schema.InferSchema(reader)
-        For Each s As XmlSchema In schemaSet.Schemas()
-            s.Write(Console.Out)
-        Next
-    End Sub
 End Class
 
 
