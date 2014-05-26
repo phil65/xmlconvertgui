@@ -666,7 +666,7 @@ Public Class Filechooser
         Next
         elementlist = doc.SelectNodes("//animation[@effect='rotatex'] | //animation[@effect='rotatey'] | //animation[@effect='rotate'] | //effect[@type='rotate'] | //effect[@type='rotatex'] | //effect[@type='rotatey']")
         For i = 0 To elementlist.Count - 1
-            convertString(elementlist(i), {"end", "center"})
+            convertString(elementlist(i), {"center"})
         Next
         elementlist = doc.SelectNodes("//focusedlayout | //itemlayout | //channellayout | //focusedchannellayout | //rulerlayout")
         For i = 0 To elementlist.Count - 1
