@@ -638,7 +638,7 @@ Public Class Filechooser
             Dim NewString As String = ""
             If Not Node.Attributes(Tag) Is Nothing Then
                 CompleteString = Node.Attributes(Tag).InnerText.ToString
-                If CompleteString.Contains(",") Or (ConvertAll = True) Then
+                If (ConvertAll = True) Then
                     For i = 0 To CompleteString.Length - 1
                         If CompleteString(i) = "," Then
                             NewString = NewString + ConvertValue(CompleteString.Substring(IndexStart, i - IndexStart), multiplyFactor) + ","
@@ -646,6 +646,8 @@ Public Class Filechooser
                         End If
                     Next
                     CompleteString = NewString + ConvertValue((CompleteString.Substring(IndexStart, CompleteString.Length - IndexStart)), multiplyFactor)
+                ElseIf CompleteString.Contains(",") And (CompleteString.Split(",").Length.Equals(4)) Then
+                    CompleteString = ConvertValue((CompleteString.Split(","))(0), multiplyFactor) + "," + ConvertValue((CompleteString.Split(","))(1), multiplyFactor) + "," + (CompleteString.Split(","))(2) + "," + (CompleteString.Split(","))(3)
                 End If
                 Node.Attributes(Tag).InnerText = CompleteString
             End If
@@ -656,14 +658,15 @@ Public Class Filechooser
         elementlist = doc.SelectNodes("//animation[@effect='zoom'] | //effect[@type='zoom']")
         For i = 0 To elementlist.Count - 1
             convertString(elementlist(i), {"start", "end"}, False)
+            convertString(elementlist(i), {"center"})
         Next
         elementlist = doc.SelectNodes("//animation[@effect='slide'] | //effect[@type='slide']")
         For i = 0 To elementlist.Count - 1
             convertString(elementlist(i), {"start", "end"})
         Next
-        elementlist = doc.SelectNodes("//animation[@effect='rotatex'] | //animation[@effect='rotatey'] | //animation[@effect='rotate'] | //effect[@type='rotate'] | //effect[@type='rotatex'] | //effect[@type='rotatey'] | //animation[@effect='slide'] | //effect[@type='slide']")
+        elementlist = doc.SelectNodes("//animation[@effect='rotatex'] | //animation[@effect='rotatey'] | //animation[@effect='rotate'] | //effect[@type='rotate'] | //effect[@type='rotatex'] | //effect[@type='rotatey']")
         For i = 0 To elementlist.Count - 1
-            convertString(elementlist(i), {"end"})
+            convertString(elementlist(i), {"end", "center"})
         Next
         elementlist = doc.SelectNodes("//focusedlayout | //itemlayout | //channellayout | //focusedchannellayout | //rulerlayout")
         For i = 0 To elementlist.Count - 1
