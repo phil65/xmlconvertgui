@@ -26,7 +26,7 @@ Partial Class Filechooser
         Me.ConvertButton = New System.Windows.Forms.Button()
         Me.xmlname = New System.Windows.Forms.Label()
         Me.OutputButton = New System.Windows.Forms.Button()
-        Me.OutputFolderDialog = New System.Windows.Forms.FolderBrowserDialog()
+        Me.OutputFolderDialog = New FolderSelect.FolderSelectDialog()
         Me.OutputLabel = New System.Windows.Forms.Label()
         Me.OutputLog = New System.Windows.Forms.TextBox()
         Me.ConversionDropDown = New System.Windows.Forms.ComboBox()
@@ -44,7 +44,7 @@ Partial Class Filechooser
         Me.Button2 = New System.Windows.Forms.Button()
         Me.Button3 = New System.Windows.Forms.Button()
         Me.Button4 = New System.Windows.Forms.Button()
-        Me.BuildFolderDialog = New System.Windows.Forms.FolderBrowserDialog()
+        Me.BuildFolderDialog = New FolderSelect.FolderSelectDialog()
         Me.EOLComboBox = New System.Windows.Forms.ComboBox()
         Me.AnimationMultiplier = New System.Windows.Forms.TextBox()
         Me.Label2 = New System.Windows.Forms.Label()
@@ -390,7 +390,7 @@ Partial Class Filechooser
     Friend WithEvents ConvertButton As System.Windows.Forms.Button
     Friend WithEvents xmlname As System.Windows.Forms.Label
     Friend WithEvents OutputButton As System.Windows.Forms.Button
-    Friend WithEvents OutputFolderDialog As System.Windows.Forms.FolderBrowserDialog
+    Friend WithEvents OutputFolderDialog As FolderSelect.FolderSelectDialog
     Friend WithEvents OutputLabel As System.Windows.Forms.Label
     Friend WithEvents OutputLog As System.Windows.Forms.TextBox
     Friend WithEvents ConversionDropDown As System.Windows.Forms.ComboBox
@@ -408,7 +408,7 @@ Partial Class Filechooser
     Friend WithEvents Button2 As System.Windows.Forms.Button
     Friend WithEvents Button3 As System.Windows.Forms.Button
     Friend WithEvents Button4 As System.Windows.Forms.Button
-    Friend WithEvents BuildFolderDialog As System.Windows.Forms.FolderBrowserDialog
+    Friend WithEvents BuildFolderDialog As FolderSelect.FolderSelectDialog
     Friend WithEvents EOLComboBox As System.Windows.Forms.ComboBox
     Friend WithEvents AnimationMultiplier As System.Windows.Forms.TextBox
     Friend WithEvents Label2 As System.Windows.Forms.Label

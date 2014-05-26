@@ -147,11 +147,11 @@ Public Class Filechooser
     End Sub
 
     Private Sub OutputButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OutputButton.Click
-        OutputFolderDialog.Description = "Choose Output Folder"
+        OutputFolderDialog.Title = "Choose Output Folder"
         Dim DidWork As Integer = OutputFolderDialog.ShowDialog()
         If DidWork = DialogResult.Cancel Then
         Else
-            strOutputFolder = OutputFolderDialog.SelectedPath
+            strOutputFolder = OutputFolderDialog.FileName
             If Filepaths(0) <> "" Then ConvertButton.Enabled = True
             OutputLabel.Text = strOutputFolder + "\"
             OutputLog.AppendText("Output Folder chosen:" & vbCrLf & strOutputFolder & vbCrLf)
@@ -314,11 +314,11 @@ Public Class Filechooser
     End Sub
 
     Private Sub BuildFolderButton(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button3.Click
-        BuildFolderDialog.Description = "Choose Build Folder"
+        BuildFolderDialog.Title = "Choose Build Folder"
         Dim DidWork As Integer = BuildFolderDialog.ShowDialog()
         If DidWork = DialogResult.Cancel Then
         Else
-            BuildFolder = BuildFolderDialog.SelectedPath
+            BuildFolder = BuildFolderDialog.FileName
             OutputLog.AppendText("Build Folder chosen:" & vbCrLf)
             OutputLog.AppendText(BuildFolder & vbCrLf)
         End If
