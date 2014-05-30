@@ -26,7 +26,6 @@ Partial Class Filechooser
         Me.ConvertButton = New System.Windows.Forms.Button()
         Me.xmlname = New System.Windows.Forms.Label()
         Me.OutputButton = New System.Windows.Forms.Button()
-        Me.OutputFolderDialog = New FolderSelect.FolderSelectDialog
         Me.OutputLabel = New System.Windows.Forms.Label()
         Me.OutputLog = New System.Windows.Forms.TextBox()
         Me.ConversionDropDown = New System.Windows.Forms.ComboBox()
@@ -34,7 +33,6 @@ Partial Class Filechooser
         Me.ConvertBorders = New System.Windows.Forms.CheckBox()
         Me.TextureCheckButton = New System.Windows.Forms.Button()
         Me.SkinFolderButton = New System.Windows.Forms.Button()
-        Me.SkinFolderDialog = New FolderSelect.FolderSelectDialog
         Me.ClearLogButton = New System.Windows.Forms.Button()
         Me.CheckFontsButton = New System.Windows.Forms.Button()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -44,7 +42,6 @@ Partial Class Filechooser
         Me.Button2 = New System.Windows.Forms.Button()
         Me.Button3 = New System.Windows.Forms.Button()
         Me.Button4 = New System.Windows.Forms.Button()
-        Me.BuildFolderDialog = New FolderSelect.FolderSelectDialog
         Me.EOLComboBox = New System.Windows.Forms.ComboBox()
         Me.AnimationMultiplier = New System.Windows.Forms.TextBox()
         Me.Label2 = New System.Windows.Forms.Label()
@@ -349,7 +346,6 @@ Partial Class Filechooser
         Me.ProgressBar1.Name = "ProgressBar1"
         Me.ProgressBar1.Size = New System.Drawing.Size(678, 23)
         Me.ProgressBar1.TabIndex = 35
-        Me.ProgressBar1.Visible = False
         '
         'Filechooser
         '
@@ -388,7 +384,7 @@ Partial Class Filechooser
         Me.Controls.Add(Me.xmlname)
         Me.Controls.Add(Me.ConvertButton)
         Me.Name = "Filechooser"
-        Me.Text = "Skin XML Converter 1.2 - by phil65"
+        Me.Text = "Skin XML Converter 1.2.1 - by phil65"
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

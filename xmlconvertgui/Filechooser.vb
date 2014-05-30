@@ -52,6 +52,9 @@ Public Class Filechooser
         ConversionDropDown.SelectedIndex = My.Settings.ConversionType
         HeaderOption.Checked = My.Settings.XMLHeader
         ConvertBorders.Checked = My.Settings.ConvertBorders
+        OutputFolderDialog = New FolderSelectDialog
+        SkinFolderDialog = New FolderSelectDialog
+        BuildFolderDialog = New FolderSelectDialog
         OutputLog.AppendText("Program started" & vbCrLf)
         OutputLog.AppendText("TexturePacker Path:" & TexturePackerPath & vbCrLf)
         OutputLog.AppendText("XML Folder Path:" & XMLFolder & vbCrLf)
@@ -102,6 +105,7 @@ Public Class Filechooser
                 myXmlSettings.IndentChars = (ControlChars.Tab)
                 OutputLog.AppendText("Indenting: Tab" & vbCrLf)
         End Select
+        InitializeProgressBar(Filepaths.Count)
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
@@ -126,7 +130,17 @@ Public Class Filechooser
                     Next
                 End If
                 CheckValues()
-                Dim wrtr As XmlWriter = XmlWriter.Create(strOutputFolder + "\" + SafeFilepaths(j).ToString, myXmlSettings)
+                Dim wrtr As XmlWriter
+                Dim tempOutputFolder As String = Filepaths(j).ToString.Substring(XMLFolder.Length + 1, Filepaths(j).ToString().Length - XMLFolder.Length - actualFile.Length - 1)
+                If (tempOutputFolder.Length > 1) Then
+                    tempOutputFolder = strOutputFolder + "\" + tempOutputFolder
+                    If (Not System.IO.Directory.Exists(tempOutputFolder)) Then
+                        System.IO.Directory.CreateDirectory(tempOutputFolder)
+                    End If
+                    wrtr = XmlWriter.Create(tempOutputFolder + SafeFilepaths(j).ToString, myXmlSettings)
+                Else
+                    wrtr = XmlWriter.Create(strOutputFolder + "\" + SafeFilepaths(j).ToString, myXmlSettings)
+                End If
                 doc.WriteTo(wrtr)
                 wrtr.WriteEndDocument()
                 wrtr.Close()
@@ -139,6 +153,7 @@ Public Class Filechooser
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
                 errorcounter = errorcounter + 1
             End Try
+            IncrementProgressBar()
         Next j
         OutputLog.AppendText("All Files converted" & vbCrLf)
         MsgBox(XMLCounter + " XML Files converted." & vbCrLf & "Errors: " + errorcounter.ToString)
@@ -213,12 +228,34 @@ Public Class Filechooser
             If FileObj.Name.Contains(".xml") Then
                 Filepaths.Add(FileObj.FullName)
                 SafeFilepaths.Add(FileObj.Name)
+                If IsBOM(FileObj.FullName) Then
+                    OutputLog.AppendText("Warning: BOM detected in: " & FileObj.Name & vbCrLf)
+                End If
             End If
         Next
         For Each SubdirInfo As DirectoryInfo In DirInfo.EnumerateDirectories
             SearchDirectory(SubdirInfo)
         Next SubdirInfo
     End Sub
+
+    Private Function IsBOM(ByVal path As String) As Boolean
+        Dim enc As System.Text.Encoding = Nothing
+        Dim file As System.IO.FileStream = New System.IO.FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)
+        If file.CanSeek Then
+            Dim bom As Byte() = New Byte(3) {} ' Get the byte-order mark, if there is one
+            file.Read(bom, 0, 4)
+            If (bom(0) = &HEF AndAlso bom(1) = &HBB AndAlso bom(2) = &HBF) OrElse (bom(0) = &HFF AndAlso bom(1) = &HFE) OrElse (bom(0) = &HFE AndAlso bom(1) = &HFF) OrElse (bom(0) = 0 AndAlso bom(1) = 0 AndAlso bom(2) = &HFE AndAlso bom(3) = &HFF) Then ' ucs-4
+                Return True
+            Else
+                Return False
+            End If
+
+            ' Now reposition the file cursor back to the start of the file
+            file.Seek(0, System.IO.SeekOrigin.Begin)
+        Else
+            Return False
+        End If
+    End Function
 
     Private Sub ClearLogButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ClearLogButton.Click
         OutputLog.Clear()
@@ -240,6 +277,7 @@ Public Class Filechooser
             OutputLog.AppendText(ex.Message)
         End Try
         OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the fonts of the upcoming list for usage." & vbCrLf)
+        InitializeProgressBar(Filepaths.Count)
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
@@ -250,6 +288,7 @@ Public Class Filechooser
             Catch ex As Exception                        ' Handle the generic Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
             End Try
+            IncrementProgressBar()
         Next j
         OutputLog.AppendText("Unused Fonts:" & vbCrLf)
         Dim str As String
