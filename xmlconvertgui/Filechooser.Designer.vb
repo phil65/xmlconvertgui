@@ -218,7 +218,7 @@ Partial Class Filechooser
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(154, 23)
         Me.Button2.TabIndex = 21
-        Me.Button2.Text = "Choose TexutePacker EXE"
+        Me.Button2.Text = "Choose TexurePacker EXE"
         Me.Button2.UseVisualStyleBackColor = True
         '
         'Button3
@@ -384,7 +384,7 @@ Partial Class Filechooser
         Me.Controls.Add(Me.xmlname)
         Me.Controls.Add(Me.ConvertButton)
         Me.Name = "Filechooser"
-        Me.Text = "Skin XML Converter 1.2.1 - by phil65"
+        Me.Text = "Skin XML Converter 1.2.2 - by phil65"
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

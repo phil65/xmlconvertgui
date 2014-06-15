@@ -3,10 +3,10 @@ C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Release\
 C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Release\Skin-XML-Converter.vbproj.GenerateResource.Cache
 C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Release\Skin-XML-Converter.vbprojResolveAssemblyReference.cache
 C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\bin\Release\FolderSelect.dll
-C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v1.2.1.exe.config
-C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v1.2.1.exe
-C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v1.2.1.pdb
-C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v1.2.1.xml
-C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v1.2.1.exe
-C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v1.2.1.xml
-C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v1.2.1.pdb
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v1.2.2.exe.config
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v1.2.2.exe
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v1.2.2.pdb
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\bin\Release\XBMC Skinning Tool v1.2.2.xml
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v1.2.2.exe
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v1.2.2.xml
+C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\xmlconvertgui\obj\x86\Release\XBMC Skinning Tool v1.2.2.pdb
