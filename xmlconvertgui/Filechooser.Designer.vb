@@ -101,12 +101,14 @@ Partial Class Filechooser
         '
         'OutputLog
         '
+        Me.OutputLog.Font = New System.Drawing.Font("Consolas", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.OutputLog.Location = New System.Drawing.Point(351, 22)
         Me.OutputLog.Multiline = True
         Me.OutputLog.Name = "OutputLog"
-        Me.OutputLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.OutputLog.ScrollBars = System.Windows.Forms.ScrollBars.Both
         Me.OutputLog.Size = New System.Drawing.Size(559, 556)
         Me.OutputLog.TabIndex = 7
+        Me.OutputLog.WordWrap = False
         '
         'ConversionDropDown
         '
@@ -384,7 +386,7 @@ Partial Class Filechooser
         Me.Controls.Add(Me.xmlname)
         Me.Controls.Add(Me.ConvertButton)
         Me.Name = "Filechooser"
-        Me.Text = "Skin XML Converter 1.2.2 - by phil65"
+        Me.Text = "Skin XML Converter 1.2.3 - by phil65"
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

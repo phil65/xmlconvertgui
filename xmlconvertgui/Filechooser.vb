@@ -9,6 +9,7 @@ Imports System.Security.Principal.WindowsIdentity
 Imports FolderSelect
 
 Public Class Filechooser
+
     Public strOutputFolder As String = ""
     Public TexturePackerPath As String = ""
     Public BuildFolder As String = ""
@@ -20,14 +21,17 @@ Public Class Filechooser
     Public xmlelementsBrackets As String() = {"visible", "enable", "usealttexture", "selected"}
     Public xmlattributes As String(,)
     Public doc As New XmlDocument()
+    Public xdoc As New XDocument
     Public multiplyFactor As Double = 1.5
-    Public ShortenedTexturePaths As New ArrayList()
     Public Filepaths As New ArrayList()
     Public SafeFilepaths As New ArrayList()
     Public elementlist As XmlNodeList
+    Public xelementlist As IEnumerable(Of XElement)
+    Public SearchString As String = ""
     Public XMLCounter As String
     Public RoundFactor As Integer
     Public actualFile As String
+    Public lineInfo As IXmlLineInfo
     Private Sub Filechooser_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         ConversionDropDown.Items.Add("720p --> 1080p")
         ConversionDropDown.Items.Add("1080p --> 720p")
@@ -189,11 +193,13 @@ Public Class Filechooser
         Else
             Try
                 If SkinFolder <> "" Then
-                    doc.Load(SkinFolder + "\addon.xml")
-                    elementlist = doc.SelectNodes("//res")
-                    If elementlist.Count > 0 Then
-                        If Not elementlist(0).Attributes("folder") Is Nothing Then
-                            XMLFolder = SkinFolder + "\" + elementlist(0).Attributes("folder").InnerText.ToString
+                    Dim reader = New FileStream(SkinFolder + "\addon.xml", FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                    xdoc = XDocument.Load(reader, LoadOptions.SetLineInfo)
+                    xelementlist = From element In xdoc.Descendants("res") Select element
+                    If xelementlist.Count > 0 Then
+                        If Not String.IsNullOrWhiteSpace(xelementlist(0).@folder) Then
+                            XMLFolder = SkinFolder + "\" + xelementlist(0).@folder
+                            lineInfo = CType(xelementlist(0), Xml.IXmlLineInfo)
                             OutputLog.AppendText("XML Folder:" & XMLFolder & vbCrLf)
                             Const ATTR_DIRECTORY = 16
                             If Dir$(XMLFolder, ATTR_DIRECTORY) <> "" Then
@@ -229,7 +235,7 @@ Public Class Filechooser
                 Filepaths.Add(FileObj.FullName)
                 SafeFilepaths.Add(FileObj.Name)
                 If IsBOM(FileObj.FullName) Then
-                    OutputLog.AppendText("Warning: BOM detected in: " & FileObj.Name & vbCrLf)
+                    OutputLog.AppendText("[Warning] BOM detected in: " & FileObj.Name & vbCrLf)
                 End If
             End If
         Next
@@ -240,7 +246,7 @@ Public Class Filechooser
 
     Private Function IsBOM(ByVal path As String) As Boolean
         Dim enc As System.Text.Encoding = Nothing
-        Dim file As System.IO.FileStream = New System.IO.FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)
+        Dim file As System.IO.FileStream = New System.IO.FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
         If file.CanSeek Then
             Dim bom As Byte() = New Byte(3) {} ' Get the byte-order mark, if there is one
             file.Read(bom, 0, 4)
@@ -255,6 +261,7 @@ Public Class Filechooser
         Else
             Return False
         End If
+        file.Close()
     End Function
 
     Private Sub ClearLogButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ClearLogButton.Click
@@ -263,26 +270,25 @@ Public Class Filechooser
     End Sub
 
     Private Sub CheckFontsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckFontsButton.Click
-        OutputLog.AppendText("Building Font List" & vbCrLf)
+        OutputLog.AppendText(vbCrLf & "+--------------+" & vbCrLf & "|  Font Check  |" & vbCrLf & "+--------------+" & vbCrLf)
         Dim ShortPath As String = ""
-        Dim FontList As New ArrayList()
-        Dim FontList2 As New ArrayList()
+        Dim xFontList As New List(Of FileLogText)
         Try
-            doc.Load(XMLFolder + "\font.xml")
-            AddNodesToArray(FontList, "name")
-            AddNodesToArray(FontList2, "filename")
+            Dim reader = New FileStream(XMLFolder + "\font.xml", FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+            xdoc = XDocument.Load(reader, LoadOptions.SetLineInfo)
+            AddNodesToList(xFontList, "name", "Font.xml")
         Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
             OutputLog.AppendText(xmlex.Message)
         Catch ex As Exception                        ' Handle the generic Exceptions here.
             OutputLog.AppendText(ex.Message)
         End Try
-        OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the fonts of the upcoming list for usage." & vbCrLf)
-        InitializeProgressBar(Filepaths.Count)
+        InitializeProgressBar(Filepaths.Count * 2)
         For j = 0 To Filepaths.Count - 1
             Try
-                doc.Load(Filepaths(j))
+                Dim reader = New FileStream(Filepaths(j), FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                xdoc = XDocument.Load(reader, LoadOptions.SetLineInfo)
                 actualFile = SafeFilepaths(j)
-                If Not Filepaths(j).ToString.ToLower.Contains("font.xml") Then RemoveNodesFromArray(FontList, "font")
+                If Not Filepaths(j).ToString.ToLower.Contains("font.xml") Then CheckNodesInList(xFontList, "font", actualFile)
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
@@ -290,32 +296,48 @@ Public Class Filechooser
             End Try
             IncrementProgressBar()
         Next j
-        OutputLog.AppendText("Unused Fonts:" & vbCrLf)
-        Dim str As String
-        For Each str In FontList
-            OutputLog.AppendText(str & vbCrLf)
+        For j = 0 To Filepaths.Count - 1
+            Try
+                Dim reader = New FileStream(Filepaths(j), FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                xdoc = XDocument.Load(reader, LoadOptions.SetLineInfo)
+                actualFile = SafeFilepaths(j)
+                If Not Filepaths(j).ToString.ToLower.Contains("font.xml") Then RemoveNodesFromList(xFontList, "font", actualFile)
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
+            End Try
+            IncrementProgressBar()
+        Next j
+        For Each element In xFontList
+            OutputLog.AppendText("Unused Font: " & element.StringText & " - [" & element.File & " : Line " & element.Line & "]" & vbCrLf)
         Next
+        OutputLog.AppendText("-- Font Check Complete --" & vbCrLf)
     End Sub
 
     Private Sub CheckIncludesButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckIncludesButton.Click
-        OutputLog.AppendText("Building Include List" & vbCrLf)
-        Dim IncludeList As New ArrayList()
-        Dim IncludeListBackup As New ArrayList()
-        Dim IncludeList2 As New ArrayList()
-        Dim ShortPath As String = ""
+        OutputLog.AppendText(vbCrLf & "+-----------------+" & vbCrLf & "|  Include Check  |" & vbCrLf & "+-----------------+" & vbCrLf)
+        Dim IncludeList As New List(Of FileLogText)
+        Dim IncludeListBackup As New List(Of FileLogText)
+        Dim IncludeList2 As New List(Of FileLogText)
         IncludeList2.Clear()
         IncludeListBackup.Clear()
         IncludeList.Clear()
         InitializeProgressBar(Filepaths.Count)
         For j = 0 To Filepaths.Count - 1
             Try
-                doc.Load(Filepaths(j))
+                Dim reader = New FileStream(Filepaths(j), FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                xdoc = XDocument.Load(reader, LoadOptions.SetLineInfo)
                 actualFile = SafeFilepaths(j)
-                AddAttributesToArray(IncludeList, "//include[(@name)]", {"name"})
-                elementlist = doc.SelectNodes("//include[not(@name)]")
-                For i = 0 To elementlist.Count - 1
-                    AddStringToArray(IncludeList2, elementlist(i).InnerXml)
-                    AddStringToArray(IncludeListBackup, elementlist(i).InnerXml)
+                AddAttributesToList(IncludeList, "include", {"name"}, actualFile)
+                xelementlist = From element In xdoc.Descendants("include") Where element.@name = "" And element.@file = "" Select element
+                For Each element In xelementlist
+                    Dim xcurrentLog = New FileLogText
+                    xcurrentLog.File = actualFile
+                    xcurrentLog.Line = CType(element, Xml.IXmlLineInfo).LineNumber
+                    xcurrentLog.StringText = element.Value
+                    AddStructToList(IncludeList2, xcurrentLog, True)
+                    AddStructToList(IncludeListBackup, xcurrentLog)
                 Next
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
@@ -324,18 +346,19 @@ Public Class Filechooser
             End Try
             IncrementProgressBar()
         Next
-        OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the upcoming List of Includes." & vbCrLf)
-        Dim Include As String
         For Each Include In IncludeList
-            RemoveStringFromArray(IncludeList2, Include)
+            RemoveStringFromList(IncludeList2, Include.StringText)
         Next
         For Each Include In IncludeListBackup
-            RemoveStringFromArray(IncludeList, Include)
+            RemoveStringFromList(IncludeList, Include.StringText)
         Next
-        OutputLog.AppendText(vbCrLf & "Unused Includes:" & vbCrLf)
-        PrintArray(IncludeList)
-        OutputLog.AppendText(vbCrLf & "Undefined Includes:" & vbCrLf)
-        PrintArray(IncludeList2)
+        For Each element In IncludeList
+            OutputLog.AppendText("Unused Include: " & element.StringText & " - [" & element.File & " : Line " & element.Line & "]" & vbCrLf)
+        Next
+        For Each element In IncludeList2
+            OutputLog.AppendText("Undefined Include: " & element.StringText & " - [" & element.File & " : Line " & element.Line & "]  " & vbCrLf)
+        Next  
+        OutputLog.AppendText("-- Include Check Complete --" & vbCrLf)
     End Sub
 
     Private Sub StartSkinBuildButton(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button4.Click
@@ -371,7 +394,8 @@ Public Class Filechooser
         InitializeProgressBar(Filepaths.Count)
         For j = 0 To Filepaths.Count - 1
             Try
-                doc.Load(Filepaths(j))
+                Dim reader = New FileStream(Filepaths(j), FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                xdoc = XDocument.Load(reader, LoadOptions.SetLineInfo)
                 actualFile = SafeFilepaths(j)
                 For k = 0 To xmlelementsBrackets.Length - 1
                     elementlist = doc.GetElementsByTagName(xmlelementsBrackets(k))
@@ -399,15 +423,34 @@ Public Class Filechooser
     End Sub
 
     Private Sub TextureCheckButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TextureCheckButton.Click
-        OutputLog.AppendText("Building Texture List" & vbCrLf)
-        TextureFinder(SkinFolder + "\media")
-        OutputLog.AppendText("Scanning XMLs. This may take a while..." & vbCrLf & "Please check the textures of the upcoming list for usage." & vbCrLf)
-        InitializeProgressBar(Filepaths.Count)
+        OutputLog.AppendText(vbCrLf & "+-----------------+" & vbCrLf & "|  Texture Check  |" & vbCrLf & "+-----------------+" & vbCrLf)
+        Dim AllShortenedTexturePaths As New ArrayList()
+        TextureFinder(SkinFolder + "\media", AllShortenedTexturePaths, True, False)
+        InitializeProgressBar(Filepaths.Count * 2)
         For j = 0 To Filepaths.Count - 1
             Try
-                doc.Load(Filepaths(j))
+                Dim reader = New FileStream(Filepaths(j), FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                xdoc = XDocument.Load(reader, LoadOptions.SetLineInfo)
                 actualFile = SafeFilepaths(j)
-                RemoveAttributesFromArray(ShortenedTexturePaths, "//texture", {"diffuse", "fallback"}, True)
+                CheckTextureAttributesInArray(AllShortenedTexturePaths, "texture", {"diffuse", "fallback"}, actualFile, True)
+                For k = 0 To xmlelementsTexture.Length - 1
+                    CheckTextureNodesInArray(AllShortenedTexturePaths, xmlelementsTexture(k), actualFile, True)
+                Next k
+            Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
+            Catch ex As Exception                        ' Handle the generic Exceptions here.
+                OutputLog.AppendText(SafeFilepaths(j) + ": " + ex.Message & vbCrLf)
+            End Try
+            IncrementProgressBar()
+        Next j
+        Dim ShortenedTexturePaths As New ArrayList()
+        TextureFinder(SkinFolder + "\media", ShortenedTexturePaths)
+        For j = 0 To Filepaths.Count - 1
+            Try
+                Dim reader = New FileStream(Filepaths(j), FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                xdoc = XDocument.Load(reader, LoadOptions.SetLineInfo)
+                actualFile = SafeFilepaths(j)
+                RemoveAttributesFromArray(ShortenedTexturePaths, "texture", {"diffuse", "fallback"}, True)
                 For k = 0 To xmlelementsTexture.Length - 1
                     RemoveNodesFromArray(ShortenedTexturePaths, xmlelementsTexture(k), True)
                 Next k
@@ -418,8 +461,9 @@ Public Class Filechooser
             End Try
             IncrementProgressBar()
         Next j
-        OutputLog.AppendText("Unused Textures:" & vbCrLf)
+        OutputLog.AppendText("-- Unused Textures --" & vbCrLf)
         PrintArray(ShortenedTexturePaths)
+        OutputLog.AppendText("-- Texture Check Complete --" & vbCrLf)
     End Sub
 
     Sub changeElements(ByVal tag As String)
@@ -533,11 +577,12 @@ Public Class Filechooser
     End Sub
 
     Sub CheckValues()
-        CheckChildren("//control[@type='button']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "colordiffuse", "texturefocus", "include", "animation", "texturenofocus", "label", "label2", "font", "textcolor", "disabledcolor", "selectedcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "textwidth", "focusedcolor", "angle", "hitrect", "enable"})
+        CheckChildren("//control[@type='button']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "colordiffuse", "texturefocus", "include", "animation", "texturenofocus", "label", "label2", "font", "textcolor", "disabledcolor", "selectedcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "textwidth", "focusedcolor", "invalidcolor", "angle", "hitrect", "enable"})
         CheckChildren("//control[@type='radiobutton']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "colordiffuse", "texturefocus", "include", "animation", "texturenofocus", "label", "selected", "font", "textcolor", "disabledcolor", "selectedcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "textwidth", "focusedcolor", "angle", "hitrect", "enable", "textureradioonfocus", "textureradioofffocus", "textureradioonnofocus", "textureradiooffnofocus", "radioposx", "radioposy", "radiowidth", "radioheight"})
         CheckChildren("//control[@type='togglebutton']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "colordiffuse", "texturefocus", "alttexturefocus", "alttexturenofocus", "altclick", "include", "animation", "texturenofocus", "label", "altlabel", "usealttexture", "font", "textcolor", "disabledcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "ondown", "ondown", "ondown", "textwidth", "focusedcolor", "subtype", "hitrect", "enable"})
         CheckChildren("//control[@type='label']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "align", "aligny", "include", "animation", "scroll", "scrollout", "info", "number", "angle", "haspath", "label", "textcolor", "selectedcolor", "font", "shadowcolor", "disabledcolor", "pauseatend", "wrapmultiline", "scrollspeed", "scrollsuffix", "textoffsetx", "textoffsety"})
         CheckChildren("//control[@type='textbox']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "align", "aligny", "include", "animation", "autoscroll", "label", "info", "font", "textcolor", "selectedcolor", "shadowcolor", "pagecontrol"})
+        CheckChildren("//control[@type='edit']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "colordiffuse", "align", "aligny", "include", "animation", "camera", "label", "hinttext", "font", "textoffsetx", "textoffsety", "pulseonselect", "textcolor", "disabledcolor", "invalidcolor", "focusedcolor", "shadowcolor", "texturefocus", "texturenofocus", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "textwidth", "hitrect", "enable"})
         CheckChildren("//control[@type='image']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "align", "aligny", "include", "animation", "aspectratio", "fadetime", "colordiffuse", "texture", "bordertexture", "bordersize", "info"})
         CheckChildren("//control[@type='multiimage']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "align", "aligny", "include", "animation", "aspectratio", "fadetime", "colordiffuse", "imagepath", "timeperimage", "loop", "info", "randomize", "pauseatend"})
         CheckChildren("//control[@type='scrollbar']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "texturesliderbackground", "texturesliderbar", "include", "animation", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "pulseonselect", "orientation", "showonepage", "pagecontrol", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback"})
@@ -727,16 +772,18 @@ Public Class Filechooser
         End If
     End Sub
 
-    Sub TextureFinder(ByVal dir As String, Optional ByVal Lowercase As Boolean = True)
+    Sub TextureFinder(ByVal dir As String, ByRef ShortenedTexturePaths As ArrayList, Optional ByVal Lowercase As Boolean = True, Optional ByVal EnableBlacklist As Boolean = True)
         Try
             For Each fname As String In Directory.GetFiles(dir)
                 Dim number As Integer = 0
                 Dim ShortPath As String = fname.Substring(SkinFolder.Length + 7, fname.Length - (SkinFolder.Length + 7))
                 Dim blacklist As String() = {"flags\", "cerberus", "default", "stars", "rating", "\480p.png", "\540p.png", "\720p.png", "\576p.png", "\1080p.png", "overlay", ".xbt"}
                 Dim blacklisted As Boolean = False
-                For Each Item In blacklist
-                    If ShortPath.Contains(Item) Then blacklisted = True
-                Next
+                If EnableBlacklist Then
+                    For Each Item In blacklist
+                        If ShortPath.Contains(Item) Then blacklisted = True
+                    Next
+                End If
                 If blacklisted = False Then
                     ShortPath = ShortPath.Replace("\", "/")
                     If Lowercase = True Then
@@ -746,7 +793,7 @@ Public Class Filechooser
                 End If
             Next
             For Each subdir As String In Directory.GetDirectories(dir)
-                TextureFinder(subdir)
+                TextureFinder(subdir, ShortenedTexturePaths, Lowercase, EnableBlacklist)
             Next
         Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
             OutputLog.AppendText(xmlex.Message)
@@ -763,22 +810,34 @@ Public Class Filechooser
     End Sub
 
     Sub RemoveAttributesFromArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, ByVal Attributes As String(), Optional ByVal Lowercase As Boolean = False)
-        elementlist = doc.SelectNodes(NodeSelection)
-        For i = 0 To elementlist.Count - 1
-            For Each Attribute In Attributes
-                If Not Attribute Is Nothing Then
-                    If Not elementlist(i).Attributes(Attribute) Is Nothing Then
-                        RemoveStringFromArray(EditArray, elementlist(i).Attributes(Attribute).InnerText.ToString, Lowercase)
-                    End If
-                End If
-            Next Attribute
+        Dim xattributelist As IEnumerable(Of XAttribute)
+        For Each Attribute In Attributes
+            Dim at As String = Attribute
+            xattributelist = From element In xdoc.Root.Descendants(NodeSelection) Select element.Attribute(at)
+            For Each element In xattributelist
+                If element IsNot Nothing Then RemoveStringFromArray(EditArray, element.Value, Lowercase)
+            Next
         Next
     End Sub
 
     Sub RemoveNodesFromArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, Optional ByVal Lowercase As Boolean = False)
-        elementlist = doc.GetElementsByTagName(NodeSelection)
-        For i = 0 To elementlist.Count - 1
-            If Not elementlist(i).InnerXml Is Nothing Then RemoveStringFromArray(EditArray, elementlist(i).InnerXml, Lowercase)
+        xelementlist = From element In xdoc.Root.Descendants Where element.Name = NodeSelection Select element
+        For Each element In xelementlist
+            If Not String.IsNullOrWhiteSpace(element.Value) Then RemoveStringFromArray(EditArray, element.Value, Lowercase)
+        Next
+    End Sub
+
+    Sub RemoveNodesFromList(ByRef EditList As List(Of FileLogText), ByVal NodeSelection As String, ByVal FileName As String, Optional ByVal Lowercase As Boolean = False)
+        xelementlist = From element In xdoc.Root.Descendants Where element.Name = NodeSelection Select element
+        For Each element In xelementlist
+            If Not String.IsNullOrWhiteSpace(element.Value) Then
+                Dim xcurrentLog = New FileLogText
+                xcurrentLog.File = FileName
+                xcurrentLog.Line = CType(element, Xml.IXmlLineInfo).LineNumber
+                xcurrentLog.StringText = element.Value
+                If Lowercase = True Then xcurrentLog.StringText = xcurrentLog.StringText.ToLower
+                RemoveStringFromList(EditList, xcurrentLog.StringText)
+            End If
         Next
     End Sub
 
@@ -787,10 +846,50 @@ Public Class Filechooser
         If EditArray.Contains(StringToRemove) Then EditArray.Remove(StringToRemove)
     End Sub
 
+    Sub RemoveStringFromList(ByRef EditList As List(Of FileLogText), ByVal StringToRemove As String)
+        SearchString = StringToRemove
+        Dim results As List(Of FileLogText) = EditList.FindAll(AddressOf FindStringText)
+        For Each result In results
+            If result IsNot Nothing Then EditList.Remove(result)
+        Next
+    End Sub
+
     Sub AddNodesToArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, Optional ByVal Lowercase As Boolean = False)
         elementlist = doc.GetElementsByTagName(NodeSelection)
         For i = 0 To elementlist.Count - 1
             If Not elementlist(i).InnerXml Is Nothing Then AddStringToArray(EditArray, elementlist(i).InnerXml, Lowercase)
+        Next
+    End Sub
+
+    Sub AddNodesToList(ByRef EditList As List(Of FileLogText), ByVal NodeSelection As String, ByVal FileName As String, Optional ByVal Lowercase As Boolean = False)
+        xelementlist = From element In xdoc.Root.Descendants Where element.Name = NodeSelection Select element
+        For Each element In xelementlist
+            If Not String.IsNullOrWhiteSpace(element.Value) Then
+                Dim xcurrentLog = New FileLogText
+                xcurrentLog.File = FileName
+                xcurrentLog.Line = CType(element, Xml.IXmlLineInfo).LineNumber
+                xcurrentLog.StringText = element.Value
+                If Lowercase = True Then xcurrentLog.StringText = xcurrentLog.StringText.ToLower
+                AddStructToList(EditList, xcurrentLog)
+            End If
+        Next
+    End Sub
+
+    Sub AddAttributesToList(ByRef EditList As List(Of FileLogText), ByVal NodeSelection As String, ByVal Attributes As String(), ByVal FileName As String, Optional ByVal Lowercase As Boolean = False)
+        Dim xattributelist As IEnumerable(Of XAttribute)
+        For Each Attribute In Attributes
+            Dim at As String = Attribute
+            xattributelist = From element In xdoc.Root.Descendants(NodeSelection) Select element.Attribute(at)
+            For Each element In xattributelist
+                If element IsNot Nothing Then
+                    Dim xcurrentLog = New FileLogText
+                    xcurrentLog.File = FileName
+                    xcurrentLog.Line = CType(element, Xml.IXmlLineInfo).LineNumber
+                    xcurrentLog.StringText = element.Value
+                    If Lowercase = True Then xcurrentLog.StringText = xcurrentLog.StringText.ToLower
+                    AddStructToList(EditList, xcurrentLog)
+                End If
+            Next
         Next
     End Sub
 
@@ -816,6 +915,12 @@ Public Class Filechooser
         If Not EditArray.Contains(StringToAdd) Then EditArray.Add(StringToAdd)
     End Sub
 
+    Sub AddStructToList(ByRef EditList As List(Of FileLogText), ByVal StructToAdd As FileLogText, Optional ByVal AddIfFound As Boolean = False)
+        SearchString = StructToAdd.StringText
+        Dim result As Integer = EditList.FindIndex(AddressOf FindStringText)
+        If result < 0 Or AddIfFound Then EditList.Add(StructToAdd)
+    End Sub
+
     Private Function CheckPath(ByVal strPath As String) As Boolean
         If Dir$(strPath) <> "" Then CheckPath = True Else CheckPath = False
     End Function
@@ -838,6 +943,48 @@ Public Class Filechooser
                     elementlist(i).ParentNode.InsertBefore(elementlist(i), elementlist(i).ParentNode.LastChild)
                 End If
             End If
+        Next
+    End Sub
+    Private Sub CheckNodesInList(ByVal CheckList As List(Of FileLogText), ByVal NodeSelection As String, ByVal FileName As String, Optional ByVal Lowercase As Boolean = False)
+        xelementlist = From element In xdoc.Root.Descendants Where element.Name = NodeSelection Select element
+        For Each element In xelementlist
+            If Not String.IsNullOrWhiteSpace(element.Value) Then
+                Dim xcurrentLog = New FileLogText
+                xcurrentLog.File = FileName
+                xcurrentLog.Line = CType(element, Xml.IXmlLineInfo).LineNumber
+                xcurrentLog.StringText = element.Value
+                SearchString = element.Value
+                If Lowercase = True Then xcurrentLog.StringText = xcurrentLog.StringText.ToLower
+                If CheckList.Find(AddressOf FindStringText) Is Nothing And element.Value <> "-" Then OutputLog.AppendText("Not Defined: " & xcurrentLog.StringText & " - [" & xcurrentLog.File & " : Line " & xcurrentLog.Line & "]" & vbCrLf)
+            End If
+        Next
+    End Sub
+    Private Sub CheckTextureNodesInArray(ByVal CheckArray As ArrayList, ByVal NodeSelection As String, ByVal FileName As String, Optional ByVal Lowercase As Boolean = False)
+        xelementlist = From element In xdoc.Root.Descendants Where element.Name = NodeSelection Select element
+        For Each element In xelementlist
+            If Not String.IsNullOrWhiteSpace(element.Value) Then
+                Dim StringToCheck As String = element.Value
+                If Lowercase = True Then StringToCheck = StringToCheck.ToLower
+                If Not CheckArray.Contains(StringToCheck) And StringToCheck <> "-" And element.Parent.Name <> "variable" And Not StringToCheck.Contains("$info") And Not StringToCheck.Contains("$var") And Not StringToCheck.Contains("special:") And Not StringToCheck.Contains("$localize") Then
+                    OutputLog.AppendText("Not Found: " & StringToCheck & " - [" & FileName & " : Line " & CType(element, Xml.IXmlLineInfo).LineNumber & "]" & vbCrLf)
+                End If
+            End If
+        Next
+    End Sub
+    Private Sub CheckTextureAttributesInArray(ByVal CheckArray As ArrayList, ByVal NodeSelection As String, ByVal Attributes As String(), ByVal FileName As String, Optional ByVal Lowercase As Boolean = False)
+        Dim xattributelist As IEnumerable(Of XAttribute)
+        For Each Attribute In Attributes
+            Dim at As String = Attribute
+            xattributelist = From element In xdoc.Root.Descendants(NodeSelection) Select element.Attribute(at)
+            For Each element In xattributelist
+                If element IsNot Nothing Then
+                    Dim StringToCheck As String = element.Value
+                    If Lowercase = True Then StringToCheck = StringToCheck.ToLower
+                    If Not CheckArray.Contains(StringToCheck) And StringToCheck <> "-" And element.Parent.Name <> "variable" And Not StringToCheck.Contains("$info") And Not StringToCheck.Contains("$var") And Not StringToCheck.Contains("special:") And Not StringToCheck.Contains("$localize") Then
+                        OutputLog.AppendText("Not Found: {" & at & "} " & StringToCheck & " - [" & FileName & " : Line " & CType(element, Xml.IXmlLineInfo).LineNumber & "]" & vbCrLf)
+                    End If
+                End If
+            Next
         Next
     End Sub
     Private Sub CheckNodeValue(ByVal XMLTag As String, ByVal ValidValues As String())
@@ -943,31 +1090,35 @@ Public Class Filechooser
     End Sub
 
     Private Sub CheckVarsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckVarsButton.Click
-        Dim VarsListRefs As New ArrayList()
-        Dim VarsListDefines As New ArrayList()
-        Dim VarsListDefinesBackup As New ArrayList()
+        OutputLog.AppendText(vbCrLf & "+------------------+" & vbCrLf & "|  Variable Check  |" & vbCrLf & "+------------------+" & vbCrLf)
+        Dim VarsListRefs As New List(Of FileLogText)
+        Dim VarsListDefines As New List(Of FileLogText)
+        Dim VarsListDefinesBackup As New List(Of FileLogText)
         Dim r As Regex = New Regex("(?<=\$VAR\[)[_.0-9A-Za-z-]+", RegexOptions.IgnoreCase)
         VarsListRefs.Clear()
         VarsListDefines.Clear()
         VarsListDefinesBackup.Clear()
-        OutputLog.AppendText("Checking the Vars..." & vbCrLf)
         InitializeProgressBar(Filepaths.Count)
         For j = 0 To Filepaths.Count - 1
             Try
-                doc.Load(Filepaths(j))
+                Dim reader = New FileStream(Filepaths(j), FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                xdoc = XDocument.Load(reader, LoadOptions.SetLineInfo)
                 actualFile = SafeFilepaths(j)
-                elementlist = doc.SelectNodes("//*")
-                For i = 0 To elementlist.Count - 1
-                    If Not elementlist(i).InnerXml Is Nothing Then
-                        Dim m As Match = r.Match(elementlist(i).InnerXml.ToString)
-                        While (m.Success)
-                            AddStringToArray(VarsListRefs, m.Value.ToString())
-                            m = m.NextMatch()
-                        End While
-                    End If
-                Next i
-                AddAttributesToArray(VarsListDefines, "//variable", {"name"})
-                AddAttributesToArray(VarsListDefinesBackup, "//variable", {"name"})
+                xelementlist = From element In xdoc.Root.Descendants Where element.HasElements = False Select element
+                For Each element In xelementlist
+                    Dim m As Match = r.Match(element.Value)
+                    While (m.Success)
+                        Dim xcurrentLog = New FileLogText
+                        xcurrentLog.File = actualFile
+                        xcurrentLog.Line = CType(element, Xml.IXmlLineInfo).LineNumber
+                        xcurrentLog.StringText = m.Value.ToString()
+                        AddStructToList(VarsListRefs, xcurrentLog, True)
+                        'OutputLog.AppendText("test1: " & m.Value.ToString() & " [" & xcurrentLog.File & " : " & xcurrentLog.Line & "]" & vbCrLf)
+                        m = m.NextMatch()
+                    End While
+                Next
+                AddAttributesToList(VarsListDefines, "variable", {"name"}, actualFile)
+                AddAttributesToList(VarsListDefinesBackup, "variable", {"name"}, actualFile)
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
@@ -975,16 +1126,19 @@ Public Class Filechooser
             End Try
             IncrementProgressBar()
         Next
-        For i = 0 To VarsListRefs.Count - 1
-            RemoveStringFromArray(VarsListDefines, VarsListRefs(i))
+        For Each VarListRef In VarsListRefs
+            RemoveStringFromList(VarsListDefines, VarListRef.StringText)
         Next
-        For i = 0 To VarsListDefinesBackup.Count - 1
-            RemoveStringFromArray(VarsListRefs, VarsListDefinesBackup(i))
+        For Each VarListRef In VarsListDefinesBackup
+            RemoveStringFromList(VarsListRefs, VarListRef.StringText)
         Next
-        OutputLog.AppendText("Undefined Vars:" & vbCrLf)
-        PrintArray(VarsListRefs)
-        OutputLog.AppendText("Unused Vars:" & vbCrLf)
-        PrintArray(VarsListDefines)
+        For Each element In VarsListDefines
+            OutputLog.AppendText("Unused Variable: " & element.StringText & " - [" & element.File & " : Line " & element.Line & "]" & vbCrLf)
+        Next
+        For Each element In VarsListRefs
+            OutputLog.AppendText("Undefined Variable: " & element.StringText & " - [" & element.File & " : Line " & element.Line & "]  " & vbCrLf)
+        Next
+        OutputLog.AppendText("-- Variable Check Complete --" & vbCrLf)
     End Sub
 
     Private Sub CheckLabelsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckLabelsButton.Click
@@ -1053,6 +1207,19 @@ Public Class Filechooser
         PrintArray(LabelsListDefines)
     End Sub
 
+    Private Function FindStringText(ByVal text As FileLogText) As Boolean
+        If text.StringText.Equals(SearchString) Then
+            Return True
+        Else
+            Return False
+        End If
+        SearchString = ""
+    End Function
+
 End Class
 
-
+Public Class FileLogText
+    Public File As String
+    Public Line As String
+    Public StringText As String
+End Class
