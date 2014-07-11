@@ -133,18 +133,15 @@ Public Class Filechooser
                         ScaleXMLNode(elementlist(i), "delay", AnimationMultiplier.Text)
                     Next
                 End If
-                CheckValues()
+                CheckValues(actualFile)
                 Dim wrtr As XmlWriter
-                Dim tempOutputFolder As String = Filepaths(j).ToString.Substring(XMLFolder.Length + 1, Filepaths(j).ToString().Length - XMLFolder.Length - actualFile.Length - 1)
-                If (tempOutputFolder.Length > 1) Then
-                    tempOutputFolder = strOutputFolder + "\" + tempOutputFolder
+                If (actualFile.LastIndexOf("\") > 0) Then
+                    Dim tempOutputFolder As String = strOutputFolder + "\" + actualFile.Substring(0, actualFile.LastIndexOf("\"))
                     If (Not System.IO.Directory.Exists(tempOutputFolder)) Then
                         System.IO.Directory.CreateDirectory(tempOutputFolder)
                     End If
-                    wrtr = XmlWriter.Create(tempOutputFolder + SafeFilepaths(j).ToString, myXmlSettings)
-                Else
-                    wrtr = XmlWriter.Create(strOutputFolder + "\" + SafeFilepaths(j).ToString, myXmlSettings)
                 End If
+                wrtr = XmlWriter.Create(strOutputFolder + "\" + SafeFilepaths(j).ToString, myXmlSettings)
                 doc.WriteTo(wrtr)
                 wrtr.WriteEndDocument()
                 wrtr.Close()
@@ -228,19 +225,19 @@ Public Class Filechooser
         End If
     End Sub
 
-    Private Sub SearchDirectory(ByVal DirInfo As DirectoryInfo)
+    Private Sub SearchDirectory(ByVal DirInfo As DirectoryInfo, Optional ByVal Folder As String = "")
         Dim FileObj As IO.FileSystemInfo
         For Each FileObj In DirInfo.GetFileSystemInfos
             If FileObj.Name.Contains(".xml") Then
                 Filepaths.Add(FileObj.FullName)
-                SafeFilepaths.Add(FileObj.Name)
+                SafeFilepaths.Add(Folder & FileObj.Name)
                 If IsBOM(FileObj.FullName) Then
-                    OutputLog.AppendText("[Warning] BOM detected in: " & FileObj.Name & vbCrLf)
+                    OutputLog.AppendText("[Warning] BOM detected in: " & Folder & FileObj.Name & vbCrLf)
                 End If
             End If
         Next
         For Each SubdirInfo As DirectoryInfo In DirInfo.EnumerateDirectories
-            SearchDirectory(SubdirInfo)
+            SearchDirectory(SubdirInfo, Folder & SubdirInfo.Name & "\")
         Next SubdirInfo
     End Sub
 
@@ -550,8 +547,10 @@ Public Class Filechooser
         For j = 0 To Filepaths.Count - 1
             Try
                 doc.Load(Filepaths(j))
+                Dim reader = New FileStream(Filepaths(j), FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                xdoc = XDocument.Load(reader, LoadOptions.SetLineInfo)
                 actualFile = SafeFilepaths(j)
-                CheckValues()
+                CheckValues(actualFile)
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
@@ -576,17 +575,17 @@ Public Class Filechooser
         ProgressBar1.Maximum = ProgressBar1.Maximum - 1
     End Sub
 
-    Sub CheckValues()
-        CheckChildren("//control[@type='button']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "colordiffuse", "texturefocus", "include", "animation", "texturenofocus", "label", "label2", "font", "textcolor", "disabledcolor", "selectedcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "textwidth", "focusedcolor", "invalidcolor", "angle", "hitrect", "enable"})
-        CheckChildren("//control[@type='radiobutton']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "colordiffuse", "texturefocus", "include", "animation", "texturenofocus", "label", "selected", "font", "textcolor", "disabledcolor", "selectedcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "textwidth", "focusedcolor", "angle", "hitrect", "enable", "textureradioonfocus", "textureradioofffocus", "textureradioonnofocus", "textureradiooffnofocus", "radioposx", "radioposy", "radiowidth", "radioheight"})
-        CheckChildren("//control[@type='togglebutton']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "colordiffuse", "texturefocus", "alttexturefocus", "alttexturenofocus", "altclick", "include", "animation", "texturenofocus", "label", "altlabel", "usealttexture", "font", "textcolor", "disabledcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "ondown", "ondown", "ondown", "textwidth", "focusedcolor", "subtype", "hitrect", "enable"})
-        CheckChildren("//control[@type='label']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "align", "aligny", "include", "animation", "scroll", "scrollout", "info", "number", "angle", "haspath", "label", "textcolor", "selectedcolor", "font", "shadowcolor", "disabledcolor", "pauseatend", "wrapmultiline", "scrollspeed", "scrollsuffix", "textoffsetx", "textoffsety"})
-        CheckChildren("//control[@type='textbox']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "align", "aligny", "include", "animation", "autoscroll", "label", "info", "font", "textcolor", "selectedcolor", "shadowcolor", "pagecontrol"})
-        CheckChildren("//control[@type='edit']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "colordiffuse", "align", "aligny", "include", "animation", "camera", "label", "hinttext", "font", "textoffsetx", "textoffsety", "pulseonselect", "textcolor", "disabledcolor", "invalidcolor", "focusedcolor", "shadowcolor", "texturefocus", "texturenofocus", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "textwidth", "hitrect", "enable"})
-        CheckChildren("//control[@type='image']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "align", "aligny", "include", "animation", "aspectratio", "fadetime", "colordiffuse", "texture", "bordertexture", "bordersize", "info"})
-        CheckChildren("//control[@type='multiimage']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "align", "aligny", "include", "animation", "aspectratio", "fadetime", "colordiffuse", "imagepath", "timeperimage", "loop", "info", "randomize", "pauseatend"})
-        CheckChildren("//control[@type='scrollbar']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "texturesliderbackground", "texturesliderbar", "include", "animation", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "pulseonselect", "orientation", "showonepage", "pagecontrol", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback"})
-        CheckChildren("//control[@type='progress']/*", {"description", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "texturebg", "lefttexture", "include", "animation", "colordiffuse", "righttexture", "overlaytexture", "midtexture", "info", "reveal"})
+    Sub CheckValues(ByVal FileName As String)
+        CheckChildren("//control[@type='button']/*", {"description", "camera", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "colordiffuse", "texturefocus", "include", "animation", "texturenofocus", "label", "label2", "font", "textcolor", "disabledcolor", "selectedcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "textwidth", "focusedcolor", "invalidcolor", "angle", "hitrect", "enable"})
+        CheckChildren("//control[@type='radiobutton']/*", {"description", "camera", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "colordiffuse", "texturefocus", "include", "animation", "texturenofocus", "label", "selected", "font", "textcolor", "disabledcolor", "selectedcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "textwidth", "focusedcolor", "angle", "hitrect", "enable", "textureradioonfocus", "textureradioofffocus", "textureradioonnofocus", "textureradiooffnofocus", "radioposx", "radioposy", "radiowidth", "radioheight"})
+        CheckChildren("//control[@type='togglebutton']/*", {"description", "camera", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "colordiffuse", "texturefocus", "alttexturefocus", "alttexturenofocus", "altclick", "include", "animation", "texturenofocus", "label", "altlabel", "usealttexture", "font", "textcolor", "disabledcolor", "shadowcolor", "align", "aligny", "textoffsetx", "textoffsety", "pulseonselect", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "textwidth", "focusedcolor", "subtype", "hitrect", "enable"})
+        CheckChildren("//control[@type='label']/*", {"description", "camera", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "align", "aligny", "include", "animation", "scroll", "scrollout", "info", "number", "angle", "haspath", "label", "textcolor", "selectedcolor", "font", "shadowcolor", "disabledcolor", "pauseatend", "wrapmultiline", "scrollspeed", "scrollsuffix", "textoffsetx", "textoffsety"})
+        CheckChildren("//control[@type='textbox']/*", {"description", "camera", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "align", "aligny", "include", "animation", "autoscroll", "label", "info", "font", "textcolor", "selectedcolor", "shadowcolor", "pagecontrol"})
+        CheckChildren("//control[@type='edit']/*", {"description", "camera", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "colordiffuse", "align", "aligny", "include", "animation", "label", "hinttext", "font", "textoffsetx", "textoffsety", "pulseonselect", "textcolor", "disabledcolor", "invalidcolor", "focusedcolor", "shadowcolor", "texturefocus", "texturenofocus", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback", "textwidth", "hitrect", "enable"})
+        CheckChildren("//control[@type='image']/*", {"description", "camera", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "align", "aligny", "include", "animation", "aspectratio", "fadetime", "colordiffuse", "texture", "bordertexture", "bordersize", "info"})
+        CheckChildren("//control[@type='multiimage']/*", {"description", "camera", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "align", "aligny", "include", "animation", "aspectratio", "fadetime", "colordiffuse", "imagepath", "timeperimage", "loop", "info", "randomize", "pauseatend"})
+        CheckChildren("//control[@type='scrollbar']/*", {"description", "camera", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "texturesliderbackground", "texturesliderbar", "include", "animation", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "pulseonselect", "orientation", "showonepage", "pagecontrol", "onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback"})
+        CheckChildren("//control[@type='progress']/*", {"description", "camera", "posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "visible", "texturebg", "lefttexture", "include", "animation", "colordiffuse", "righttexture", "overlaytexture", "midtexture", "info", "reveal"})
         CheckChildren("//content/*", {"item", "include"})
         '     MoveNodeToBottom("animation")
         '    MoveNodeToBottom("visible")
@@ -677,8 +676,10 @@ Public Class Filechooser
         CheckAttributes("control", {"id", "type"})
         CheckAttributes("animation", {"start", "end", "effect", "tween", "easing", "time", "condition", "reversible", "type", "center", "delay", "pulse", "loop", "acceleration"})
         CheckAttributes("effect", {"start", "end", "tween", "easing", "time", "condition", "type", "center", "delay", "pulse", "loop", "acceleration"})
+
+        CheckMissingNoOp({"onclick", "onfocus", "onunfocus", "onup", "onleft", "onright", "ondown", "onback"}, FileName)
         CheckDoubleValues()
-        Dim Actions As String() = {"Help", "Reboot", "Restart", "ShutDown", "Powerdown", "Quit", "Hibernate", "Suspend", "InhibitIdleShutdown", "AllowIdleShutdown", "RestartApp", "Minimize"}
+        'Dim Actions As String() = {"Help", "Reboot", "Restart", "ShutDown", "Powerdown", "Quit", "Hibernate", "Suspend", "InhibitIdleShutdown", "AllowIdleShutdown", "RestartApp", "Minimize"}
     End Sub
 
     Sub ScaleXMLNode(ByRef Element As XmlNode, ByVal tag As String, ByVal ScaleFactor As String)
@@ -987,6 +988,14 @@ Public Class Filechooser
             Next
         Next
     End Sub
+    Sub CheckMissingNoOp(ByVal NodeList As String(), ByVal FileName As String)
+        For Each Node In NodeList
+            xelementlist = From element In xdoc.Root.Descendants(Node) Where element.Value = "-" Select element
+            For Each element In xelementlist
+                OutputLog.AppendText("Invalid value ""-"" in <" & element.Name.ToString & ">, use ""noop"" instead - [" & FileName & " : Line " & CType(element, Xml.IXmlLineInfo).LineNumber & "]" & vbCrLf)
+            Next
+        Next
+    End Sub
     Private Sub CheckNodeValue(ByVal XMLTag As String, ByVal ValidValues As String())
         elementlist = doc.GetElementsByTagName(XMLTag)
         For i = 0 To elementlist.Count - 1
@@ -1094,7 +1103,8 @@ Public Class Filechooser
         Dim VarsListRefs As New List(Of FileLogText)
         Dim VarsListDefines As New List(Of FileLogText)
         Dim VarsListDefinesBackup As New List(Of FileLogText)
-        Dim r As Regex = New Regex("(?<=\$VAR\[)[_.0-9A-Za-z-]+", RegexOptions.IgnoreCase)
+        'Dim r As Regex = New Regex("(?<=\$VAR\[)[:_.0-9A-Za-z-]+", RegexOptions.IgnoreCase)
+        Dim r As Regex = New Regex("(?<=\$VAR\[)[^\]]+", RegexOptions.IgnoreCase)
         VarsListRefs.Clear()
         VarsListDefines.Clear()
         VarsListDefinesBackup.Clear()

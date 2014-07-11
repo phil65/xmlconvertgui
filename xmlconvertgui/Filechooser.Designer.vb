@@ -101,10 +101,15 @@ Partial Class Filechooser
         '
         'OutputLog
         '
+        Me.OutputLog.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.OutputLog.BackColor = System.Drawing.SystemColors.Window
         Me.OutputLog.Font = New System.Drawing.Font("Consolas", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.OutputLog.Location = New System.Drawing.Point(351, 22)
         Me.OutputLog.Multiline = True
         Me.OutputLog.Name = "OutputLog"
+        Me.OutputLog.ReadOnly = True
         Me.OutputLog.ScrollBars = System.Windows.Forms.ScrollBars.Both
         Me.OutputLog.Size = New System.Drawing.Size(559, 556)
         Me.OutputLog.TabIndex = 7
@@ -161,6 +166,7 @@ Partial Class Filechooser
         '
         'ClearLogButton
         '
+        Me.ClearLogButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ClearLogButton.Location = New System.Drawing.Point(835, 584)
         Me.ClearLogButton.Name = "ClearLogButton"
         Me.ClearLogButton.Size = New System.Drawing.Size(75, 23)
@@ -288,6 +294,7 @@ Partial Class Filechooser
         '
         'SaveButton
         '
+        Me.SaveButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.SaveButton.Location = New System.Drawing.Point(697, 584)
         Me.SaveButton.Name = "SaveButton"
         Me.SaveButton.Size = New System.Drawing.Size(132, 23)
@@ -344,6 +351,8 @@ Partial Class Filechooser
         '
         'ProgressBar1
         '
+        Me.ProgressBar1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ProgressBar1.Location = New System.Drawing.Point(13, 584)
         Me.ProgressBar1.Name = "ProgressBar1"
         Me.ProgressBar1.Size = New System.Drawing.Size(678, 23)
@@ -385,8 +394,9 @@ Partial Class Filechooser
         Me.Controls.Add(Me.OutputButton)
         Me.Controls.Add(Me.xmlname)
         Me.Controls.Add(Me.ConvertButton)
+        Me.MinimumSize = New System.Drawing.Size(929, 657)
         Me.Name = "Filechooser"
-        Me.Text = "Skin XML Converter 1.2.3 - by phil65"
+        Me.Text = "Skin XML Converter 1.2.4 - by phil65"
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
