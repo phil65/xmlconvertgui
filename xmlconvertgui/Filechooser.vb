@@ -145,6 +145,9 @@ Public Class Filechooser
                 doc.WriteTo(wrtr)
                 wrtr.WriteEndDocument()
                 wrtr.Close()
+                Dim objWriter As New System.IO.StreamWriter(strOutputFolder + "\" + SafeFilepaths(j).ToString, True)
+                objWriter.Write(vbLf)
+                objWriter.Close()
                 OutputLog.AppendText(SafeFilepaths(j) + " created successfully" & vbCrLf)
                 XMLCounter = XMLCounter + 1
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
