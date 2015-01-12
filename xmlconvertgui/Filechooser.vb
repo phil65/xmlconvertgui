@@ -1124,7 +1124,7 @@ Public Class Filechooser
                         Dim xcurrentLog = New FileLogText
                         xcurrentLog.File = actualFile
                         xcurrentLog.Line = CType(element, Xml.IXmlLineInfo).LineNumber
-                        xcurrentLog.StringText = m.Value.ToString()
+                        xcurrentLog.StringText = m.Value.ToString().Split(",")(0)
                         AddStructToList(VarsListRefs, xcurrentLog, True)
                         'OutputLog.AppendText("test1: " & m.Value.ToString() & " [" & xcurrentLog.File & " : " & xcurrentLog.Line & "]" & vbCrLf)
                         m = m.NextMatch()
