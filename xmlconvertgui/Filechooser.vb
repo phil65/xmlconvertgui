@@ -133,7 +133,7 @@ Public Class Filechooser
                         ScaleXMLNode(elementlist(i), "delay", AnimationMultiplier.Text)
                         ScaleXMLNode(elementlist(i), "repeat", AnimationMultiplier.Text)
                     Next
-                    elementlist = doc.SelectNodes("//scrolltime")
+                    elementlist = doc.SelectNodes("//scrolltime | //constant")
                     For i = 0 To elementlist.Count - 1
                         elementlist(i).InnerXml = ConvertValue(elementlist(i).InnerXml, XmlConvert.ToDouble(AnimationMultiplier.Text))
                     Next
