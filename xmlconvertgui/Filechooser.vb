@@ -127,15 +127,10 @@ Public Class Filechooser
                 End If
                 Dim Number As Double
                 If (AnimationMultiplier.Text <> 1) And (Double.TryParse(AnimationMultiplier.Text, Number)) Then
-                    elementlist = doc.SelectNodes("//animation | //effect | //autoscroll")
+                    elementlist = doc.SelectNodes("//animation | //effect")
                     For i = 0 To elementlist.Count - 1
                         ScaleXMLNode(elementlist(i), "time", AnimationMultiplier.Text)
                         ScaleXMLNode(elementlist(i), "delay", AnimationMultiplier.Text)
-                        ScaleXMLNode(elementlist(i), "repeat", AnimationMultiplier.Text)
-                    Next
-                    elementlist = doc.SelectNodes("//scrolltime")
-                    For i = 0 To elementlist.Count - 1
-                        elementlist(i).InnerXml = ConvertValue(elementlist(i).InnerXml, XmlConvert.ToDouble(AnimationMultiplier.Text))
                     Next
                 End If
                 CheckValues(actualFile)
