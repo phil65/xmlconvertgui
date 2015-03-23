@@ -33,6 +33,7 @@ Public Class Filechooser
     Public actualFile As String
     Public lineInfo As IXmlLineInfo
     Private Sub Filechooser_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        TabPage2.Enabled = False
         ConversionDropDown.Items.Add("720p --> 1080p")
         ConversionDropDown.Items.Add("1080p --> 720p")
         ConversionDropDown.Items.Add("No Change")
@@ -207,6 +208,7 @@ Public Class Filechooser
                                 SearchDirectory(DirInfo)
                                 OutputButton.Visible = True
                                 OutputLabel.Visible = True
+                                InitializeMediaTab()
                                 If strOutputFolder <> "" Then ConvertButton.Enabled = True
                             Else
                                 MsgBox("Path from addon.xml does not exist.")
@@ -777,11 +779,12 @@ Public Class Filechooser
             For Each fname As String In Directory.GetFiles(dir)
                 Dim number As Integer = 0
                 Dim ShortPath As String = fname.Substring(SkinFolder.Length + 7, fname.Length - (SkinFolder.Length + 7))
-                Dim blacklist As String() = {"flags\", "cerberus", "default", "stars", "rating", "\480p.png", "\540p.png", "\720p.png", "\576p.png", "\1080p.png", "overlay", ".xbt"}
+                'Dim blacklist As String() = {"flags\", "cerberus", "default", "stars", "rating", "\480p.png", "\540p.png", "\720p.png", "\576p.png", "\1080p.png", "overlay", ".xbt"}
+                Dim blacklist As List(Of String) = GetCheckedNodes(TreeView1.Nodes)
                 Dim blacklisted As Boolean = False
                 If EnableBlacklist Then
                     For Each Item In blacklist
-                        If ShortPath.Contains(Item) Then blacklisted = True
+                        If fname.Contains(Item) Then blacklisted = True
                     Next
                 End If
                 If blacklisted = False Then
@@ -1233,6 +1236,119 @@ Public Class Filechooser
         SearchString = ""
     End Function
 
+    Private Sub TabControl1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TabControl1.SelectedIndexChanged
+        If TabControl1.SelectedTab Is TabPage2 And TabPage2.Enabled = False Then
+            TabControl1.SelectedTab = TabPage1
+            MsgBox("Please select a skin folder first")
+        Else
+            'If GetCheckedNodes(TreeView1.Nodes).Contains("list") Then MsgBox("Success")
+        End If
+    End Sub
+
+    Private Sub InitializeMediaTab()
+        TabPage2.Enabled = True
+        TreeView1.Nodes.Clear()
+        Dim rootDir As String = String.Empty
+        rootDir = "media"
+        'Add this drive as a root node
+        Dim root As TreeNode = TreeView1.Nodes.Add(rootDir)
+        root.Tag = SkinFolder + "\media"
+        'Populate this root node
+        PopulateTreeView(SkinFolder + "\media", TreeView1.Nodes(0))
+        TreeView1.Nodes(0).Expand()
+        SetDefaultCheckedNodes(TreeView1.Nodes)
+    End Sub
+
+    Private Sub PopulateTreeView(ByVal dir As String, ByVal parentNode As TreeNode)
+        Dim folder As String = String.Empty
+        Try
+            'Add folders to treeview
+            Dim folders() As String = IO.Directory.GetDirectories(dir)
+            If folders.Length <> 0 Then
+                Dim folderNode As TreeNode = Nothing
+                Dim folderName As String = String.Empty
+                For Each folder In folders
+                    folderName = IO.Path.GetFileName(folder)
+                    folderNode = parentNode.Nodes.Add(folderName)
+                    folderNode.Tag = folder
+                    PopulateTreeView(folder, folderNode)
+                Next
+            End If
+            'Add the files to treeview
+            Dim files() As String = IO.Directory.GetFiles(dir)
+            If files.Length <> 0 Then
+                Dim fileNode As TreeNode = Nothing
+                For Each file As String In files
+                    fileNode = parentNode.Nodes.Add(IO.Path.GetFileName(file))
+                    fileNode.Tag = file
+                Next
+            End If
+        Catch ex As UnauthorizedAccessException
+            parentNode.Nodes.Add("Access Denied")
+        End Try
+    End Sub
+
+    Private Sub CheckAllChildNodes(treeNode As TreeNode, nodeChecked As Boolean)
+        Dim node As TreeNode
+        For Each node In treeNode.Nodes
+            node.Checked = nodeChecked
+            If node.Nodes.Count > 0 Then
+                ' If the current node has child nodes, call the CheckAllChildsNodes method recursively.
+                Me.CheckAllChildNodes(node, nodeChecked)
+            End If
+        Next node
+    End Sub
+
+    Private Sub UnCheckAllParentNodes(treeNode As TreeNode)
+        If (treeNode.Parent IsNot Nothing) Then
+            If (treeNode.Parent.GetType() Is GetType(TreeNode)) Then
+                treeNode.Parent.Checked = False
+                UnCheckAllParentNodes(treeNode.Parent)
+            End If
+        End If
+    End Sub
+
+    Private Sub node_AfterCheck(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterCheck
+        If e.Action <> TreeViewAction.Unknown Then
+            If e.Node.Nodes.Count > 0 Then
+                Me.CheckAllChildNodes(e.Node, e.Node.Checked)
+            End If
+            If e.Node.Checked = False Then
+                UnCheckAllParentNodes(e.Node)
+            End If
+        End If
+    End Sub
+
+    Private Sub SetDefaultCheckedNodes(node As TreeNodeCollection)
+        Dim blacklist As String() = {"defaultactor.png", "defaultaddon.png", "defaultaddonalbuminfo.png", "defaultaddonartistinfo.png", "defaultaddonaudiodecoder.png", "defaultaddonaudioencoder.png", "defaultaddoncontextitem.png", "defaultaddonhelper.png", "defaultaddoninfolibrary.png", "defaultaddonlanguage.png", "defaultaddonlibrary.png", "defaultaddonlyrics.png", "defaultaddonmovieinfo.png", _
+                                     "defaultaddonmusic.png", "defaultaddonmusicvideoinfo.png", "defaultaddonnone.png", "defaultaddonpicture.png", "defaultaddonprogram.png", "defaultaddonpvrclient.png", "defaultaddonrepository.png", "defaultaddonscreensaver.png", "defaultaddonservice.png", "defaultaddonskin.png", "defaultaddonsubtitles.png", "defaultaddontvinfo.png", "defaultaddonvideo.png", _
+                                     "defaultaddonvisualization.png", "defaultaddonweather.png", "defaultaddonwebskin.png", "defaultaddsource.png", "defaultalbumcover.png", "defaultartist.png", "defaultaudio.png", "defaultcdda.png", "defaultcountry.png", "defaultdirector.png", "defaultdvdempty.png", "defaultdvdrom.png", "defaultfile.png", "defaultfolder.png", "defaultfolderback.png", "defaultgenre.png", _
+                                     "defaultharddisk.png", "defaultinprogressshows.png", "defaultmovies.png", "defaultmovietitle.png", "defaultmusicalbums.png", "defaultmusicartists.png", "defaultmusiccompilations.png", "defaultmusicgenres.png", "defaultmusicplaylists.png", "defaultmusicplugins.png", "defaultmusicrecentlyadded.png", "defaultmusicrecentlyplayed.png", _
+                                     "defaultmusicsearch.png", "defaultmusicsongs.png", "defaultmusictop100.png", "defaultmusictop100albums.png", "defaultmusictop100songs.png", "defaultmusicvideos.png", "defaultmusicvideotitle.png", "defaultmusicyears.png", "defaultnetwork.png", "defaultpicture.png", "defaultplaylist.png", "defaultprogram.png", "defaultrecentlyaddedepisodes.png", _
+                                     "defaultrecentlyaddedmovies.png", "defaultrecentlyaddedmusicvideos.png", "defaultremovabledisk.png", "defaultscript.png", "defaultsets.png", "defaultshortcut.png", "defaultstudios.png", "defaulttvshows.png", "defaulttvshowtitle.png", "defaultvcd.png", "defaultvideo.png", "defaultvideocover.png", "defaultvideodeleted.png", "defaultvideoplaylists.png", _
+                                     "defaultvideoplugins.png", "defaultyear.png", "overlayhastrainer.png", "overlayhd.png", "overlaylocked.png", "overlayrar.png", "overlaytrained.png", "overlaytrainer.png", "overlayunwatched.png", "overlaywatched.png", "overlayzip.png", "rating0.png", "rating1.png", "rating2.png", "rating3.png", "rating4.png", "rating5.png"}
+        For Each n As TreeNode In node
+            If blacklist.Contains(n.Text.ToLower) Or n.Text.ToLower.Contains(".xbt") Then
+                n.Checked = True
+                If n.Nodes.Count > 0 Then
+                    Me.CheckAllChildNodes(n, True)
+                End If
+            End If
+            SetDefaultCheckedNodes(n.Nodes)
+        Next
+    End Sub
+
+    Private Function GetCheckedNodes(ByVal node As TreeNodeCollection) As List(Of String)
+        Dim CheckedNodes As New List(Of String)
+        For Each n As TreeNode In node
+            If n.Checked Then
+                CheckedNodes.Add(n.Tag)
+                'OutputLog.AppendText(n.Text & vbCrLf)
+            End If
+            CheckedNodes.AddRange(GetCheckedNodes(n.Nodes))
+        Next
+        Return CheckedNodes
+    End Function
 End Class
 
 Public Class FileLogText
