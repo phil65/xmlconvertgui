@@ -17,7 +17,7 @@ Public Class Filechooser
     Public SkinFolder As String = ""
     Public xmlelements As String() = {"posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "textoffsetx", "textoffsety", "radiowidth", "radioheight", "radioposx", "radioposy", "textwidth", "size", "itemgap", "spinwidth", "spinheight"}
     Public xmlelementsBorder As String() = {"border", "bordersize"}
-    Public xmlelementsTexture As String() = {"texture", "texturefocus", "texturenofocus", "texturebg", "bordertexture", "value", "icon", "thumb", "alttexturefocus", "alttexturenofocus", "texturesliderbackground", "texturesliderbar", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "midtexture", "righttexture", "lefttexture"}
+    Public xmlelementsTexture As String() = {"texture", "texturefocus", "texturenofocus", "texturebg", "bordertexture", "value", "icon", "thumb", "alttexturefocus", "alttexturenofocus", "texturesliderbackground", "texturesliderbar", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "textureradioonfocus", "textureradioofffocus", "textureradioonnofocus", "textureradiooffnofocus", "midtexture", "righttexture", "lefttexture"}
     Public xmlelementsBrackets As String() = {"visible", "enable", "usealttexture", "selected"}
     Public xmlattributes As String(,)
     Public doc As New XmlDocument()
@@ -432,10 +432,8 @@ Public Class Filechooser
                 Dim reader = New FileStream(Filepaths(j), FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
                 xdoc = XDocument.Load(reader, LoadOptions.SetLineInfo)
                 actualFile = SafeFilepaths(j)
-                CheckTextureAttributesInArray(AllShortenedTexturePaths, "texture", {"diffuse", "fallback"}, actualFile, True)
-                For k = 0 To xmlelementsTexture.Length - 1
-                    CheckTextureNodesInArray(AllShortenedTexturePaths, xmlelementsTexture(k), actualFile, True)
-                Next k
+                CheckTextureAttributesInArray(AllShortenedTexturePaths, xmlelementsTexture, {"diffuse", "fallback"}, actualFile, True)
+                CheckTextureNodesInArray(AllShortenedTexturePaths, xmlelementsTexture, actualFile, True)
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
@@ -450,10 +448,8 @@ Public Class Filechooser
                 Dim reader = New FileStream(Filepaths(j), FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
                 xdoc = XDocument.Load(reader, LoadOptions.SetLineInfo)
                 actualFile = SafeFilepaths(j)
-                RemoveAttributesFromArray(ShortenedTexturePaths, "texture", {"diffuse", "fallback"}, True)
-                For k = 0 To xmlelementsTexture.Length - 1
-                    RemoveNodesFromArray(ShortenedTexturePaths, xmlelementsTexture(k), True)
-                Next k
+                RemoveAttributesFromArray(ShortenedTexturePaths, xmlelementsTexture, {"diffuse", "fallback"}, True)
+                RemoveNodesFromArray(ShortenedTexturePaths, xmlelementsTexture, True)
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
@@ -813,21 +809,25 @@ Public Class Filechooser
         Next
     End Sub
 
-    Sub RemoveAttributesFromArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, ByVal Attributes As String(), Optional ByVal Lowercase As Boolean = False)
+    Sub RemoveAttributesFromArray(ByRef EditArray As ArrayList, ByVal NodesSelection As String(), ByVal Attributes As String(), Optional ByVal Lowercase As Boolean = False)
         Dim xattributelist As IEnumerable(Of XAttribute)
-        For Each Attribute In Attributes
-            Dim at As String = Attribute
-            xattributelist = From element In xdoc.Root.Descendants(NodeSelection) Select element.Attribute(at)
-            For Each element In xattributelist
-                If element IsNot Nothing Then RemoveStringFromArray(EditArray, element.Value, Lowercase)
+        For Each NodeSelection In NodesSelection
+            For Each Attribute In Attributes
+                Dim at As String = Attribute
+                xattributelist = From element In xdoc.Root.Descendants(NodeSelection) Select element.Attribute(at)
+                For Each element In xattributelist
+                    If element IsNot Nothing Then RemoveStringFromArray(EditArray, element.Value, Lowercase)
+                Next
             Next
         Next
     End Sub
 
-    Sub RemoveNodesFromArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, Optional ByVal Lowercase As Boolean = False)
-        xelementlist = From element In xdoc.Root.Descendants Where element.Name = NodeSelection Select element
-        For Each element In xelementlist
-            If Not String.IsNullOrWhiteSpace(element.Value) Then RemoveStringFromArray(EditArray, element.Value, Lowercase)
+    Sub RemoveNodesFromArray(ByRef EditArray As ArrayList, ByVal NodesSelection As String(), Optional ByVal Lowercase As Boolean = False)
+        For Each NodeSelection In NodesSelection
+            xelementlist = From element In xdoc.Root.Descendants Where element.Name = NodeSelection Select element
+            For Each element In xelementlist
+                If Not String.IsNullOrWhiteSpace(element.Value) Then RemoveStringFromArray(EditArray, element.Value, Lowercase)
+            Next
         Next
     End Sub
 
@@ -963,31 +963,35 @@ Public Class Filechooser
             End If
         Next
     End Sub
-    Private Sub CheckTextureNodesInArray(ByVal CheckArray As ArrayList, ByVal NodeSelection As String, ByVal FileName As String, Optional ByVal Lowercase As Boolean = False)
-        xelementlist = From element In xdoc.Root.Descendants Where element.Name = NodeSelection Select element
-        For Each element In xelementlist
-            If Not String.IsNullOrWhiteSpace(element.Value) Then
-                Dim StringToCheck As String = element.Value
-                If Lowercase = True Then StringToCheck = StringToCheck.ToLower
-                If Not CheckArray.Contains(StringToCheck) And StringToCheck <> "-" And element.Parent.Name <> "variable" And Not StringToCheck.Contains("$info") And Not StringToCheck.Contains("$var") And Not StringToCheck.Contains("special:") And Not StringToCheck.Contains("$localize") Then
-                    OutputLog.AppendText("Not Found: " & StringToCheck & " - [" & FileName & " : Line " & CType(element, Xml.IXmlLineInfo).LineNumber & "]" & vbCrLf)
-                End If
-            End If
-        Next
-    End Sub
-    Private Sub CheckTextureAttributesInArray(ByVal CheckArray As ArrayList, ByVal NodeSelection As String, ByVal Attributes As String(), ByVal FileName As String, Optional ByVal Lowercase As Boolean = False)
-        Dim xattributelist As IEnumerable(Of XAttribute)
-        For Each Attribute In Attributes
-            Dim at As String = Attribute
-            xattributelist = From element In xdoc.Root.Descendants(NodeSelection) Select element.Attribute(at)
-            For Each element In xattributelist
-                If element IsNot Nothing Then
+    Private Sub CheckTextureNodesInArray(ByVal CheckArray As ArrayList, ByVal NodesSelection As String(), ByVal FileName As String, Optional ByVal Lowercase As Boolean = False)
+        For Each NodeSelection In NodesSelection
+            xelementlist = From element In xdoc.Root.Descendants Where element.Name = NodeSelection Select element
+            For Each element In xelementlist
+                If Not String.IsNullOrWhiteSpace(element.Value) Then
                     Dim StringToCheck As String = element.Value
                     If Lowercase = True Then StringToCheck = StringToCheck.ToLower
                     If Not CheckArray.Contains(StringToCheck) And StringToCheck <> "-" And element.Parent.Name <> "variable" And Not StringToCheck.Contains("$info") And Not StringToCheck.Contains("$var") And Not StringToCheck.Contains("special:") And Not StringToCheck.Contains("$localize") Then
-                        OutputLog.AppendText("Not Found: {" & at & "} " & StringToCheck & " - [" & FileName & " : Line " & CType(element, Xml.IXmlLineInfo).LineNumber & "]" & vbCrLf)
+                        OutputLog.AppendText("Not Found: " & StringToCheck & " - [" & FileName & " : Line " & CType(element, Xml.IXmlLineInfo).LineNumber & "]" & vbCrLf)
                     End If
                 End If
+            Next
+        Next
+    End Sub
+    Private Sub CheckTextureAttributesInArray(ByVal CheckArray As ArrayList, ByVal NodesSelection As String(), ByVal Attributes As String(), ByVal FileName As String, Optional ByVal Lowercase As Boolean = False)
+        Dim xattributelist As IEnumerable(Of XAttribute)
+        For Each NodeSelection In NodesSelection
+            For Each Attribute In Attributes
+                Dim at As String = Attribute
+                xattributelist = From element In xdoc.Root.Descendants(NodeSelection) Select element.Attribute(at)
+                For Each element In xattributelist
+                    If element IsNot Nothing Then
+                        Dim StringToCheck As String = element.Value
+                        If Lowercase = True Then StringToCheck = StringToCheck.ToLower
+                        If Not CheckArray.Contains(StringToCheck) And StringToCheck <> "-" And element.Parent.Name <> "variable" And Not StringToCheck.Contains("$info") And Not StringToCheck.Contains("$var") And Not StringToCheck.Contains("special:") And Not StringToCheck.Contains("$localize") Then
+                            OutputLog.AppendText("Not Found: {" & at & "} " & StringToCheck & " - [" & FileName & " : Line " & CType(element, Xml.IXmlLineInfo).LineNumber & "]" & vbCrLf)
+                        End If
+                    End If
+                Next
             Next
         Next
     End Sub
