@@ -463,7 +463,7 @@ Partial Class Filechooser
         Me.Controls.Add(Me.OutputLog)
         Me.MinimumSize = New System.Drawing.Size(929, 657)
         Me.Name = "Filechooser"
-        Me.Text = "Skin XML Converter 1.2.4 - by phil65"
+        Me.Text = "Skin XML Converter 1.2.6 - by phil65"
         Me.TabControl1.ResumeLayout(False)
         Me.TabPage1.ResumeLayout(False)
         Me.TabPage1.PerformLayout()
