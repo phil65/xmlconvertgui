@@ -17,7 +17,7 @@ Public Class Filechooser
     Public SkinFolder As String = ""
     Public xmlelements As String() = {"posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "textoffsetx", "textoffsety", "radiowidth", "radioheight", "radioposx", "radioposy", "textwidth", "size", "itemgap", "spinwidth", "spinheight"}
     Public xmlelementsBorder As String() = {"border", "bordersize"}
-    Public xmlelementsTexture As String() = {"texture", "texturefocus", "texturenofocus", "texturebg", "bordertexture", "value", "icon", "thumb", "alttexturefocus", "alttexturenofocus", "texturesliderbackground", "texturesliderbar", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "textureradioonfocus", "textureradioofffocus", "textureradioonnofocus", "textureradiooffnofocus", "midtexture", "righttexture", "lefttexture"}
+    Public xmlelementsTexture As String() = {"texture", "texturefocus", "texturenofocus", "texturebg", "bordertexture", "value", "icon", "thumb", "alttexturefocus", "alttexturenofocus", "texturesliderbackground", "texturesliderbar", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "textureup", "textureupfocus", "texturedown", "texturedownfocus", "textureradioonfocus", "textureradioofffocus", "textureradioonnofocus", "textureradiooffnofocus", "midtexture", "righttexture", "lefttexture"}
     Public xmlelementsBrackets As String() = {"visible", "enable", "usealttexture", "selected"}
     Public xmlattributes As String(,)
     Public doc As New XmlDocument()
