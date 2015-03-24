@@ -17,7 +17,7 @@ Public Class Filechooser
     Public SkinFolder As String = ""
     Public xmlelements As String() = {"posx", "posy", "top", "bottom", "left", "right", "centertop", "centerbottom", "centerleft", "centerright", "width", "height", "textoffsetx", "textoffsety", "radiowidth", "radioheight", "radioposx", "radioposy", "textwidth", "size", "itemgap", "spinwidth", "spinheight"}
     Public xmlelementsBorder As String() = {"border", "bordersize"}
-    Public xmlelementsTexture As String() = {"texture", "texturefocus", "texturenofocus", "texturebg", "bordertexture", "value", "icon", "thumb", "alttexturefocus", "alttexturenofocus", "texturesliderbackground", "texturesliderbar", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "midtexture", "righttexture", "lefttexture"}
+    Public xmlelementsTexture As String() = {"texture", "texturefocus", "texturenofocus", "texturebg", "bordertexture", "value", "icon", "thumb", "alttexturefocus", "alttexturenofocus", "texturesliderbackground", "texturesliderbar", "texturesliderbarfocus", "textureslidernib", "textureslidernibfocus", "textureup", "textureupfocus", "texturedown", "texturedownfocus", "textureradioonfocus", "textureradioofffocus", "textureradioonnofocus", "textureradiooffnofocus", "midtexture", "righttexture", "lefttexture"}
     Public xmlelementsBrackets As String() = {"visible", "enable", "usealttexture", "selected"}
     Public xmlattributes As String(,)
     Public doc As New XmlDocument()
@@ -33,6 +33,7 @@ Public Class Filechooser
     Public actualFile As String
     Public lineInfo As IXmlLineInfo
     Private Sub Filechooser_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        TabPage2.Enabled = False
         ConversionDropDown.Items.Add("720p --> 1080p")
         ConversionDropDown.Items.Add("1080p --> 720p")
         ConversionDropDown.Items.Add("No Change")
@@ -207,6 +208,7 @@ Public Class Filechooser
                                 SearchDirectory(DirInfo)
                                 OutputButton.Visible = True
                                 OutputLabel.Visible = True
+                                InitializeMediaTab()
                                 If strOutputFolder <> "" Then ConvertButton.Enabled = True
                             Else
                                 MsgBox("Path from addon.xml does not exist.")
@@ -432,10 +434,8 @@ Public Class Filechooser
                 Dim reader = New FileStream(Filepaths(j), FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
                 xdoc = XDocument.Load(reader, LoadOptions.SetLineInfo)
                 actualFile = SafeFilepaths(j)
-                CheckTextureAttributesInArray(AllShortenedTexturePaths, "texture", {"diffuse", "fallback"}, actualFile, True)
-                For k = 0 To xmlelementsTexture.Length - 1
-                    CheckTextureNodesInArray(AllShortenedTexturePaths, xmlelementsTexture(k), actualFile, True)
-                Next k
+                CheckTextureAttributesInArray(AllShortenedTexturePaths, xmlelementsTexture, {"diffuse", "fallback"}, actualFile, True)
+                CheckTextureNodesInArray(AllShortenedTexturePaths, xmlelementsTexture, actualFile, True)
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
@@ -450,10 +450,8 @@ Public Class Filechooser
                 Dim reader = New FileStream(Filepaths(j), FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
                 xdoc = XDocument.Load(reader, LoadOptions.SetLineInfo)
                 actualFile = SafeFilepaths(j)
-                RemoveAttributesFromArray(ShortenedTexturePaths, "texture", {"diffuse", "fallback"}, True)
-                For k = 0 To xmlelementsTexture.Length - 1
-                    RemoveNodesFromArray(ShortenedTexturePaths, xmlelementsTexture(k), True)
-                Next k
+                RemoveAttributesFromArray(ShortenedTexturePaths, xmlelementsTexture, {"diffuse", "fallback"}, True)
+                RemoveNodesFromArray(ShortenedTexturePaths, xmlelementsTexture, True)
             Catch xmlex As XmlException                  ' Handle the Xml Exceptions here.
                 OutputLog.AppendText(SafeFilepaths(j) + ": " + xmlex.Message & vbCrLf)
             Catch ex As Exception                        ' Handle the generic Exceptions here.
@@ -781,11 +779,12 @@ Public Class Filechooser
             For Each fname As String In Directory.GetFiles(dir)
                 Dim number As Integer = 0
                 Dim ShortPath As String = fname.Substring(SkinFolder.Length + 7, fname.Length - (SkinFolder.Length + 7))
-                Dim blacklist As String() = {"flags\", "cerberus", "default", "stars", "rating", "\480p.png", "\540p.png", "\720p.png", "\576p.png", "\1080p.png", "overlay", ".xbt"}
+                'Dim blacklist As String() = {"flags\", "cerberus", "default", "stars", "rating", "\480p.png", "\540p.png", "\720p.png", "\576p.png", "\1080p.png", "overlay", ".xbt"}
+                Dim blacklist As List(Of String) = GetCheckedNodes(TreeView1.Nodes)
                 Dim blacklisted As Boolean = False
                 If EnableBlacklist Then
                     For Each Item In blacklist
-                        If ShortPath.Contains(Item) Then blacklisted = True
+                        If fname.Contains(Item) Then blacklisted = True
                     Next
                 End If
                 If blacklisted = False Then
@@ -813,21 +812,25 @@ Public Class Filechooser
         Next
     End Sub
 
-    Sub RemoveAttributesFromArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, ByVal Attributes As String(), Optional ByVal Lowercase As Boolean = False)
+    Sub RemoveAttributesFromArray(ByRef EditArray As ArrayList, ByVal NodesSelection As String(), ByVal Attributes As String(), Optional ByVal Lowercase As Boolean = False)
         Dim xattributelist As IEnumerable(Of XAttribute)
-        For Each Attribute In Attributes
-            Dim at As String = Attribute
-            xattributelist = From element In xdoc.Root.Descendants(NodeSelection) Select element.Attribute(at)
-            For Each element In xattributelist
-                If element IsNot Nothing Then RemoveStringFromArray(EditArray, element.Value, Lowercase)
+        For Each NodeSelection In NodesSelection
+            For Each Attribute In Attributes
+                Dim at As String = Attribute
+                xattributelist = From element In xdoc.Root.Descendants(NodeSelection) Select element.Attribute(at)
+                For Each element In xattributelist
+                    If element IsNot Nothing Then RemoveStringFromArray(EditArray, element.Value, Lowercase)
+                Next
             Next
         Next
     End Sub
 
-    Sub RemoveNodesFromArray(ByRef EditArray As ArrayList, ByVal NodeSelection As String, Optional ByVal Lowercase As Boolean = False)
-        xelementlist = From element In xdoc.Root.Descendants Where element.Name = NodeSelection Select element
-        For Each element In xelementlist
-            If Not String.IsNullOrWhiteSpace(element.Value) Then RemoveStringFromArray(EditArray, element.Value, Lowercase)
+    Sub RemoveNodesFromArray(ByRef EditArray As ArrayList, ByVal NodesSelection As String(), Optional ByVal Lowercase As Boolean = False)
+        For Each NodeSelection In NodesSelection
+            xelementlist = From element In xdoc.Root.Descendants Where element.Name = NodeSelection Select element
+            For Each element In xelementlist
+                If Not String.IsNullOrWhiteSpace(element.Value) Then RemoveStringFromArray(EditArray, element.Value, Lowercase)
+            Next
         Next
     End Sub
 
@@ -963,31 +966,35 @@ Public Class Filechooser
             End If
         Next
     End Sub
-    Private Sub CheckTextureNodesInArray(ByVal CheckArray As ArrayList, ByVal NodeSelection As String, ByVal FileName As String, Optional ByVal Lowercase As Boolean = False)
-        xelementlist = From element In xdoc.Root.Descendants Where element.Name = NodeSelection Select element
-        For Each element In xelementlist
-            If Not String.IsNullOrWhiteSpace(element.Value) Then
-                Dim StringToCheck As String = element.Value
-                If Lowercase = True Then StringToCheck = StringToCheck.ToLower
-                If Not CheckArray.Contains(StringToCheck) And StringToCheck <> "-" And element.Parent.Name <> "variable" And Not StringToCheck.Contains("$info") And Not StringToCheck.Contains("$var") And Not StringToCheck.Contains("special:") And Not StringToCheck.Contains("$localize") Then
-                    OutputLog.AppendText("Not Found: " & StringToCheck & " - [" & FileName & " : Line " & CType(element, Xml.IXmlLineInfo).LineNumber & "]" & vbCrLf)
-                End If
-            End If
-        Next
-    End Sub
-    Private Sub CheckTextureAttributesInArray(ByVal CheckArray As ArrayList, ByVal NodeSelection As String, ByVal Attributes As String(), ByVal FileName As String, Optional ByVal Lowercase As Boolean = False)
-        Dim xattributelist As IEnumerable(Of XAttribute)
-        For Each Attribute In Attributes
-            Dim at As String = Attribute
-            xattributelist = From element In xdoc.Root.Descendants(NodeSelection) Select element.Attribute(at)
-            For Each element In xattributelist
-                If element IsNot Nothing Then
+    Private Sub CheckTextureNodesInArray(ByVal CheckArray As ArrayList, ByVal NodesSelection As String(), ByVal FileName As String, Optional ByVal Lowercase As Boolean = False)
+        For Each NodeSelection In NodesSelection
+            xelementlist = From element In xdoc.Root.Descendants Where element.Name = NodeSelection Select element
+            For Each element In xelementlist
+                If Not String.IsNullOrWhiteSpace(element.Value) Then
                     Dim StringToCheck As String = element.Value
                     If Lowercase = True Then StringToCheck = StringToCheck.ToLower
                     If Not CheckArray.Contains(StringToCheck) And StringToCheck <> "-" And element.Parent.Name <> "variable" And Not StringToCheck.Contains("$info") And Not StringToCheck.Contains("$var") And Not StringToCheck.Contains("special:") And Not StringToCheck.Contains("$localize") Then
-                        OutputLog.AppendText("Not Found: {" & at & "} " & StringToCheck & " - [" & FileName & " : Line " & CType(element, Xml.IXmlLineInfo).LineNumber & "]" & vbCrLf)
+                        OutputLog.AppendText("Not Found: " & StringToCheck & " - [" & FileName & " : Line " & CType(element, Xml.IXmlLineInfo).LineNumber & "]" & vbCrLf)
                     End If
                 End If
+            Next
+        Next
+    End Sub
+    Private Sub CheckTextureAttributesInArray(ByVal CheckArray As ArrayList, ByVal NodesSelection As String(), ByVal Attributes As String(), ByVal FileName As String, Optional ByVal Lowercase As Boolean = False)
+        Dim xattributelist As IEnumerable(Of XAttribute)
+        For Each NodeSelection In NodesSelection
+            For Each Attribute In Attributes
+                Dim at As String = Attribute
+                xattributelist = From element In xdoc.Root.Descendants(NodeSelection) Select element.Attribute(at)
+                For Each element In xattributelist
+                    If element IsNot Nothing Then
+                        Dim StringToCheck As String = element.Value
+                        If Lowercase = True Then StringToCheck = StringToCheck.ToLower
+                        If Not CheckArray.Contains(StringToCheck) And StringToCheck <> "-" And element.Parent.Name <> "variable" And Not StringToCheck.Contains("$info") And Not StringToCheck.Contains("$var") And Not StringToCheck.Contains("special:") And Not StringToCheck.Contains("$localize") Then
+                            OutputLog.AppendText("Not Found: {" & at & "} " & StringToCheck & " - [" & FileName & " : Line " & CType(element, Xml.IXmlLineInfo).LineNumber & "]" & vbCrLf)
+                        End If
+                    End If
+                Next
             Next
         Next
     End Sub
@@ -1229,6 +1236,119 @@ Public Class Filechooser
         SearchString = ""
     End Function
 
+    Private Sub TabControl1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles TabControl1.SelectedIndexChanged
+        If TabControl1.SelectedTab Is TabPage2 And TabPage2.Enabled = False Then
+            TabControl1.SelectedTab = TabPage1
+            MsgBox("Please select a skin folder first")
+        Else
+            'If GetCheckedNodes(TreeView1.Nodes).Contains("list") Then MsgBox("Success")
+        End If
+    End Sub
+
+    Private Sub InitializeMediaTab()
+        TabPage2.Enabled = True
+        TreeView1.Nodes.Clear()
+        Dim rootDir As String = String.Empty
+        rootDir = "media"
+        'Add this drive as a root node
+        Dim root As TreeNode = TreeView1.Nodes.Add(rootDir)
+        root.Tag = SkinFolder + "\media"
+        'Populate this root node
+        PopulateTreeView(SkinFolder + "\media", TreeView1.Nodes(0))
+        TreeView1.Nodes(0).Expand()
+        SetDefaultCheckedNodes(TreeView1.Nodes)
+    End Sub
+
+    Private Sub PopulateTreeView(ByVal dir As String, ByVal parentNode As TreeNode)
+        Dim folder As String = String.Empty
+        Try
+            'Add folders to treeview
+            Dim folders() As String = IO.Directory.GetDirectories(dir)
+            If folders.Length <> 0 Then
+                Dim folderNode As TreeNode = Nothing
+                Dim folderName As String = String.Empty
+                For Each folder In folders
+                    folderName = IO.Path.GetFileName(folder)
+                    folderNode = parentNode.Nodes.Add(folderName)
+                    folderNode.Tag = folder
+                    PopulateTreeView(folder, folderNode)
+                Next
+            End If
+            'Add the files to treeview
+            Dim files() As String = IO.Directory.GetFiles(dir)
+            If files.Length <> 0 Then
+                Dim fileNode As TreeNode = Nothing
+                For Each file As String In files
+                    fileNode = parentNode.Nodes.Add(IO.Path.GetFileName(file))
+                    fileNode.Tag = file
+                Next
+            End If
+        Catch ex As UnauthorizedAccessException
+            parentNode.Nodes.Add("Access Denied")
+        End Try
+    End Sub
+
+    Private Sub CheckAllChildNodes(treeNode As TreeNode, nodeChecked As Boolean)
+        Dim node As TreeNode
+        For Each node In treeNode.Nodes
+            node.Checked = nodeChecked
+            If node.Nodes.Count > 0 Then
+                ' If the current node has child nodes, call the CheckAllChildsNodes method recursively.
+                Me.CheckAllChildNodes(node, nodeChecked)
+            End If
+        Next node
+    End Sub
+
+    Private Sub UnCheckAllParentNodes(treeNode As TreeNode)
+        If (treeNode.Parent IsNot Nothing) Then
+            If (treeNode.Parent.GetType() Is GetType(TreeNode)) Then
+                treeNode.Parent.Checked = False
+                UnCheckAllParentNodes(treeNode.Parent)
+            End If
+        End If
+    End Sub
+
+    Private Sub node_AfterCheck(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterCheck
+        If e.Action <> TreeViewAction.Unknown Then
+            If e.Node.Nodes.Count > 0 Then
+                Me.CheckAllChildNodes(e.Node, e.Node.Checked)
+            End If
+            If e.Node.Checked = False Then
+                UnCheckAllParentNodes(e.Node)
+            End If
+        End If
+    End Sub
+
+    Private Sub SetDefaultCheckedNodes(node As TreeNodeCollection)
+        Dim blacklist As String() = {"defaultactor.png", "defaultaddon.png", "defaultaddonalbuminfo.png", "defaultaddonartistinfo.png", "defaultaddonaudiodecoder.png", "defaultaddonaudioencoder.png", "defaultaddoncontextitem.png", "defaultaddonhelper.png", "defaultaddoninfolibrary.png", "defaultaddonlanguage.png", "defaultaddonlibrary.png", "defaultaddonlyrics.png", "defaultaddonmovieinfo.png", _
+                                     "defaultaddonmusic.png", "defaultaddonmusicvideoinfo.png", "defaultaddonnone.png", "defaultaddonpicture.png", "defaultaddonprogram.png", "defaultaddonpvrclient.png", "defaultaddonrepository.png", "defaultaddonscreensaver.png", "defaultaddonservice.png", "defaultaddonskin.png", "defaultaddonsubtitles.png", "defaultaddontvinfo.png", "defaultaddonvideo.png", _
+                                     "defaultaddonvisualization.png", "defaultaddonweather.png", "defaultaddonwebskin.png", "defaultaddsource.png", "defaultalbumcover.png", "defaultartist.png", "defaultaudio.png", "defaultcdda.png", "defaultcountry.png", "defaultdirector.png", "defaultdvdempty.png", "defaultdvdrom.png", "defaultfile.png", "defaultfolder.png", "defaultfolderback.png", "defaultgenre.png", _
+                                     "defaultharddisk.png", "defaultinprogressshows.png", "defaultmovies.png", "defaultmovietitle.png", "defaultmusicalbums.png", "defaultmusicartists.png", "defaultmusiccompilations.png", "defaultmusicgenres.png", "defaultmusicplaylists.png", "defaultmusicplugins.png", "defaultmusicrecentlyadded.png", "defaultmusicrecentlyplayed.png", _
+                                     "defaultmusicsearch.png", "defaultmusicsongs.png", "defaultmusictop100.png", "defaultmusictop100albums.png", "defaultmusictop100songs.png", "defaultmusicvideos.png", "defaultmusicvideotitle.png", "defaultmusicyears.png", "defaultnetwork.png", "defaultpicture.png", "defaultplaylist.png", "defaultprogram.png", "defaultrecentlyaddedepisodes.png", _
+                                     "defaultrecentlyaddedmovies.png", "defaultrecentlyaddedmusicvideos.png", "defaultremovabledisk.png", "defaultscript.png", "defaultsets.png", "defaultshortcut.png", "defaultstudios.png", "defaulttvshows.png", "defaulttvshowtitle.png", "defaultvcd.png", "defaultvideo.png", "defaultvideocover.png", "defaultvideodeleted.png", "defaultvideoplaylists.png", _
+                                     "defaultvideoplugins.png", "defaultyear.png", "overlayhastrainer.png", "overlayhd.png", "overlaylocked.png", "overlayrar.png", "overlaytrained.png", "overlaytrainer.png", "overlayunwatched.png", "overlaywatched.png", "overlayzip.png", "rating0.png", "rating1.png", "rating2.png", "rating3.png", "rating4.png", "rating5.png"}
+        For Each n As TreeNode In node
+            If blacklist.Contains(n.Text.ToLower) Or n.Text.ToLower.Contains(".xbt") Then
+                n.Checked = True
+                If n.Nodes.Count > 0 Then
+                    Me.CheckAllChildNodes(n, True)
+                End If
+            End If
+            SetDefaultCheckedNodes(n.Nodes)
+        Next
+    End Sub
+
+    Private Function GetCheckedNodes(ByVal node As TreeNodeCollection) As List(Of String)
+        Dim CheckedNodes As New List(Of String)
+        For Each n As TreeNode In node
+            If n.Checked Then
+                CheckedNodes.Add(n.Tag)
+                'OutputLog.AppendText(n.Text & vbCrLf)
+            End If
+            CheckedNodes.AddRange(GetCheckedNodes(n.Nodes))
+        Next
+        Return CheckedNodes
+    End Function
 End Class
 
 Public Class FileLogText

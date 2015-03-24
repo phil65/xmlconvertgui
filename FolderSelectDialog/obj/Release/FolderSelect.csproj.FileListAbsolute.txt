@@ -1,4 +1,0 @@
-C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\FolderSelectDialog\bin\Release\FolderSelect.dll
-C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\FolderSelectDialog\bin\Release\FolderSelect.pdb
-C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\FolderSelectDialog\obj\Release\FolderSelect.dll
-C:\Users\PCloutier\Documents\GitHub\xmlconvertgui\FolderSelectDialog\obj\Release\FolderSelect.pdb

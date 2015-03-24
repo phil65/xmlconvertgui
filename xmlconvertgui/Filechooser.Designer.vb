@@ -55,6 +55,14 @@ Partial Class Filechooser
         Me.ReorderButton = New System.Windows.Forms.CheckBox()
         Me.BackgroundWorker1 = New System.ComponentModel.BackgroundWorker()
         Me.ProgressBar1 = New System.Windows.Forms.ProgressBar()
+        Me.TabControl1 = New System.Windows.Forms.TabControl()
+        Me.TabPage1 = New System.Windows.Forms.TabPage()
+        Me.TabPage2 = New System.Windows.Forms.TabPage()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.TreeView1 = New System.Windows.Forms.TreeView()
+        Me.TabControl1.SuspendLayout()
+        Me.TabPage1.SuspendLayout()
+        Me.TabPage2.SuspendLayout()
         Me.SuspendLayout()
         '
         'OpenFileDialog
@@ -64,7 +72,7 @@ Partial Class Filechooser
         'ConvertButton
         '
         Me.ConvertButton.Enabled = False
-        Me.ConvertButton.Location = New System.Drawing.Point(203, 368)
+        Me.ConvertButton.Location = New System.Drawing.Point(200, 354)
         Me.ConvertButton.Name = "ConvertButton"
         Me.ConvertButton.Size = New System.Drawing.Size(75, 23)
         Me.ConvertButton.TabIndex = 3
@@ -74,7 +82,7 @@ Partial Class Filechooser
         'xmlname
         '
         Me.xmlname.AutoSize = True
-        Me.xmlname.Location = New System.Drawing.Point(163, 25)
+        Me.xmlname.Location = New System.Drawing.Point(160, 11)
         Me.xmlname.Name = "xmlname"
         Me.xmlname.Size = New System.Drawing.Size(99, 13)
         Me.xmlname.TabIndex = 4
@@ -82,7 +90,7 @@ Partial Class Filechooser
         '
         'OutputButton
         '
-        Me.OutputButton.Location = New System.Drawing.Point(203, 323)
+        Me.OutputButton.Location = New System.Drawing.Point(200, 309)
         Me.OutputButton.Name = "OutputButton"
         Me.OutputButton.Size = New System.Drawing.Size(75, 24)
         Me.OutputButton.TabIndex = 5
@@ -92,7 +100,7 @@ Partial Class Filechooser
         '
         'OutputLabel
         '
-        Me.OutputLabel.Location = New System.Drawing.Point(185, 296)
+        Me.OutputLabel.Location = New System.Drawing.Point(182, 282)
         Me.OutputLabel.Name = "OutputLabel"
         Me.OutputLabel.Size = New System.Drawing.Size(152, 24)
         Me.OutputLabel.TabIndex = 6
@@ -117,10 +125,11 @@ Partial Class Filechooser
         '
         'ConversionDropDown
         '
+        Me.ConversionDropDown.BackColor = System.Drawing.SystemColors.Control
         Me.ConversionDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ConversionDropDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ConversionDropDown.ImeMode = System.Windows.Forms.ImeMode.Off
-        Me.ConversionDropDown.Location = New System.Drawing.Point(10, 240)
+        Me.ConversionDropDown.Location = New System.Drawing.Point(7, 226)
         Me.ConversionDropDown.Name = "ConversionDropDown"
         Me.ConversionDropDown.Size = New System.Drawing.Size(121, 21)
         Me.ConversionDropDown.TabIndex = 8
@@ -128,7 +137,7 @@ Partial Class Filechooser
         'HeaderOption
         '
         Me.HeaderOption.AutoSize = True
-        Me.HeaderOption.Location = New System.Drawing.Point(10, 402)
+        Me.HeaderOption.Location = New System.Drawing.Point(7, 388)
         Me.HeaderOption.Name = "HeaderOption"
         Me.HeaderOption.Size = New System.Drawing.Size(108, 17)
         Me.HeaderOption.TabIndex = 9
@@ -138,7 +147,7 @@ Partial Class Filechooser
         'ConvertBorders
         '
         Me.ConvertBorders.AutoSize = True
-        Me.ConvertBorders.Location = New System.Drawing.Point(10, 425)
+        Me.ConvertBorders.Location = New System.Drawing.Point(7, 411)
         Me.ConvertBorders.Name = "ConvertBorders"
         Me.ConvertBorders.Size = New System.Drawing.Size(102, 17)
         Me.ConvertBorders.TabIndex = 12
@@ -148,7 +157,7 @@ Partial Class Filechooser
         '
         'TextureCheckButton
         '
-        Me.TextureCheckButton.Location = New System.Drawing.Point(49, 59)
+        Me.TextureCheckButton.Location = New System.Drawing.Point(46, 45)
         Me.TextureCheckButton.Name = "TextureCheckButton"
         Me.TextureCheckButton.Size = New System.Drawing.Size(95, 23)
         Me.TextureCheckButton.TabIndex = 13
@@ -157,7 +166,7 @@ Partial Class Filechooser
         '
         'SkinFolderButton
         '
-        Me.SkinFolderButton.Location = New System.Drawing.Point(58, 20)
+        Me.SkinFolderButton.Location = New System.Drawing.Point(55, 6)
         Me.SkinFolderButton.Name = "SkinFolderButton"
         Me.SkinFolderButton.Size = New System.Drawing.Size(75, 23)
         Me.SkinFolderButton.TabIndex = 14
@@ -176,7 +185,7 @@ Partial Class Filechooser
         '
         'CheckFontsButton
         '
-        Me.CheckFontsButton.Location = New System.Drawing.Point(49, 88)
+        Me.CheckFontsButton.Location = New System.Drawing.Point(46, 74)
         Me.CheckFontsButton.Name = "CheckFontsButton"
         Me.CheckFontsButton.Size = New System.Drawing.Size(95, 23)
         Me.CheckFontsButton.TabIndex = 16
@@ -187,7 +196,7 @@ Partial Class Filechooser
         '
         Me.Label1.AutoSize = True
         Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(76, 201)
+        Me.Label1.Location = New System.Drawing.Point(73, 187)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(143, 16)
         Me.Label1.TabIndex = 17
@@ -203,7 +212,7 @@ Partial Class Filechooser
         '
         'CheckIncludesButton
         '
-        Me.CheckIncludesButton.Location = New System.Drawing.Point(49, 117)
+        Me.CheckIncludesButton.Location = New System.Drawing.Point(46, 103)
         Me.CheckIncludesButton.Name = "CheckIncludesButton"
         Me.CheckIncludesButton.Size = New System.Drawing.Size(95, 23)
         Me.CheckIncludesButton.TabIndex = 19
@@ -212,17 +221,18 @@ Partial Class Filechooser
         '
         'IndentingDropDown
         '
+        Me.IndentingDropDown.BackColor = System.Drawing.SystemColors.Control
         Me.IndentingDropDown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.IndentingDropDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.IndentingDropDown.ImeMode = System.Windows.Forms.ImeMode.Off
-        Me.IndentingDropDown.Location = New System.Drawing.Point(10, 284)
+        Me.IndentingDropDown.Location = New System.Drawing.Point(7, 270)
         Me.IndentingDropDown.Name = "IndentingDropDown"
         Me.IndentingDropDown.Size = New System.Drawing.Size(121, 21)
         Me.IndentingDropDown.TabIndex = 20
         '
         'Button2
         '
-        Me.Button2.Location = New System.Drawing.Point(79, 465)
+        Me.Button2.Location = New System.Drawing.Point(76, 451)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(154, 23)
         Me.Button2.TabIndex = 21
@@ -231,7 +241,7 @@ Partial Class Filechooser
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(79, 511)
+        Me.Button3.Location = New System.Drawing.Point(76, 487)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(154, 23)
         Me.Button3.TabIndex = 22
@@ -240,7 +250,7 @@ Partial Class Filechooser
         '
         'Button4
         '
-        Me.Button4.Location = New System.Drawing.Point(79, 554)
+        Me.Button4.Location = New System.Drawing.Point(76, 523)
         Me.Button4.Name = "Button4"
         Me.Button4.Size = New System.Drawing.Size(154, 23)
         Me.Button4.TabIndex = 23
@@ -249,17 +259,18 @@ Partial Class Filechooser
         '
         'EOLComboBox
         '
+        Me.EOLComboBox.BackColor = System.Drawing.SystemColors.Control
         Me.EOLComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.EOLComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.EOLComboBox.ImeMode = System.Windows.Forms.ImeMode.Off
-        Me.EOLComboBox.Location = New System.Drawing.Point(10, 323)
+        Me.EOLComboBox.Location = New System.Drawing.Point(7, 309)
         Me.EOLComboBox.Name = "EOLComboBox"
         Me.EOLComboBox.Size = New System.Drawing.Size(121, 21)
         Me.EOLComboBox.TabIndex = 24
         '
         'AnimationMultiplier
         '
-        Me.AnimationMultiplier.Location = New System.Drawing.Point(290, 249)
+        Me.AnimationMultiplier.Location = New System.Drawing.Point(287, 235)
         Me.AnimationMultiplier.Name = "AnimationMultiplier"
         Me.AnimationMultiplier.Size = New System.Drawing.Size(37, 20)
         Me.AnimationMultiplier.TabIndex = 25
@@ -268,7 +279,7 @@ Partial Class Filechooser
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(154, 243)
+        Me.Label2.Location = New System.Drawing.Point(151, 229)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(111, 26)
         Me.Label2.TabIndex = 26
@@ -276,7 +287,7 @@ Partial Class Filechooser
         '
         'CheckBracketsButton
         '
-        Me.CheckBracketsButton.Location = New System.Drawing.Point(166, 88)
+        Me.CheckBracketsButton.Location = New System.Drawing.Point(163, 74)
         Me.CheckBracketsButton.Name = "CheckBracketsButton"
         Me.CheckBracketsButton.Size = New System.Drawing.Size(95, 23)
         Me.CheckBracketsButton.TabIndex = 27
@@ -285,7 +296,7 @@ Partial Class Filechooser
         '
         'CheckIDsButton
         '
-        Me.CheckIDsButton.Location = New System.Drawing.Point(166, 117)
+        Me.CheckIDsButton.Location = New System.Drawing.Point(163, 103)
         Me.CheckIDsButton.Name = "CheckIDsButton"
         Me.CheckIDsButton.Size = New System.Drawing.Size(95, 23)
         Me.CheckIDsButton.TabIndex = 28
@@ -304,7 +315,7 @@ Partial Class Filechooser
         '
         'CheckValuesButton
         '
-        Me.CheckValuesButton.Location = New System.Drawing.Point(166, 59)
+        Me.CheckValuesButton.Location = New System.Drawing.Point(163, 45)
         Me.CheckValuesButton.Name = "CheckValuesButton"
         Me.CheckValuesButton.Size = New System.Drawing.Size(95, 23)
         Me.CheckValuesButton.TabIndex = 30
@@ -313,7 +324,7 @@ Partial Class Filechooser
         '
         'CheckVarsButton
         '
-        Me.CheckVarsButton.Location = New System.Drawing.Point(49, 146)
+        Me.CheckVarsButton.Location = New System.Drawing.Point(46, 132)
         Me.CheckVarsButton.Name = "CheckVarsButton"
         Me.CheckVarsButton.Size = New System.Drawing.Size(95, 23)
         Me.CheckVarsButton.TabIndex = 31
@@ -322,7 +333,7 @@ Partial Class Filechooser
         '
         'CheckLabelsButton
         '
-        Me.CheckLabelsButton.Location = New System.Drawing.Point(166, 146)
+        Me.CheckLabelsButton.Location = New System.Drawing.Point(163, 132)
         Me.CheckLabelsButton.Name = "CheckLabelsButton"
         Me.CheckLabelsButton.Size = New System.Drawing.Size(95, 23)
         Me.CheckLabelsButton.TabIndex = 32
@@ -332,7 +343,7 @@ Partial Class Filechooser
         'AutoFixCheckBox
         '
         Me.AutoFixCheckBox.AutoSize = True
-        Me.AutoFixCheckBox.Location = New System.Drawing.Point(9, 359)
+        Me.AutoFixCheckBox.Location = New System.Drawing.Point(6, 345)
         Me.AutoFixCheckBox.Name = "AutoFixCheckBox"
         Me.AutoFixCheckBox.Size = New System.Drawing.Size(99, 17)
         Me.AutoFixCheckBox.TabIndex = 33
@@ -342,7 +353,7 @@ Partial Class Filechooser
         'ReorderButton
         '
         Me.ReorderButton.AutoSize = True
-        Me.ReorderButton.Location = New System.Drawing.Point(9, 379)
+        Me.ReorderButton.Location = New System.Drawing.Point(6, 365)
         Me.ReorderButton.Name = "ReorderButton"
         Me.ReorderButton.Size = New System.Drawing.Size(121, 17)
         Me.ReorderButton.TabIndex = 34
@@ -358,45 +369,106 @@ Partial Class Filechooser
         Me.ProgressBar1.Size = New System.Drawing.Size(678, 23)
         Me.ProgressBar1.TabIndex = 35
         '
+        'TabControl1
+        '
+        Me.TabControl1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.TabControl1.Controls.Add(Me.TabPage1)
+        Me.TabControl1.Controls.Add(Me.TabPage2)
+        Me.TabControl1.Location = New System.Drawing.Point(3, 2)
+        Me.TabControl1.Name = "TabControl1"
+        Me.TabControl1.SelectedIndex = 0
+        Me.TabControl1.Size = New System.Drawing.Size(343, 576)
+        Me.TabControl1.TabIndex = 36
+        '
+        'TabPage1
+        '
+        Me.TabPage1.Controls.Add(Me.SkinFolderButton)
+        Me.TabPage1.Controls.Add(Me.ReorderButton)
+        Me.TabPage1.Controls.Add(Me.ConvertButton)
+        Me.TabPage1.Controls.Add(Me.AutoFixCheckBox)
+        Me.TabPage1.Controls.Add(Me.xmlname)
+        Me.TabPage1.Controls.Add(Me.CheckLabelsButton)
+        Me.TabPage1.Controls.Add(Me.OutputButton)
+        Me.TabPage1.Controls.Add(Me.CheckVarsButton)
+        Me.TabPage1.Controls.Add(Me.OutputLabel)
+        Me.TabPage1.Controls.Add(Me.CheckValuesButton)
+        Me.TabPage1.Controls.Add(Me.ConversionDropDown)
+        Me.TabPage1.Controls.Add(Me.HeaderOption)
+        Me.TabPage1.Controls.Add(Me.CheckIDsButton)
+        Me.TabPage1.Controls.Add(Me.ConvertBorders)
+        Me.TabPage1.Controls.Add(Me.CheckBracketsButton)
+        Me.TabPage1.Controls.Add(Me.TextureCheckButton)
+        Me.TabPage1.Controls.Add(Me.Label2)
+        Me.TabPage1.Controls.Add(Me.CheckFontsButton)
+        Me.TabPage1.Controls.Add(Me.AnimationMultiplier)
+        Me.TabPage1.Controls.Add(Me.Label1)
+        Me.TabPage1.Controls.Add(Me.EOLComboBox)
+        Me.TabPage1.Controls.Add(Me.CheckIncludesButton)
+        Me.TabPage1.Controls.Add(Me.Button4)
+        Me.TabPage1.Controls.Add(Me.IndentingDropDown)
+        Me.TabPage1.Controls.Add(Me.Button3)
+        Me.TabPage1.Controls.Add(Me.Button2)
+        Me.TabPage1.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage1.Name = "TabPage1"
+        Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage1.Size = New System.Drawing.Size(335, 550)
+        Me.TabPage1.TabIndex = 0
+        Me.TabPage1.Text = "Main"
+        Me.TabPage1.UseVisualStyleBackColor = True
+        '
+        'TabPage2
+        '
+        Me.TabPage2.Controls.Add(Me.Label3)
+        Me.TabPage2.Controls.Add(Me.TreeView1)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage2.Name = "TabPage2"
+        Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage2.Size = New System.Drawing.Size(335, 550)
+        Me.TabPage2.TabIndex = 1
+        Me.TabPage2.Text = "Media"
+        Me.TabPage2.UseVisualStyleBackColor = True
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(60, 23)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(200, 13)
+        Me.Label3.TabIndex = 5
+        Me.Label3.Text = "Choose the media items to ignore in scan"
+        '
+        'TreeView1
+        '
+        Me.TreeView1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TreeView1.BackColor = System.Drawing.SystemColors.Control
+        Me.TreeView1.CheckBoxes = True
+        Me.TreeView1.Location = New System.Drawing.Point(0, 58)
+        Me.TreeView1.Name = "TreeView1"
+        Me.TreeView1.Size = New System.Drawing.Size(335, 492)
+        Me.TreeView1.TabIndex = 0
+        '
         'Filechooser
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(913, 619)
+        Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.ProgressBar1)
-        Me.Controls.Add(Me.ReorderButton)
-        Me.Controls.Add(Me.AutoFixCheckBox)
-        Me.Controls.Add(Me.CheckLabelsButton)
-        Me.Controls.Add(Me.CheckVarsButton)
-        Me.Controls.Add(Me.CheckValuesButton)
         Me.Controls.Add(Me.SaveButton)
-        Me.Controls.Add(Me.CheckIDsButton)
-        Me.Controls.Add(Me.CheckBracketsButton)
-        Me.Controls.Add(Me.Label2)
-        Me.Controls.Add(Me.AnimationMultiplier)
-        Me.Controls.Add(Me.EOLComboBox)
-        Me.Controls.Add(Me.Button4)
-        Me.Controls.Add(Me.Button3)
-        Me.Controls.Add(Me.Button2)
-        Me.Controls.Add(Me.IndentingDropDown)
-        Me.Controls.Add(Me.CheckIncludesButton)
         Me.Controls.Add(Me.Splitter1)
-        Me.Controls.Add(Me.Label1)
-        Me.Controls.Add(Me.CheckFontsButton)
         Me.Controls.Add(Me.ClearLogButton)
-        Me.Controls.Add(Me.SkinFolderButton)
-        Me.Controls.Add(Me.TextureCheckButton)
-        Me.Controls.Add(Me.ConvertBorders)
-        Me.Controls.Add(Me.HeaderOption)
-        Me.Controls.Add(Me.ConversionDropDown)
         Me.Controls.Add(Me.OutputLog)
-        Me.Controls.Add(Me.OutputLabel)
-        Me.Controls.Add(Me.OutputButton)
-        Me.Controls.Add(Me.xmlname)
-        Me.Controls.Add(Me.ConvertButton)
         Me.MinimumSize = New System.Drawing.Size(929, 657)
         Me.Name = "Filechooser"
-        Me.Text = "Skin XML Converter 1.2.4 - by phil65"
+        Me.Text = "Skin XML Converter 1.2.6 - by phil65"
+        Me.TabControl1.ResumeLayout(False)
+        Me.TabPage1.ResumeLayout(False)
+        Me.TabPage1.PerformLayout()
+        Me.TabPage2.ResumeLayout(False)
+        Me.TabPage2.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -437,5 +509,10 @@ Partial Class Filechooser
     Friend WithEvents ReorderButton As System.Windows.Forms.CheckBox
     Friend WithEvents BackgroundWorker1 As System.ComponentModel.BackgroundWorker
     Friend WithEvents ProgressBar1 As System.Windows.Forms.ProgressBar
+    Friend WithEvents TabControl1 As System.Windows.Forms.TabControl
+    Friend WithEvents TabPage2 As System.Windows.Forms.TabPage
+    Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
+    Friend WithEvents TreeView1 As System.Windows.Forms.TreeView
+    Friend WithEvents Label3 As System.Windows.Forms.Label
 
 End Class
